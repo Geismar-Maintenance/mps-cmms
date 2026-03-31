@@ -1,70 +1,119 @@
-// This adds a temporary bridge that attaches the correct headers for you
-const API_BASE_URL = "https://cors-anywhere.herokuapp.com/https://ep-restless-art-aejfppri.apirest.c-2.us-east-2.aws.neon.tech/neondb/rest/v1";
+// 1. DYNAMIC CONFIGURATION
+// Ensure this matches your Neon Project Settings > PostgREST URL
+const API_URL = "https://ep-restless-art-aejfppri.apirest.c-2.us-east-2.aws.neon.tech";
 
-// const API_BASE_URL = "https://ep-restless-art-aejfppri.apirest.c-2.us-east-2.aws.neon.tech/neondb/rest/v1";
+/**
+ * Main function to handle all database interactions.
+ * @param {string} table - The PostgreSQL table name (case-sensitive)
+ * @param {string} actionType - The logical action (e.g., 'addPart')
+ */
+async function dbAction(table, actionType) {
+    const token = sessionStorage.getItem('mps_token');
+    
+    if (!token) {
+        alert("No active session. Please log in with your JWT.");
+        location.reload();
+        return;
+    }
 
-// Helper function for API calls
-async function apiRequest(endpoint, method, data = null) {
-    const options = {
-        method: method,
-        headers: {
-            'Content-Type': 'application/json',
-            'Prefer': 'return=representation' // Tells PostgREST to return the created/updated row
-        }
-    };
-    if (data) options.body = JSON.stringify(data);
+    let payload = {};
 
+    // 2. DATA MAPPING (Matches your index.html IDs to Database Columns)
+    // IMPORTANT: PostgreSQL usually expects lowercase column names.
     try {
-        const response = await fetch(`${API_BASE_URL}/${endpoint}`, options);
-        if (!response.ok) throw new Error(await response.text());
-        return await response.json();
+        if (actionType === 'addPart') {
+            payload = {
+                partnumber: document.getElementById('p_no').value.trim(),
+                modelnumber: document.getElementById('p_model').value.trim(),
+                manufacturer: document.getElementById('p_mfg').value.trim(),
+                description: document.getElementById('p_desc').value.trim(),
+                unitcost: parseFloat(document.getElementById('p_cost').value) || 0
+            };
+        } 
+        else if (actionType === 'updateStock') {
+            payload = {
+                partnumber: document.getElementById('r_part').value.trim(),
+                facilityid: parseInt(document.getElementById('r_fac').value),
+                quantity: parseInt(document.getElementById('r_qty').value),
+                ownergroup: document.getElementById('r_owner').value,
+                binlocation: document.getElementById('r_bin').value.trim()
+            };
+        }
+        else if (actionType === 'addTech') {
+            payload = {
+                fullname: document.getElementById('t_name').value.trim(),
+                techlevel: document.getElementById('t_level').value,
+                contactemail: document.getElementById('t_email').value.trim(),
+                contactphone: document.getElementById('t_phone').value.trim()
+            };
+        }
+
+        // 3. THE API CALL
+        const response = await fetch(`${API_URL}/${table}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/vnd.pgrst.object+json',
+                'Prefer': 'return=representation',
+                'Content-Profile': 'public' // Explicitly targets the public schema
+            },
+            body: JSON.stringify(payload)
+        });
+
+        // 4. RESPONSE HANDLING
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Success:", data);
+            alert(`Record saved successfully to ${table}!`);
+            clearForm(actionType);
+        } else {
+            const errorData = await response.json();
+            console.error("Database Error:", errorData);
+            
+            // Specific error handling for industrial users
+            if (response.status === 401) {
+                alert("Session Expired or Invalid Token. Please log in again.");
+                logout();
+            } else if (response.status === 400) {
+                alert(`Data Error: ${errorData.message || 'Check column names and formatting.'}`);
+            } else {
+                alert(`System Error: ${errorData.hint || errorData.message}`);
+            }
+        }
     } catch (err) {
-        console.error("API Error:", err);
-        alert("Operation Failed: " + err.message);
+        console.error("Network/Connection Error:", err);
+        alert("Failed to connect to the database. Check your internet or CORS settings.");
     }
 }
 
-// 1. ADD MASTER PART
-async function addPart() {
-    const data = {
-        PartNumber: document.getElementById('p_no').value,
-        ModelNumber: document.getElementById('p_model').value,
-        Description: document.getElementById('p_desc').value,
-        Manufacturer: document.getElementById('p_mfg').value,
-        UnitCost: parseFloat(document.getElementById('p_cost').value)
-    };
-    
-    const res = await apiRequest('MasterParts', 'POST', data);
-    if (res) alert("Success: Part added to Global Catalog.");
+// Helper to clear forms after successful entry
+function clearForm(type) {
+    if (type === 'addPart') {
+        document.querySelectorAll('#pane-inv input, #pane-inv textarea').forEach(i => i.value = '');
+    }
 }
 
-// 2. ADD TECHNICIAN
-async function addTech() {
-    const data = { Username: document.getElementById('tech_name').value, Role: 'Mechanic' };
-    const res = await apiRequest('Users', 'POST', data);
-    if (res) alert("Success: Technician registered.");
+// Auth UI Helpers
+function saveToken() {
+    const token = document.getElementById('user-token').value.trim();
+    if (token.startsWith('ey')) {
+        sessionStorage.setItem('mps_token', token);
+        document.getElementById('auth-overlay').style.display = 'none';
+    } else {
+        document.getElementById('login-err').innerText = "Invalid JWT Format. Must start with 'ey'.";
+    }
 }
 
-// 3. CREATE WORK ORDER
-async function createWO() {
-    const data = {
-        AssetID: parseInt(document.getElementById('wo_asset').value),
-        Description: document.getElementById('wo_desc').value,
-        Status: 'Open'
-    };
-    const res = await apiRequest('WorkOrders', 'POST', data);
-    if (res) alert("Success: Work Order #" + res[0].WONumber + " is now Open.");
+function logout() {
+    sessionStorage.removeItem('mps_token');
+    location.reload();
 }
 
-// 4. ISSUE PART (Logic: Create a Transaction)
-// PostgREST handles the 'Insert'. To subtract from Inventory, 
-// we typically use a Database Trigger in Neon to keep it automated.
-async function issuePart() {
-    const data = {
-        PartNumber: document.getElementById('i_part').value,
-        WONumber: parseInt(document.getElementById('i_wo').value),
-        QtyChange: -Math.abs(parseInt(document.getElementById('i_qty').value)) // Force negative
-    };
-    const res = await apiRequest('Transactions', 'POST', data);
-    if (res) alert("Success: Part issued and stock transaction recorded.");
-}
+// Check auth status on load
+window.addEventListener('load', () => {
+    if (sessionStorage.getItem('mps_token')) {
+        const overlay = document.getElementById('auth-overlay');
+        if (overlay) overlay.style.display = 'none';
+    }
+});
