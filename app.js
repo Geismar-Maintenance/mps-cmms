@@ -1,7 +1,7 @@
 // 1. CONFIGURATION
 const API_URL = "https://ep-restless-art-aejfppri.apirest.c-2.us-east-2.aws.neon.tech/neondb/rest/v1";
 
-// This is the "Guest" token that identifies you as the 'anon' role we authorized in SQL
+// Ensure this token is valid for your Neon instance
 const GUEST_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiJpYXQiOjE1MTYyMzkwMjJ9.Q3Yn-ST6S-5v_9wX-9wX-9wX-9wX-9wX-9wX-9wX-9w";
 
 /**
@@ -13,7 +13,7 @@ async function dbAction(table, action) {
     let payload = {};
 
     try {
-        // 2. DATA MAPPING (Matches your new lowercase HTML IDs)
+        // 2. DATA MAPPING (Matches HTML IDs and DB Columns exactly: no underscores)
         if (action === 'addPart') {
             payload = {
                 partnumber: document.getElementById('partnumber').value.trim(),
@@ -21,7 +21,7 @@ async function dbAction(table, action) {
                 manufacturer: document.getElementById('manufacturer').value.trim(),
                 category: document.getElementById('category').value,
                 unitcost: parseFloat(document.getElementById('unitcost').value) || 0,
-                modelnumber: document.getElementById('modelnumber').value.trim(),
+                modelnumber: document.getElementById('modelnumber').value.trim()
             };
         }
 
@@ -32,18 +32,18 @@ async function dbAction(table, action) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${GUEST_TOKEN}`,
                 'Accept': 'application/json',
-                'Prefer': 'return=representation',
-                'Content-Profile': 'public'
+                'Prefer': 'return=minimal' // Essential to avoid "missing key id" errors
             },
             body: JSON.stringify(payload)
         });
 
         // 4. RESPONSE HANDLING
         if (response.ok) {
-            const data = await response.json();
-            console.log("Database Success:", data);
-            alert(`✅ Success! Record added to ${table}.`);
+            console.log("Database Success");
+            alert(`✅ Success! Part ${payload.partnumber} added to ${table}.`);
             clearForm();
+            // Refresh table if the function exists
+            if (typeof fetchTableData === 'function') fetchTableData(table);
         } else {
             const error = await response.json();
             console.error("Database Refusal:", error);
@@ -51,17 +51,17 @@ async function dbAction(table, action) {
         }
 
     } catch (err) {
-        // This is the "catch" block that was missing!
-        console.error("Connection Failed:", err);
-        alert("Could not connect to Neon. Check your internet or API URL.");
+        // Log the actual error to console so we can see if it's a code crash or a network issue
+        console.error("System Error:", err);
+        alert("Action failed. Check browser console (F12) for the specific error.");
     }
 }
 
 // UI Helper: Clears the form
 function clearForm() {
-    const ids = ['partnumber', 'description', 'manufacturer', 'modelnumber', 'unitcost', 'inventories', 'transactions'];
+    const ids = ['partnumber', 'description', 'manufacturer', 'modelnumber', 'unitcost'];
     ids.forEach(id => {
         const el = document.getElementById(id);
-        if(el) el.value = (id === 'unitcost' || id === 'inventories') ? '0' : '';
+        if(el) el.value = (id === 'unitcost') ? '0' : '';
     });
 }
