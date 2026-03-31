@@ -3,192 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MPS_CMMS | Secure Operations</title>
+    <title>MPS_CMMS | Industrial Maintenance</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; }
-        .navbar { background-color: #1e293b; border-bottom: 4px solid #3b82f6; }
-        .card { border: none; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
-        .section-title { color: #1e293b; font-weight: 700; border-left: 4px solid #2563eb; padding-left: 10px; margin-bottom: 20px; }
-        /* Auth Overlay Styles */
-        #auth-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(15, 23, 42, 0.95); z-index: 9999; 
-            display: flex; align-items: center; justify-content: center; 
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .navbar { background-color: #2c3e50; }
+        .card { border: none; border-radius: 10px; }
+        .nav-tabs .nav-link { color: #2c3e50; font-weight: 500; }
+        .nav-tabs .nav-link.active { background-color: #fff; border-bottom: 3px solid #3498db; }
+        #auth-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 9999; display: none;
+            align-items: center; justify-content: center;
         }
     </style>
 </head>
 <body>
 
-<div id="auth-overlay" Style="display: none;">
-    <div class="card p-4 text-center" style="width: 450px;">
-        <h3 class="mb-3">🔐 MPS_CMMS Login</h3>
-        <p class="text-muted small">Enter your Neon Service Role JWT to begin session.</p>
-        <input type="password" id="user-token" class="form-control mb-3" placeholder="Paste ey... token here">
-        <button onclick="saveToken()" class="btn btn-primary w-100">Connect to Database</button>
-        <div class="mt-3 small text-danger" id="login-err"></div>
-    </div>
-</div>
-
-<nav class="navbar navbar-dark py-3">
-    <div class="container justify-content-between">
-        <span class="navbar-brand mb-0 h1">⚙️ MPS_CMMS</span>
-        <button class="btn btn-outline-light btn-sm" onclick="logout()">Logout</button>
-    </div>
-</nav>
-
-<div class="container mt-4 pb-5">
-    <ul class="nav nav-pills nav-fill mb-4 bg-white p-2 rounded shadow-sm" id="mainTabs">
-        <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#pane-inv">📦 Inventory</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#pane-wo">🛠️ Work Orders</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#pane-admin">👥 Admin</button></li>
-    </ul>
-
-    <div class="tab-content">
-        <div class="tab-pane fade show active" id="pane-inv">
-            <div class="row">
-                <div class="col-lg-7">
-                    <div class="card p-4">
-                        <h5 class="section-title">Add Master Part</h5>
-                        <div class="row g-2">
-                            <div class="col-md-6"><label class="form-label">Part Number</label><input type="text" id="p_no" class="form-control"></div>
-                            <div class="col-md-6"><label class="form-label">Model Number</label><input type="text" id="p_model" class="form-control"></div>
-                            <div class="col-12"><label class="form-label">Manufacturer</label><input type="text" id="p_mfg" class="form-control"></div>
-                            <div class="col-12"><label class="form-label">Description</label><textarea id="p_desc" class="form-control" rows="2"></textarea></div>
-                            <div class="col-md-6"><label class="form-label">Unit Cost ($)</label><input type="number" step="0.01" id="p_cost" class="form-control"></div>
-                            <button onclick="dbAction('MasterParts', 'addPart')" class="btn btn-primary mt-3">Save Part</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-5">
-                    <div class="card p-4 border-top border-success border-4">
-                        <h5 class="section-title text-success">Stock Update</h5>
-                        <input type="text" id="r_part" class="form-control mb-2" placeholder="Part Number">
-                        <div class="row g-2 mb-2">
-                            <div class="col-6"><input type="number" id="r_fac" class="form-control" placeholder="Facility ID"></div>
-                            <div class="col-6"><input type="number" id="r_qty" class="form-control" placeholder="Qty +/-"></div>
-                        </div>
-                        <select id="r_owner" class="form-select mb-2"><option value="Local">Local</option><option value="COE">COE</option></select>
-                        <input type="text" id="r_bin" class="form-control mb-3" placeholder="Bin Location">
-                        <button onclick="dbAction('Inventory', 'updateStock')" class="btn btn-success w-100">Update Stock</button>
-                    </div>
-                </div>
-            </div>
+    <div id="auth-overlay">
+        <div class="card p-4 text-center shadow-lg" style="width: 400px;">
+            <h3 class="mb-3">🔐 System Login</h3>
+            <p class="text-muted small">Authentication bypass active for testing.</p>
+            <button onclick="document.getElementById('auth-overlay').style.display='none'" class="btn btn-primary w-100">Enter System</button>
         </div>
+    </div>
 
-        <div class="tab-pane fade" id="pane-wo">
-            <div class="card p-4">
+    <nav class="navbar navbar-dark shadow-sm mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <span class="fs-4 fw-bold">⚙️ MPS_CMMS</span>
+                <span class="badge bg-primary ms-2">BETA v1.2</span>
+            </a>
+            <div class="text-light small" id="connection-status">Connected to Neon DB</div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <ul class="nav nav-tabs mb-4" id="cmmsTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#parts-pane" type="button">📦 Master Parts</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#wo-pane" type="button">🛠️ Work Orders</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tech-pane" type="button">👥 Technicians</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="cmmsContent">
+            
+            <div class="tab-pane fade show active" id="parts-pane">
                 <div class="row">
-                    <div class="col-md-6 border-end">
-                        <h5 class="section-title">New Work Order</h5>
-                        <input type="number" id="wo_asset" class="form-control mb-2" placeholder="Asset ID">
-                        <input type="number" id="wo_tech" class="form-control mb-2" placeholder="Tech ID">
-                        <select id="wo_pri" class="form-select mb-2"><option value="Routine">Routine</option><option value="Urgent">Urgent</option><option value="Emergency">Emergency</option></select>
-                        <textarea id="wo_desc" class="form-control mb-3" placeholder="Problem..."></textarea>
-                        <button onclick="dbAction('WorkOrders', 'createWO')" class="btn btn-primary w-100">Open WO</button>
+                    <div class="col-lg-5">
+                        <div class="card shadow-sm p-4">
+                            <h5 class="card-title border-bottom pb-2 mb-3">Add New Master Part</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small">Part Number</label>
+                                    <input type="text" id="partnumber" class="form-control form-control-sm" placeholder="ID-123">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small">Model Number</label>
+                                    <input type="text" id="modelnumber" class="form-control form-control-sm">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small">Manufacturer</label>
+                                    <input type="text" id="manufacturer" class="form-control form-control-sm">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small">Category</label>
+                                    <select id="category" class="form-select form-select-sm">
+                                        <option value="Mechanical">Mechanical</option>
+                                        <option value="Electrical">Electrical</option>
+                                        <option value="Pneumatic">Pneumatic</option>
+                                        <option value="Lubrication">Lubrication</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small">Unit Cost ($)</label>
+                                    <input type="number" step="0.01" id="unitcost" class="form-control form-control-sm">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small">Description</label>
+                                    <textarea id="description" class="form-control form-control-sm" rows="2"></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small">In-Stock Qty</label>
+                                    <input type="number" id="inventories" class="form-control form-control-sm" value="0">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small">Initial Log</label>
+                                    <input type="text" id="transactions" class="form-control form-control-sm" value="Initial Setup">
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <button onclick="dbAction('masterparts', 'addPart')" class="btn btn-primary w-100 fw-bold">💾 Save to Database</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-7">
+                        <div class="card shadow-sm p-4">
+                            <h5 class="card-title border-bottom pb-2 mb-3">Live Inventory Preview</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Part #</th>
+                                            <th>Description</th>
+                                            <th>Qty</th>
+                                            <th>Cost</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="parts-table-body">
+                                        <tr><td colspan="4" class="text-center text-muted italic">Click refresh to load parts...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="tab-pane fade" id="pane-admin">
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="card p-4">
-                        <h5 class="section-title">New Technician</h5>
-                        <input type="text" id="t_name" class="form-control mb-2" placeholder="Full Name">
-                        <select id="t_level" class="form-select mb-2">
-                            <option value="Level I">Level I</option><option value="Level II">Level II</option><option value="Lead">Lead</option>
-                        </select>
-                        <input type="email" id="t_email" class="form-control mb-2" placeholder="Email">
-                        <input type="text" id="t_phone" class="form-control mb-3" placeholder="Phone">
-                        <button onclick="dbAction('Technicians', 'addTech')" class="btn btn-outline-primary w-100">Save Tech</button>
-                    </div>
+            <div class="tab-pane fade" id="wo-pane">
+                <div class="card shadow-sm p-5 text-center">
+                    <h4>🛠️ Work Order Module</h4>
+                    <p class="text-muted">Module currently in development. Link to 'workorders' table pending.</p>
                 </div>
             </div>
+
+            <div class="tab-pane fade" id="tech-pane">
+                <div class="card shadow-sm p-5 text-center">
+                    <h4>👥 Technician Management</h4>
+                    <p class="text-muted">Module currently in development. Link to 'technicians' table pending.</p>
+                </div>
+            </div>
+
         </div>
     </div>
-</div>
 
-<script>
-    const API_URL = "https://ep-restless-art-aejfppri.apirest.c-2.us-east-2.aws.neon.tech/neondb/rest/v1";
-
-    // 1. AUTH LOGIC: Save token to session (not hardcoded)
-    function saveToken() {
-        const token = document.getElementById('user-token').value;
-        if (token.startsWith('ey')) {
-            sessionStorage.setItem('mps_token', token);
-            document.getElementById('auth-overlay').style.display = 'none';
-        } else {
-            document.getElementById('login-err').innerText = "Invalid JWT Token format.";
-        }
-    }
-
-    function logout() {
-        sessionStorage.removeItem('mps_token');
-        location.reload();
-    }
-
-    // Check if logged in on load
-    if (sessionStorage.getItem('mps_token')) {
-        document.getElementById('auth-overlay').style.display = 'none';
-    }
-
-    // 2. DATABASE LOGIC
-    async function dbAction(table, type) {
-        const token = sessionStorage.getItem('mps_token');
-        let payload = {};
-
-        // Mapping
-        if (type === 'addPart') {
-            payload = {
-                PartNumber: document.getElementById('p_no').value,
-                ModelNumber: document.getElementById('p_model').value,
-                Manufacturer: document.getElementById('p_mfg').value,
-                Description: document.getElementById('p_desc').value,
-                UnitCost: parseFloat(document.getElementById('p_cost').value) || 0
-            };
-        } else if (type === 'updateStock') {
-            payload = {
-                PartNumber: document.getElementById('r_part').value,
-                FacilityID: parseInt(document.getElementById('r_fac').value),
-                Quantity: parseInt(document.getElementById('r_qty').value),
-                OwnerGroup: document.getElementById('r_owner').value,
-                BinLocation: document.getElementById('r_bin').value
-            };
-        } else if (type === 'addTech') {
-            payload = {
-                FullName: document.getElementById('t_name').value,
-                TechLevel: document.getElementById('t_level').value,
-                ContactEmail: document.getElementById('t_email').value,
-                ContactPhone: document.getElementById('t_phone').value
-            };
-        }
-
-        try {
-            const response = await fetch(`${API_URL}/${table}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                    'Prefer': 'return=representation'
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (response.ok) {
-                alert("Success!");
-            } else {
-                const err = await response.json();
-                alert("Error: " + err.message);
-                if(response.status === 401) logout();
-            }
-        } catch (e) {
-            alert("Connection Failed.");
-        }
-    }
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
