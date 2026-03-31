@@ -23,7 +23,6 @@ async function dbAction(table, action) {
                 unitcost: parseFloat(document.getElementById('unitcost').value) || 0,
                 modelnumber: document.getElementById('modelnumber').value.trim(),
                 inventories: parseInt(document.getElementById('inventories').value) || 0,
-                transactions: document.getElementById('transactions').value.trim()
             };
         }
 
