@@ -111,9 +111,9 @@ function logout() {
 }
 
 // Check auth status on load
-window.addEventListener('load', () => {
-    if (sessionStorage.getItem('mps_token')) {
-        const overlay = document.getElementById('auth-overlay');
-        if (overlay) overlay.style.display = 'none';
-    }
-});
+// window.addEventListener('load', () => {
+//     if (sessionStorage.getItem('mps_token')) {
+//         const overlay = document.getElementById('auth-overlay');
+//         if (overlay) overlay.style.display = 'none';
+//     }
+// });
