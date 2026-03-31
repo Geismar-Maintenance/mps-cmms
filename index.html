@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPS_CMMS | Industrial Operations Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        .navbar-dark { background-color: #1e293b; border-bottom: 4px solid #3b82f6; }
+        .card { border: none; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 1.5rem; }
+        .btn-primary { background-color: #2563eb; border: none; }
+        .btn-success { background-color: #10b981; border: none; }
+        .nav-pills .nav-link.active { background-color: #2563eb; font-weight: 600; }
+        .form-label { font-weight: 500; color: #475569; font-size: 0.85rem; margin-bottom: 0.25rem; }
+        .section-title { color: #1e293b; font-weight: 700; border-left: 4px solid #2563eb; padding-left: 10px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark mb-4">
+    <div class="container justify-content-center">
+        <span class="navbar-brand mb-0 h1">⚙️ MPS_CMMS COMMAND CENTER</span>
+    </div>
+</nav>
+
+<div class="container pb-5">
+    <ul class="nav nav-pills nav-fill mb-4 bg-white p-2 rounded shadow-sm" id="mainTabs" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#pane-inv">📦 Inventory & Parts</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#pane-wo">🛠️ Work Orders</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#pane-admin">👥 Personnel & Assets</button></li>
+    </ul>
+
+    <div class="tab-content">
+        
+        <div class="tab-pane fade show active" id="pane-inv">
+            <div class="row">
+                <div class="col-lg-7">
+                    <div class="card p-4">
+                        <h5 class="section-title">Add to Master Catalog</h5>
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Part Number (Internal)</label>
+                                <input type="text" id="p_no" class="form-control" placeholder="MPS-001">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Model Number (Mfg)</label>
+                                <input type="text" id="p_model" class="form-control" placeholder="1756-L81E">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Manufacturer</label>
+                                <input type="text" id="p_mfg" class="form-control" placeholder="Rockwell Automation">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Description</label>
+                                <textarea id="p_desc" class="form-control" rows="2" placeholder="ControlLogix 5580 Controller"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Unit Cost ($)</label>
+                                <input type="number" step="0.01" id="p_cost" class="form-control">
+                            </div>
+                            <div class="col-12 mt-3">
+                                <button onclick="cmmsAction('MasterParts', 'addPart')" class="btn btn-primary w-100">Save Part to Global Database</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="card p-4 border-top border-success border-4">
+                        <h5 class="section-title text-success" style="border-color: #10b981;">Stock Transaction</h5>
+                        <label class="form-label">Part Number</label>
+                        <input type="text" id="r_part" class="form-control mb-2">
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <label class="form-label">Facility ID</label>
+                                <input type="number" id="r_fac" class="form-control">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Quantity (+ / -)</label>
+                                <input type="number" id="r_qty" class="form-control">
+                            </div>
+                        </div>
+                        <label class="form-label">Ownership Group</label>
+                        <select id="r_owner" class="form-select mb-2">
+                            <option value="Local">Local (Site Expense)</option>
+                            <option value="COE">COE (Corporate Asset)</option>
+                        </select>
+                        <label class="form-label">Bin Location</label>
+                        <input type="text" id="r_bin" class="form-control mb-3" placeholder="A-01-05">
+                        <button onclick="cmmsAction('Inventory', 'updateStock')" class="btn btn-success w-100">Execute Transaction</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="pane-wo">
+            <div class="card p-4">
+                <div class="row">
+                    <div class="col-md-6 border-end">
+                        <h5 class="section-title">Open New Work Order</h5>
+                        <label class="form-label">Asset ID</label>
+                        <input type="number" id="wo_asset" class="form-control mb-2">
+                        <label class="form-label">Assigned Technician ID</label>
+                        <input type="number" id="wo_tech" class="form-control mb-2">
+                        <label class="form-label">Priority</label>
+                        <select id="wo_pri" class="form-select mb-2">
+                            <option value="Routine">Routine</option>
+                            <option value="Urgent">Urgent</option>
+                            <option value="Emergency">Emergency / Down</option>
+                        </select>
+                        <label class="form-label">Problem Description</label>
+                        <textarea id="wo_desc" class="form-control mb-3" rows="3"></textarea>
+                        <button onclick="cmmsAction('WorkOrders', 'createWO')" class="btn btn-primary w-100">Register Work Order</button>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="section-title" style="border-color: #1e293b;">Close Work Order</h5>
+                        <label class="form-label">WO Number</label>
+                        <input type="number" id="c_wo" class="form-control mb-2">
+                        <label class="form-label">Resolution Notes</label>
+                        <textarea id="c_notes" class="form-control mb-3" rows="5" placeholder="What was fixed?"></textarea>
+                        <button onclick="cmmsAction('WorkOrders', 'closeWO')" class="btn btn-dark w-100">Finalize & Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="pane-admin">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card p-4">
+                        <h5 class="section-title">Register Technician</h5>
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="t_name" class="form-control mb-2">
+                        <label class="form-label">Skill Level</label>
+                        <select id="t_level" class="form-select mb-2">
+                            <option value="Level I">Level I (Junior)</option>
+                            <option value="Level II">Level II (Intermediate)</option>
+                            <option value="Level III">Level III (Senior)</option>
+                            <option value="Lead">Lead Mechanic</option>
+                        </select>
+                        <label class="form-label">Contact Email</label>
+                        <input type="email" id="t_email" class="form-control mb-2">
+                        <label class="form-label">Contact Phone</label>
+                        <input type="text" id="t_phone" class="form-control mb-3">
+                        <button onclick="cmmsAction('Technicians', 'addTech')" class="btn btn-outline-primary w-100">Save Technician</button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card p-4">
+                        <h5 class="section-title">Register Machine Asset</h5>
+                        <label class="form-label">Machine Name</label>
+                        <input type="text" id="a_name" class="form-control mb-2">
+                        <label class="form-label">Facility ID</label>
+                        <input type="number" id="a_fac" class="form-control mb-2">
+                        <label class="form-label">Department / Area</label>
+                        <input type="text" id="a_area" class="form-control mb-3">
+                        <button onclick="cmmsAction('Assets', 'addAsset')" class="btn btn-outline-primary w-100">Save Asset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- DATABASE CONFIGURATION ---
+    const API_URL = "https://ep-restless-art-aejfppri.apirest.c-2.us-east-2.aws.neon.tech/neondb/rest/v1";
+    
+    // REPLACE THIS with your actual JWT token from Neon Settings > API Keys
+    // const AUTH_TOKEN = "napi_gg02rl8w77pbchfg6z5k678b26lvxyqowarujuvgoq71e2lj083ujpboh8rf0gvz"; 
+
+    async function cmmsAction(table, type) {
+        let payload = {};
+        let method = "POST";
+        let finalUrl = `${API_URL}/${table}`;
+
+        try {
+            // Mapping Logic
+            if (type === 'addPart') {
+                payload = {
+                    PartNumber: document.getElementById('p_no').value,
+                    ModelNumber: document.getElementById('p_model').value,
+                    Manufacturer: document.getElementById('p_mfg').value,
+                    Description: document.getElementById('p_desc').value,
+                    UnitCost: parseFloat(document.getElementById('p_cost').value) || 0
+                };
+            } 
+            else if (type === 'updateStock') {
+                payload = {
+                    PartNumber: document.getElementById('r_part').value,
+                    FacilityID: parseInt(document.getElementById('r_fac').value),
+                    Quantity: parseInt(document.getElementById('r_qty').value),
+                    OwnerGroup: document.getElementById('r_owner').value,
+                    BinLocation: document.getElementById('r_bin').value
+                };
+            }
+            else if (type === 'addTech') {
+                payload = {
+                    FullName: document.getElementById('t_name').value,
+                    TechLevel: document.getElementById('t_level').value,
+                    ContactEmail: document.getElementById('t_email').value,
+                    ContactPhone: document.getElementById('t_phone').value
+                };
+            }
+            else if (type === 'addAsset') {
+                payload = {
+                    AssetName: document.getElementById('a_name').value,
+                    FacilityID: parseInt(document.getElementById('a_fac').value),
+                    Area: document.getElementById('a_area').value
+                };
+            }
+            else if (type === 'createWO') {
+                payload = {
+                    AssetID: parseInt(document.getElementById('wo_asset').value),
+                    TechID: parseInt(document.getElementById('wo_tech').value),
+                    Priority: document.getElementById('wo_pri').value,
+                    Description: document.getElementById('wo_desc').value,
+                    Status: 'Open'
+                };
+            }
+
+            // API Execution
+            const response = await fetch(finalUrl, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation',
+                    'Authorization': `Bearer ${AUTH_TOKEN}` // Authorization fix
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                alert(`Success: ${table} record updated.`);
+                // Optional: Clear forms here
+            } else {
+                const err = await response.json();
+                alert(`Error: ${err.message || JSON.stringify(err)}`);
+            }
+        } catch (error) {
+            alert("Connection Error: Check console and network settings.");
+            console.error(error);
+        }
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
