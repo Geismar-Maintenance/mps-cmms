@@ -13,15 +13,28 @@ async function dbAction(table, action) {
     let payload = {};
 
     try {
-        // 2. DATA MAPPING (Matches HTML IDs and DB Columns exactly: no underscores)
+        // 2. DATA MAPPING
+        // These IDs must match the 'id' attribute in your HTML EXACTLY
         if (action === 'addPart') {
+            const elPart = document.getElementById('partnumber');
+            const elDesc = document.getElementById('description');
+            const elManu = document.getElementById('manufacturer');
+            const elCat  = document.getElementById('category');
+            const elCost = document.getElementById('unitcost');
+            const elMod  = document.getElementById('modelnumber');
+
+            // Safety check: If any element is missing, stop and alert
+            if (!elPart || !elDesc || !elManu || !elCat || !elCost || !elMod) {
+                throw new Error("One or more form fields are missing from the HTML.");
+            }
+
             payload = {
-                partnumber: document.getElementById('partnumber').value.trim(),
-                description: document.getElementById('description').value.trim(),
-                manufacturer: document.getElementById('manufacturer').value.trim(),
-                category: document.getElementById('category').value,
-                unitcost: parseFloat(document.getElementById('unitcost').value) || 0,
-                modelnumber: document.getElementById('modelnumber').value.trim()
+                partnumber: elPart.value.trim(),
+                description: elDesc.value.trim(),
+                manufacturer: elManu.value.trim(),
+                category: elCat.value,
+                unitcost: parseFloat(elCost.value) || 0,
+                modelnumber: elMod.value.trim()
             };
         }
 
@@ -32,7 +45,7 @@ async function dbAction(table, action) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${GUEST_TOKEN}`,
                 'Accept': 'application/json',
-                'Prefer': 'return=minimal' // Essential to avoid "missing key id" errors
+                'Prefer': 'return=minimal' 
             },
             body: JSON.stringify(payload)
         });
@@ -42,8 +55,6 @@ async function dbAction(table, action) {
             console.log("Database Success");
             alert(`✅ Success! Part ${payload.partnumber} added to ${table}.`);
             clearForm();
-            // Refresh table if the function exists
-            if (typeof fetchTableData === 'function') fetchTableData(table);
         } else {
             const error = await response.json();
             console.error("Database Refusal:", error);
@@ -51,9 +62,8 @@ async function dbAction(table, action) {
         }
 
     } catch (err) {
-        // Log the actual error to console so we can see if it's a code crash or a network issue
-        console.error("System Error:", err);
-        alert("Action failed. Check browser console (F12) for the specific error.");
+        console.error("System Error Details:", err);
+        alert(`Action failed: ${err.message}`);
     }
 }
 
