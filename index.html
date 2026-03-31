@@ -8,12 +8,12 @@
     <style>
         body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .navbar { background-color: #2c3e50; }
-        .card { border: none; border-radius: 10px; transition: transform 0.2s; }
-        .nav-tabs .nav-link { color: #2c3e50; font-weight: 500; border: none; }
-        .nav-tabs .nav-link.active { background-color: transparent; border-bottom: 3px solid #3498db; color: #3498db; }
+        .card { border: none; border-radius: 10px; }
+        .nav-tabs .nav-link { color: #2c3e50; font-weight: 500; }
+        .nav-tabs .nav-link.active { background-color: #fff; border-bottom: 3px solid #3498db; }
         #auth-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 9999; display: flex;
+            background: rgba(0,0,0,0.8); z-index: 9999; display: flex;
             align-items: center; justify-content: center;
         }
     </style>
@@ -21,54 +21,49 @@
 <body>
 
     <div id="auth-overlay">
-        <div class="card p-4 text-center shadow-lg" style="width: 350px;">
+        <div class="card p-4 text-center shadow-lg" style="width: 400px;">
             <h3 class="mb-3">🔐 System Login</h3>
-            <p class="text-muted small">Standard Authentication active.</p>
-            <button onclick="document.getElementById('auth-overlay').style.display='none'" class="btn btn-primary w-100 fw-bold">Enter System</button>
+            <p class="text-muted small">Authentication bypass active for testing.</p>
+            <button onclick="document.getElementById('auth-overlay').style.display='none'" class="btn btn-primary w-100">Enter System</button>
         </div>
     </div>
 
     <nav class="navbar navbar-dark shadow-sm mb-4">
-        <div class="container">
+        <div class="container-fluid">
             <a class="navbar-brand d-flex align-items-center" href="#">
                 <span class="fs-4 fw-bold">⚙️ MPS_CMMS</span>
-                <span class="badge bg-info ms-2" style="font-size: 0.6em;">v1.2</span>
+                <span class="badge bg-primary ms-2">BETA v1.2</span>
             </a>
-            <div id="db-indicator" class="text-light small">
-                <span class="spinner-grow spinner-grow-sm text-success me-1"></span> Neon DB Online
-            </div>
+            <div class="text-light small" id="connection-status">Connected to Neon DB</div>
         </div>
     </nav>
 
     <div class="container">
         <ul class="nav nav-tabs mb-4" id="cmmsTabs" role="tablist">
             <li class="nav-item">
-                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#parts-pane">📦 Master Parts</button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#wo-pane">🛠️ Work Orders</button>
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#parts-pane" type="button">📦 Master Parts</button>
             </li>
         </ul>
 
-        <div class="tab-content">
+        <div class="tab-content" id="cmmsContent">
             <div class="tab-pane fade show active" id="parts-pane">
                 <div class="row">
-                    <div class="col-lg-5 mb-4">
+                    <div class="col-lg-5">
                         <div class="card shadow-sm p-4">
-                            <h5 class="card-title border-bottom pb-2 mb-3 text-primary">Register New Part</h5>
+                            <h5 class="card-title border-bottom pb-2 mb-3 text-primary">Add New Master Part</h5>
                             <form id="partsForm" onsubmit="event.preventDefault(); dbAction('masterparts', 'addPart');">
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label for="part_number" class="form-label small fw-bold">Part Number</label>
-                                        <input type="text" id="part_number" class="form-control form-control-sm" placeholder="e.g. BE-6205" required>
+                                        <label for="partnumber" class="form-label small fw-bold">Part Number</label>
+                                        <input type="text" id="partnumber" class="form-control form-control-sm" placeholder="ID-123" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="model_number" class="form-label small fw-bold">Model Number</label>
-                                        <input type="text" id="model_number" class="form-control form-control-sm">
+                                        <label for="modelnumber" class="form-label small fw-bold">Model Number</label>
+                                        <input type="text" id="modelnumber" class="form-control form-control-sm">
                                     </div>
                                     <div class="col-12">
-                                        <label for="description" class="form-label small fw-bold">Description</label>
-                                        <input type="text" id="description" class="form-control form-control-sm" required>
+                                        <label for="manufacturer" class="form-label small fw-bold">Manufacturer</label>
+                                        <input type="text" id="manufacturer" class="form-control form-control-sm">
                                     </div>
                                     <div class="col-md-6">
                                         <label for="category" class="form-label small fw-bold">Category</label>
@@ -76,22 +71,19 @@
                                             <option value="Mechanical">Mechanical</option>
                                             <option value="Electrical">Electrical</option>
                                             <option value="Pneumatic">Pneumatic</option>
-                                            <option value="Hydraulic">Hydraulic</option>
                                             <option value="Lubrication">Lubrication</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="unit_cost" class="form-label small fw-bold">Unit Cost ($)</label>
-                                        <input type="number" step="0.01" id="unit_cost" class="form-control form-control-sm" value="0.00">
+                                        <label for="unitcost" class="form-label small fw-bold">Unit Cost ($)</label>
+                                        <input type="number" step="0.01" id="unitcost" class="form-control form-control-sm" value="0.00">
                                     </div>
-                                    <div class="col-md-12">
-                                        <label for="manufacturer" class="form-label small fw-bold">Manufacturer</label>
-                                        <input type="text" id="manufacturer" class="form-control form-control-sm">
+                                    <div class="col-12">
+                                        <label for="description" class="form-label small fw-bold">Description</label>
+                                        <textarea id="description" class="form-control form-control-sm" rows="2" required></textarea>
                                     </div>
                                     <div class="col-12 mt-4">
-                                        <button type="submit" class="btn btn-primary w-100 shadow-sm fw-bold">
-                                            💾 Commit to Master Table
-                                        </button>
+                                        <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">💾 Save to Database</button>
                                     </div>
                                 </div>
                             </form>
@@ -100,34 +92,26 @@
                     
                     <div class="col-lg-7">
                         <div class="card shadow-sm p-4">
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
-                                <h5 class="card-title mb-0">Live Inventory List</h5>
-                                <button onclick="fetchTableData('masterparts')" class="btn btn-sm btn-outline-secondary">🔄 Refresh</button>
+                            <div class="d-flex justify-content-between border-bottom pb-2 mb-3">
+                                <h5 class="card-title">Inventory Preview</h5>
+                                <button onclick="location.reload()" class="btn btn-sm btn-outline-secondary">🔄 Refresh</button>
                             </div>
-                            <div class="table-responsive" style="max-height: 500px;">
-                                <table class="table table-hover align-middle small">
-                                    <thead class="table-light sticky-top">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
                                         <tr>
                                             <th>Part #</th>
                                             <th>Description</th>
-                                            <th>Qty</th>
                                             <th>Cost</th>
                                         </tr>
                                     </thead>
                                     <tbody id="parts-table-body">
-                                        </tbody>
+                                        <tr><td colspan="3" class="text-center text-muted">Awaiting database connection...</td></tr>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="wo-pane">
-                <div class="text-center p-5">
-                    <img src="https://cdn-icons-png.flaticon.com/512/609/609034.png" width="80" class="mb-3 opacity-50">
-                    <h5>Work Order Module</h5>
-                    <p class="text-muted">Linking to <code>workorders</code> table...</p>
                 </div>
             </div>
         </div>
