@@ -22,7 +22,6 @@ async function dbAction(table, action) {
                 category: document.getElementById('category').value,
                 unitcost: parseFloat(document.getElementById('unitcost').value) || 0,
                 modelnumber: document.getElementById('modelnumber').value.trim(),
-                inventories: parseInt(document.getElementById('inventories').value) || 0,
             };
         }
 
