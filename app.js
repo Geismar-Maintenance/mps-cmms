@@ -1,9 +1,3 @@
-To get your CMMS fully operational on GitHub Pages using the anon role we just authorized, we need to rewrite app.js to handle the "Guest" authentication automatically.
-
-This version removes the manual login requirement and uses the Static JWT that tells Neon: "I am the anonymous user you just gave permissions to."
-
-The Updated app.js (Testing Mode)
-JavaScript
 // 1. CONFIGURATION
 const API_URL = "https://ep-restless-art-aejfppri.apirest.c-2.us-east-2.aws.neon.tech";
 
