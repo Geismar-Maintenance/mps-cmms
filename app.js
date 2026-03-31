@@ -1,77 +1,51 @@
-// 1. CONFIGURATION
+// 1. CONFIGURATION (No trailing slash here to avoid the double-slash error)
 const API_URL = "https://ep-restless-art-aejfppri.apirest.c-2.us-east-2.aws.neon.tech/neondb/rest/v1";
+const GUEST_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiJpYXQiOjE1MTYyMzkwMjJ9.Q3Yn-ST6S-5v_9wX-9wX-9wX-9wX-9wX-9wX-9wX-9w"; 
 
-// Ensure this token is valid for your Neon instance
-const GUEST_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiJpYXQiOjE1MTYyMzkwMjJ9.Q3Yn-ST6S-5v_9wX-9wX-9wX-9wX-9wX-9wX-9wX-9w";
-
-/**
- * Main Database Controller
- */
 async function dbAction(table, action) {
-    console.log(`Attempting to save to ${table}...`);
-    
-    let payload = {};
-
     try {
-        // 2. DATA MAPPING
-        // These IDs must match the 'id' attribute in your HTML EXACTLY
-        if (action === 'addPart') {
-            const elPart = document.getElementById('partnumber');
-            const elDesc = document.getElementById('description');
-            const elManu = document.getElementById('manufacturer');
-            const elCat  = document.getElementById('category');
-            const elCost = document.getElementById('unitcost');
-            const elMod  = document.getElementById('modelnumber');
+        // 2. PAYLOAD MAPPING (Matches your HTML IDs and DB columns)
+        const payload = {
+            partnumber: document.getElementById('partnumber').value.trim(),
+            description: document.getElementById('description').value.trim(),
+            manufacturer: document.getElementById('manufacturer').value.trim(),
+            category: document.getElementById('category').value,
+            unitcost: parseFloat(document.getElementById('unitcost').value) || 0,
+            modelnumber: document.getElementById('modelnumber').value.trim()
+        };
 
-            // Safety check: If any element is missing, stop and alert
-            if (!elPart || !elDesc || !elManu || !elCat || !elCost || !elMod) {
-                throw new Error("One or more form fields are missing from the HTML.");
-            }
-
-            payload = {
-                partnumber: elPart.value.trim(),
-                description: elDesc.value.trim(),
-                manufacturer: elManu.value.trim(),
-                category: elCat.value,
-                unitcost: parseFloat(elCost.value) || 0,
-                modelnumber: elMod.value.trim()
-            };
-        }
-
-        // 3. THE API CALL
+        // 3. THE FETCH (Notice the single forward slash between URL and table)
         const response = await fetch(`${API_URL}/${table}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${GUEST_TOKEN}`,
                 'Accept': 'application/json',
-                'Prefer': 'return=minimal' 
+                'Prefer': 'return=minimal' // This bypasses the "missing key id" error
             },
             body: JSON.stringify(payload)
         });
 
-        // 4. RESPONSE HANDLING
         if (response.ok) {
-            console.log("Database Success");
-            alert(`✅ Success! Part ${payload.partnumber} added to ${table}.`);
-            clearForm();
+            alert("✅ Success! Part saved to Neon.");
+            document.getElementById('partsForm').reset();
         } else {
-            const error = await response.json();
-            console.error("Database Refusal:", error);
-            alert(`❌ Database Error: ${error.message}`);
+            const errData = await response.json();
+            console.error("Database Error:", errData);
+            alert(`❌ Error: ${errData.message}`);
         }
-
     } catch (err) {
-        console.error("System Error Details:", err);
-        alert(`Action failed: ${err.message}`);
+        console.error("Network/Fetch Error:", err);
+        alert("Fetch failed. Check the console (F12) for CORS or URL errors.");
     }
 }
 
-// UI Helper: Clears the form
-function clearForm() {
-    const ids = ['partnumber', 'description', 'manufacturer', 'modelnumber', 'unitcost'];
-    ids.forEach(id => {
-        const el = document.getElementById(id);
-        if(el) el.value = (id === 'unitcost') ? '0' : '';
-    });
-}
+// 4. EVENT LISTENER (The "Bulletproof" way to handle the button click)
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('partsForm');
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault(); // Prevents the page from refreshing and killing the fetch
+            dbAction('masterparts', 'addPart');
+        });
+    }
