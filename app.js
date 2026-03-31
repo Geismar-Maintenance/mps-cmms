@@ -18,17 +18,16 @@ async function dbAction(table, action) {
     try {
         if (action === 'addPart') {
     payload = {
-        // EXACT match to your database column names
+        // Left side MUST match Neon column names exactly
+        // Right side MUST match your HTML input IDs
         partnumber: document.getElementById('p_no').value.trim(),
         description: document.getElementById('p_desc').value.trim(),
         manufacturer: document.getElementById('p_mfg').value.trim(),
-        category: document.getElementById('p_cat').value, // Added category
+        category: "General", // Use a default if you don't have a p_cat input yet
         unitcost: parseFloat(document.getElementById('p_cost').value) || 0,
         modelnumber: document.getElementById('p_model').value.trim(),
-        
-        // If these are simple count/note columns in the same table:
-        inventories: parseInt(document.getElementById('p_inv').value) || 0,
-        transactions: "Initial Entry" // Or a string/count depending on your column type
+        inventories: parseInt(document.getElementById('p_inv')?.value) || 0,
+        transactions: "Initial Setup" 
     };
 }
             };
