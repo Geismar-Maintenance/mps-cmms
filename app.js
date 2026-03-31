@@ -53,7 +53,7 @@ async function dbAction(table, actionType) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                // 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/vnd.pgrst.object+json',
                 'Prefer': 'return=representation',
                 'Content-Profile': 'public' // Explicitly targets the public schema
