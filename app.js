@@ -33,7 +33,7 @@ async function dbAction(table, action) {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${GUEST_TOKEN}`,
-                'Accept': 'application/vnd.pgrst.object+json',
+                'Accept': 'application/json',
                 'Prefer': 'return=representation',
                 'Content-Profile': 'public'
             },
