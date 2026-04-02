@@ -4,82 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MPS-CMMS | Operations Portal</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
+    <link rel="stylesheet" href="https://unpkg.com/@neondatabase/neon-js@latest/dist/ui.css">
+    <script src="https://unpkg.com/@neondatabase/neon-js@latest/dist/index.bundle.js"></script>
+
     <style>
         :root { --sidebar-width: 260px; }
+        body { background-color: #1a1d20; margin: 0; padding: 0; transition: background-color 0.4s ease; font-family: system-ui, -apple-system, sans-serif; }
         
-        /* Default State: Auth Background */
-        body { 
-            background-color: #1a1d20; 
-            margin: 0; 
-            padding: 0; 
-            transition: background-color 0.4s ease;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
+        /* Auth Container */
+        #auth-container { height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center; z-index: 2000; }
+        #neon-auth-ui { width: 100%; max-width: 420px; background: #ffffff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); min-height: 350px; }
 
-        /* 1. AUTHENTICATION UI */
-        #auth-container { 
-            height: 100vh; 
-            width: 100vw; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 2000;
-        }
-
-        #neon-auth-ui { 
-            width: 100%; 
-            max-width: 400px; 
-            background: #ffffff; 
-            padding: 2rem; 
-            border-radius: 12px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        /* 2. APP UI (Hidden until login) */
+        /* Hidden elements until Login */
         #sidebar, #main-content { display: none; }
 
-        /* 3. LOGGED-IN STATE */
+        /* Active App State */
         .active-app { background-color: #f4f7f6; }
-        
         .active-app #auth-container { display: none !important; }
-        
-        .active-app #sidebar { 
-            display: flex; 
-            width: var(--sidebar-width); 
-            height: 100vh; 
-            position: fixed; 
-            background: #212529; 
-            color: white;
-            flex-direction: column;
-            z-index: 1000;
-        }
+        .active-app #sidebar { display: flex; width: var(--sidebar-width); height: 100vh; position: fixed; background: #212529; color: white; flex-direction: column; z-index: 1000; }
+        .active-app #main-content { display: block; margin-left: var(--sidebar-width); padding: 40px; min-height: 100vh; }
 
-        .active-app #main-content { 
-            display: block; 
-            margin-left: var(--sidebar-width); 
-            padding: 40px;
-            min-height: 100vh;
-        }
-
-        /* Sidebar Styling */
-        .nav-link { color: #adb5bd; cursor: pointer; transition: 0.2s; border-radius: 6px; margin: 4px 0; }
+        .nav-link { color: #adb5bd; cursor: pointer; border-radius: 6px; margin: 4px 0; }
         .nav-link:hover, .nav-link.active { color: #fff; background: #343a40; }
-        
-        .module-section { display: none; animation: fadeIn 0.4s ease; }
-        .module-section.active { display: block; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .module-section { display: none; }
+        .module-section.active { display: block; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body id="app-body">
 
     <div id="auth-container">
-        <div id="neon-auth-ui" class="text-center">
-            <div class="spinner-border text-primary mb-3" role="status"></div>
-            <p class="text-dark fw-bold">Initializing Secure Session...</p>
+        <div id="neon-auth-ui" class="text-center d-flex flex-column justify-content-center">
+            <div class="spinner-border text-primary mx-auto mb-3" role="status"></div>
+            <p class="text-dark fw-bold mb-0">Connecting to MPS Secure Gateway...</p>
         </div>
     </div>
 
@@ -88,145 +49,40 @@
             <h4 class="fw-bold text-primary mb-0">MPS-CMMS</h4>
             <small class="text-muted">Industrial Operations</small>
         </div>
-        
         <ul class="nav nav-pills flex-column mb-auto">
-            <li class="nav-item">
-                <a class="nav-link active" id="nav-wo" onclick="switchModule('wo-mgmt')" role="button">
-                    <i class="bi bi-tools me-2"></i> Work Orders
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="nav-parts" onclick="switchModule('part-mgmt')" role="button">
-                    <i class="bi bi-gear-wide-connected me-2"></i> Master Parts
-                </a>
-            </li>
+            <li class="nav-item"><a class="nav-link active" onclick="switchModule('wo-mgmt')" id="link-wo"><i class="bi bi-tools me-2"></i> Work Orders</a></li>
+            <li class="nav-item"><a class="nav-link" onclick="switchModule('part-mgmt')" id="link-parts"><i class="bi bi-gear-wide-connected me-2"></i> Master Parts</a></li>
         </ul>
-        
         <hr class="text-secondary">
-        <div class="d-grid gap-2">
-            <button class="btn btn-outline-danger btn-sm" onclick="handleSignOut()">
-                <i class="bi bi-box-arrow-left me-2"></i>Sign Out
-            </button>
-        </div>
+        <button class="btn btn-outline-danger btn-sm w-100" onclick="handleSignOut()">Sign Out</button>
     </nav>
 
     <main id="main-content">
-        <header class="d-flex justify-content-between align-items-center mb-5 border-bottom pb-3">
-            <div>
-                <h2 id="module-title" class="fw-bold mb-0 text-dark">Work Order Management</h2>
-                <p class="text-muted small mb-0">Real-time maintenance tracking</p>
-            </div>
-            <button class="btn btn-primary shadow-sm px-4 py-2" onclick="openCreateModal()">
-                <i class="bi bi-plus-circle me-2"></i>Add New Record
-            </button>
+        <header class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+            <h2 id="module-title" class="fw-bold m-0">Work Order Management</h2>
+            <button class="btn btn-primary shadow-sm" onclick="openAddModal()">Add New Record</button>
         </header>
 
         <section id="wo-mgmt" class="module-section active">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr><th>WO#</th><th>Asset</th><th>Description</th><th>Priority</th><th>Status</th><th>Actions</th></tr>
-                            </thead>
-                            <tbody id="wo-table-body">
-                                </tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light"><tr><th>WO#</th><th>Asset</th><th>Description</th><th>Priority</th><th>Status</th></tr></thead>
+                    <tbody id="wo-table-body"></tbody>
+                </table>
             </div>
         </section>
 
         <section id="part-mgmt" class="module-section">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr><th>Part#</th><th>Manufacturer</th><th>Model</th><th>Stock Level</th><th>Actions</th></tr>
-                            </thead>
-                            <tbody id="parts-table-body">
-                                </tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light"><tr><th>Part#</th><th>Mfg</th><th>Model</th><th>Stock</th></tr></thead>
+                    <tbody id="parts-table-body"></tbody>
+                </table>
             </div>
         </section>
     </main>
 
-    <div class="modal fade" id="modalAddPart" tabindex="-1" aria-labelledby="modalAddPartLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title" id="modalAddPartLabel">New Master Part</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="formAddPart">
-                    <div class="modal-body row g-3">
-                        <div class="col-md-6">
-                            <label for="p_num" class="form-label small fw-bold">Part Number</label>
-                            <input type="text" id="p_num" class="form-control" name="PartNumber" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="p_mfg" class="form-label small fw-bold">Manufacturer</label>
-                            <input type="text" id="p_mfg" class="form-control" name="Manufacturer">
-                        </div>
-                        <div class="col-12">
-                            <label for="p_desc" class="form-label small fw-bold">Description</label>
-                            <textarea id="p_desc" class="form-control" name="Description" rows="2"></textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="p_cost" class="form-label small fw-bold">Cost ($)</label>
-                            <input type="number" step="0.01" id="p_cost" class="form-control" name="Cost">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="p_re" class="form-label small fw-bold">Reorder Level</label>
-                            <input type="number" id="p_re" class="form-control" name="ReorderLevel">
-                        </div>
-                    </div>
-                    <div class="modal-footer border-0">
-                        <button type="submit" class="btn btn-primary w-100 py-2">Save to Registry</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="modalAddWO" tabindex="-1" aria-labelledby="modalAddWOLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="modalAddWOLabel">Generate Work Order</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="formAddWO">
-                    <div class="modal-body row g-3">
-                        <div class="col-md-6">
-                            <label for="wo_a" class="form-label small fw-bold">Asset ID</label>
-                            <input type="number" id="wo_a" class="form-control" name="AssetID" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="wo_p" class="form-label small fw-bold">Priority</label>
-                            <select id="wo_p" class="form-select" name="Priority">
-                                <option value="High">High (Immediate)</option>
-                                <option value="Medium" selected>Medium (Standard)</option>
-                                <option value="Low">Low (Scheduled)</option>
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <label for="wo_d" class="form-label small fw-bold">Description of Issue</label>
-                            <textarea id="wo_d" class="form-control" name="Description" rows="3" required></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-0">
-                        <button type="submit" class="btn btn-primary w-100 py-2">Dispatch Work Order</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
