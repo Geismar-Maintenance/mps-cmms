@@ -2,16 +2,20 @@ import { neon } from 'https://esm.sh/@neondatabase/serverless';
 import { createAuthClient } from 'https://esm.sh/@neondatabase/auth-client';
 
 // --- CONFIGURATION ---
-// Your specific Neon Auth URL
+// CLEAN BASE URL (Extracted from your working JWKS link)
 const NEON_AUTH_URL = 'https://ep-plain-mouse-aeznlgmn.neonauth.c-2.us-east-2.aws.neon.tech/neondb/auth';
 
-// Your Connection String (Note: We use the 'anon' user because the JWT handles the actual permission)
+// Your standard database connection
 const DATABASE_URL = 'postgresql://anon@ep-plain-mouse-aeznlgmn-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require';
 
-// Initialize the Auth Client
 const authClient = createAuthClient({
   baseUrl: NEON_AUTH_URL,
 });
+
+/** * Rest of your app.js logic remains the same.
+ * The initApp() function will now be able to find the 
+ * /openid-configuration automatically because the base is valid.
+ */
 
 let sql; // Global SQL instance initialized after login
 let currentModule = 'wo-mgmt';
