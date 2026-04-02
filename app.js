@@ -1,37 +1,72 @@
 import { neon } from 'https://esm.sh/@neondatabase/serverless';
+import { createAuthClient } from 'https://esm.sh/@neondatabase/auth-client';
 
 // --- CONFIGURATION ---
-const DATABASE_URL = 'postgresql://anon@ep-plain-mouse-aeznlgmn-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
+// Your specific Neon Auth URL
+const NEON_AUTH_URL = 'https://ep-plain-mouse-aeznlgmn.neonauth.c-2.us-east-2.aws.neon.tech/neondb/auth';
 
-// --- STATE MANAGEMENT ---
+// Your Connection String (Note: We use the 'anon' user because the JWT handles the actual permission)
+const DATABASE_URL = 'postgresql://anon@ep-plain-mouse-aeznlgmn-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require';
+
+// Initialize the Auth Client
+const authClient = createAuthClient({
+  baseUrl: NEON_AUTH_URL,
+});
+
+let sql; // Global SQL instance initialized after login
 let currentModule = 'wo-mgmt';
 
-// --- CORE FUNCTIONS ---
+/**
+ * --- AUTHENTICATION & INITIALIZATION ---
+ */
+async function initApp() {
+    const session = await authClient.getSession();
 
-async function runQuery(query, params = []) {
-    const authToken = sessionStorage.getItem('neon_token');
-    if (!authToken) throw new Error("Not authenticated");
-    
-    const sql = neon(DATABASE_URL, { authToken });
-    return await sql(query, params);
+    if (session && session.accessToken) {
+        // 1. User is authenticated
+        document.getElementById('app-body').classList.add('active-app');
+        
+        // 2. Initialize the Serverless Driver with the JWT (Access Token)
+        sql = neon(DATABASE_URL, { authToken: session.accessToken });
+        
+        // 3. Load initial data
+        console.log("Authenticated successfully with Neon Auth.");
+        refreshData();
+    } else {
+        // 4. User is not logged in, render the Neon Sign-In UI
+        document.getElementById('app-body').classList.remove('active-app');
+        renderLoginUI();
+    }
 }
 
-const ui = {
-    hideAuth: () => document.getElementById('auth-overlay').style.setProperty('display', 'none', 'important'),
-    showModule: (id) => {
-        document.querySelectorAll('.module-section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        currentModule = id;
+function renderLoginUI() {
+    const container = document.getElementById('neon-auth-ui');
+    if (container) {
+        authClient.renderSignIn(container, {
+            onSuccess: () => {
+                console.log("Sign-in successful.");
+                initApp();
+            },
+        });
     }
+}
+
+// Global Sign Out Handler
+document.getElementById('btnSignOut').onclick = async () => {
+    await authClient.signOut();
+    sessionStorage.clear();
+    location.reload();
 };
 
-// --- DATABASE OPERATIONS ---
-
+/**
+ * --- DATA OPERATIONS ---
+ */
 async function refreshData() {
+    if (!sql) return;
+
     try {
         if (currentModule === 'wo-mgmt') {
-            const data = await runQuery('SELECT * FROM WorkOrders ORDER BY WOID DESC');
+            const data = await sql('SELECT * FROM WorkOrders ORDER BY WOID DESC');
             const tbody = document.getElementById('wo-table-body');
             tbody.innerHTML = data.map(wo => `
                 <tr>
@@ -42,10 +77,9 @@ async function refreshData() {
                     <td><span class="badge bg-info">${wo.status || 'New'}</span></td>
                     <td>${wo.duedate || '--'}</td>
                     <td><button class="btn btn-sm btn-outline-danger" onclick="window.deleteItem('WorkOrders', 'WOID', ${wo.woid})">Delete</button></td>
-                </tr>
-            `).join('');
+                </tr>`).join('');
         } else if (currentModule === 'part-mgmt') {
-            const data = await runQuery('SELECT * FROM MasterParts ORDER BY PartID DESC');
+            const data = await sql('SELECT * FROM MasterParts ORDER BY PartID DESC');
             const tbody = document.getElementById('parts-table-body');
             tbody.innerHTML = data.map(p => `
                 <tr>
@@ -55,85 +89,69 @@ async function refreshData() {
                     <td>$${p.cost}</td>
                     <td>${p.reorderlevel}</td>
                     <td><button class="btn btn-sm btn-outline-danger" onclick="window.deleteItem('MasterParts', 'PartID', ${p.partid})">Remove</button></td>
-                </tr>
-            `).join('');
+                </tr>`).join('');
         }
     } catch (err) {
-        console.error("Fetch Error:", err);
+        console.error("Database Fetch Error:", err);
     }
 }
 
-// Global delete handler
-window.deleteItem = async (table, col, id) => {
-    if (!confirm("Delete this record?")) return;
-    try {
-        await runQuery(`DELETE FROM ${table} WHERE ${col} = $1`, [id]);
-        refreshData();
-    } catch (err) { alert("Delete failed: " + err.message); }
-};
-
-// --- EVENT LISTENERS ---
-
-document.getElementById('btnConnect').addEventListener('click', () => {
-    const token = document.getElementById('db-token-input').value;
-    if (token.length > 50) {
-        sessionStorage.setItem('neon_token', token);
-        ui.hideAuth();
-        refreshData();
-    } else {
-        alert("Please enter a valid JWT token.");
-    }
-});
-
-// Navigation
-document.getElementById('nav-wo').onclick = () => { ui.showModule('wo-mgmt'); refreshData(); };
-document.getElementById('nav-part').onclick = () => { ui.showModule('part-mgmt'); refreshData(); };
-
-// Form Submissions
+/**
+ * --- FORM SUBMISSIONS ---
+ */
 document.getElementById('formAddPart').onsubmit = async (e) => {
     e.preventDefault();
-    const fd = new FormData(e.target);
-    const d = Object.fromEntries(fd.entries());
-    
+    const d = Object.fromEntries(new FormData(e.target));
     try {
-        await runQuery(
-            `INSERT INTO MasterParts (PartNumber, Manufacturer, Model, Description, Cost, ReorderLevel) 
-             VALUES ($1, $2, $3, $4, $5, $6)`,
-            [d.PartNumber, d.Manufacturer, d.Model, d.Description, parseFloat(d.Cost), parseInt(d.ReorderLevel)]
-        );
+        await sql('INSERT INTO MasterParts (PartNumber, Manufacturer, Description, Cost, ReorderLevel) VALUES ($1, $2, $3, $4, $5)', 
+        [d.PartNumber, d.Manufacturer, d.Description, parseFloat(d.Cost), parseInt(d.ReorderLevel)]);
+        
         bootstrap.Modal.getInstance(document.getElementById('modalAddPart')).hide();
         e.target.reset();
         refreshData();
-    } catch (err) { alert(err.message); }
+    } catch (err) { alert("Error saving part: " + err.message); }
 };
 
 document.getElementById('formAddWO').onsubmit = async (e) => {
     e.preventDefault();
-    const fd = new FormData(e.target);
-    const d = Object.fromEntries(fd.entries());
-    
+    const d = Object.fromEntries(new FormData(e.target));
     try {
-        await runQuery(
-            `INSERT INTO WorkOrders (AssetID, Description, Priority, WOType, DueDate) 
-             VALUES ($1, $2, $3, $4, $5)`,
-            [parseInt(d.AssetID), d.Description, d.Priority, d.WOType, d.DueDate]
-        );
+        await sql('INSERT INTO WorkOrders (AssetID, Description, Priority, DueDate) VALUES ($1, $2, $3, $4)', 
+        [parseInt(d.AssetID), d.Description, d.Priority, d.DueDate]);
+        
         bootstrap.Modal.getInstance(document.getElementById('modalAddWO')).hide();
         e.target.reset();
         refreshData();
-    } catch (err) { alert(err.message); }
+    } catch (err) { alert("Error generating WO: " + err.message); }
 };
 
-// Open Modals via Central Button
+/**
+ * --- UI NAVIGATION ---
+ */
+window.switchModule = (id) => {
+    document.querySelectorAll('.module-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    
+    document.getElementById(id).classList.add('active');
+    currentModule = id;
+    refreshData();
+};
+
 document.getElementById('btnAddRecord').onclick = () => {
     const modalId = currentModule === 'wo-mgmt' ? 'modalAddWO' : 'modalAddPart';
     const modalEl = document.getElementById(modalId);
-    modalEl.removeAttribute('aria-hidden'); // Fix focus error
+    modalEl.removeAttribute('aria-hidden'); 
     new bootstrap.Modal(modalEl).show();
 };
 
-// Auto-login check
-if (sessionStorage.getItem('neon_token')) {
-    ui.hideAuth();
-    refreshData();
-}
+// Global delete helper
+window.deleteItem = async (table, col, id) => {
+    if (!confirm("Are you sure you want to delete this record?")) return;
+    try {
+        await sql(`DELETE FROM ${table} WHERE ${col} = $1`, [id]);
+        refreshData();
+    } catch (err) { alert("Delete failed: " + err.message); }
+};
+
+// Start the Auth Check
+initApp();
