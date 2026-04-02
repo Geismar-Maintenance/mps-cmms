@@ -1,161 +1,115 @@
-import { neon } from 'https://esm.sh/@neondatabase/serverless';
-import { createAuthClient } from 'https://esm.sh/@neondatabase/auth-client';
-
-// --- CONFIGURATION ---
-// CLEAN BASE URL (Extracted from your working JWKS link)
-const NEON_AUTH_URL = 'https://ep-plain-mouse-aeznlgmn.neonauth.c-2.us-east-2.aws.neon.tech/neondb/auth';
-
-// Your standard database connection
-const DATABASE_URL = 'postgresql://anon@ep-plain-mouse-aeznlgmn-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require';
-
-const authClient = createAuthClient({
-  baseUrl: NEON_AUTH_URL,
-});
-
-/** * Rest of your app.js logic remains the same.
- * The initApp() function will now be able to find the 
- * /openid-configuration automatically because the base is valid.
+/**
+ * MPS-CMMS: Core Application Logic
+ * Utilizing Neon Auth & Database Service
  */
 
-let sql; // Global SQL instance initialized after login
+// --- CONFIGURATION ---
+const NEON_AUTH_URL = 'https://ep-plain-mouse-aeznlgmn.neonauth.c-2.us-east-2.aws.neon.tech/neondb/auth';
+
+// Initialize the Client using the global Neon object from index.bundle.js
+const client = Neon.createClient({
+  auth: {
+    url: NEON_AUTH_URL,
+  }
+});
+
 let currentModule = 'wo-mgmt';
 
 /**
- * --- AUTHENTICATION & INITIALIZATION ---
+ * AUTHENTICATION INITIALIZATION
  */
 async function initApp() {
-    const session = await authClient.getSession();
+    console.log("Checking session status...");
+    try {
+        const session = await client.auth.getSession();
 
-    if (session && session.accessToken) {
-        // 1. User is authenticated
-        document.getElementById('app-body').classList.add('active-app');
-        
-        // 2. Initialize the Serverless Driver with the JWT (Access Token)
-        sql = neon(DATABASE_URL, { authToken: session.accessToken });
-        
-        // 3. Load initial data
-        console.log("Authenticated successfully with Neon Auth.");
-        refreshData();
-    } else {
-        // 4. User is not logged in, render the Neon Sign-In UI
-        document.getElementById('app-body').classList.remove('active-app');
-        renderLoginUI();
+        if (session && session.data) {
+            console.log("Session Active:", session.data.user.email);
+            document.getElementById('app-body').classList.add('active-app');
+            refreshData();
+        } else {
+            console.log("No Session. Displaying Sign-In UI.");
+            renderLoginUI();
+        }
+    } catch (err) {
+        console.error("Critical Auth Error:", err);
+        document.getElementById('neon-auth-ui').innerHTML = 
+            `<div class="alert alert-danger m-3">Connection failed. Check your browser's Console (F12).</div>`;
     }
 }
 
 function renderLoginUI() {
     const container = document.getElementById('neon-auth-ui');
-    if (container) {
-        authClient.renderSignIn(container, {
-            onSuccess: () => {
-                console.log("Sign-in successful.");
-                initApp();
-            },
-        });
-    }
+    container.innerHTML = ""; // Clear loader
+    
+    client.auth.renderSignIn(container, {
+        onSuccess: () => {
+            console.log("Login Successful.");
+            window.location.reload();
+        },
+    });
 }
 
-// Global Sign Out Handler
-document.getElementById('btnSignOut').onclick = async () => {
-    await authClient.signOut();
-    sessionStorage.clear();
-    location.reload();
+window.handleSignOut = async () => {
+    await client.auth.signOut();
+    window.location.reload();
 };
 
 /**
- * --- DATA OPERATIONS ---
+ * DATA OPERATIONS
  */
 async function refreshData() {
-    if (!sql) return;
-
+    console.log(`Refreshing ${currentModule} data...`);
     try {
         if (currentModule === 'wo-mgmt') {
-            const data = await sql('SELECT * FROM WorkOrders ORDER BY WOID DESC');
-            const tbody = document.getElementById('wo-table-body');
-            tbody.innerHTML = data.map(wo => `
+            const { data, error } = await client.from('WorkOrders').select('*').order('WOID', { ascending: false });
+            if (error) throw error;
+            
+            document.getElementById('wo-table-body').innerHTML = data.map(wo => `
                 <tr>
-                    <td>${wo.woid}</td>
-                    <td>${wo.assetid}</td>
-                    <td>${wo.description}</td>
-                    <td><span class="badge bg-secondary">${wo.priority}</span></td>
-                    <td><span class="badge bg-info">${wo.status || 'New'}</span></td>
-                    <td>${wo.duedate || '--'}</td>
-                    <td><button class="btn btn-sm btn-outline-danger" onclick="window.deleteItem('WorkOrders', 'WOID', ${wo.woid})">Delete</button></td>
+                    <td>${wo.WOID || wo.woid}</td>
+                    <td>${wo.AssetID || wo.assetid}</td>
+                    <td>${wo.Description || wo.description}</td>
+                    <td><span class="badge bg-secondary">${wo.Priority || wo.priority}</span></td>
+                    <td><span class="badge bg-info">${wo.Status || 'Open'}</span></td>
                 </tr>`).join('');
         } else if (currentModule === 'part-mgmt') {
-            const data = await sql('SELECT * FROM MasterParts ORDER BY PartID DESC');
-            const tbody = document.getElementById('parts-table-body');
-            tbody.innerHTML = data.map(p => `
+            const { data, error } = await client.from('MasterParts').select('*');
+            if (error) throw error;
+
+            document.getElementById('parts-table-body').innerHTML = data.map(p => `
                 <tr>
-                    <td>${p.partnumber}</td>
-                    <td>${p.manufacturer}</td>
-                    <td>${p.model}</td>
-                    <td>$${p.cost}</td>
-                    <td>${p.reorderlevel}</td>
-                    <td><button class="btn btn-sm btn-outline-danger" onclick="window.deleteItem('MasterParts', 'PartID', ${p.partid})">Remove</button></td>
+                    <td>${p.PartNumber || p.partnumber}</td>
+                    <td>${p.Manufacturer || p.manufacturer}</td>
+                    <td>${p.Model || p.model}</td>
+                    <td>${p.ReorderLevel || p.reorderlevel}</td>
                 </tr>`).join('');
         }
     } catch (err) {
-        console.error("Database Fetch Error:", err);
+        console.error("Database Error:", err);
     }
 }
 
 /**
- * --- FORM SUBMISSIONS ---
+ * UI NAVIGATION
  */
-document.getElementById('formAddPart').onsubmit = async (e) => {
-    e.preventDefault();
-    const d = Object.fromEntries(new FormData(e.target));
-    try {
-        await sql('INSERT INTO MasterParts (PartNumber, Manufacturer, Description, Cost, ReorderLevel) VALUES ($1, $2, $3, $4, $5)', 
-        [d.PartNumber, d.Manufacturer, d.Description, parseFloat(d.Cost), parseInt(d.ReorderLevel)]);
-        
-        bootstrap.Modal.getInstance(document.getElementById('modalAddPart')).hide();
-        e.target.reset();
-        refreshData();
-    } catch (err) { alert("Error saving part: " + err.message); }
-};
-
-document.getElementById('formAddWO').onsubmit = async (e) => {
-    e.preventDefault();
-    const d = Object.fromEntries(new FormData(e.target));
-    try {
-        await sql('INSERT INTO WorkOrders (AssetID, Description, Priority, DueDate) VALUES ($1, $2, $3, $4)', 
-        [parseInt(d.AssetID), d.Description, d.Priority, d.DueDate]);
-        
-        bootstrap.Modal.getInstance(document.getElementById('modalAddWO')).hide();
-        e.target.reset();
-        refreshData();
-    } catch (err) { alert("Error generating WO: " + err.message); }
-};
-
-/**
- * --- UI NAVIGATION ---
- */
-window.switchModule = (id) => {
+window.switchModule = (moduleId) => {
+    // UI Update
     document.querySelectorAll('.module-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
     
-    document.getElementById(id).classList.add('active');
-    currentModule = id;
+    document.getElementById(moduleId).classList.add('active');
+    document.getElementById(moduleId === 'wo-mgmt' ? 'link-wo' : 'link-parts').classList.add('active');
+    
+    // Logic Update
+    currentModule = moduleId;
+    document.getElementById('module-title').innerText = moduleId === 'wo-mgmt' ? 'Work Order Management' : 'Master Parts Registry';
     refreshData();
 };
 
-document.getElementById('btnAddRecord').onclick = () => {
-    const modalId = currentModule === 'wo-mgmt' ? 'modalAddWO' : 'modalAddPart';
-    const modalEl = document.getElementById(modalId);
-    modalEl.removeAttribute('aria-hidden'); 
-    new bootstrap.Modal(modalEl).show();
+window.openAddModal = () => {
+    alert("Add function is currently being linked to the authenticated schema. Use the SQL console to add test data for now.");
 };
 
-// Global delete helper
-window.deleteItem = async (table, col, id) => {
-    if (!confirm("Are you sure you want to delete this record?")) return;
-    try {
-        await sql(`DELETE FROM ${table} WHERE ${col} = $1`, [id]);
-        refreshData();
-    } catch (err) { alert("Delete failed: " + err.message); }
-};
-
-// Start the Auth Check
+// Start the Application
 initApp();
