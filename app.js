@@ -36,16 +36,21 @@ function showModule(moduleId) {
  */
 function openCreateModal() {
     const activeModule = document.querySelector('.module-section.active').id;
-    
+    let modalElement;
+
     if (activeModule === 'wo-mgmt') {
-        new bootstrap.Modal(document.getElementById('modalAddWO')).show();
+        modalElement = document.getElementById('modalAddWO');
     } else if (activeModule === 'part-mgmt') {
-        new bootstrap.Modal(document.getElementById('modalAddPart')).show();
-    } else {
-        alert("Management module for this section is still under development.");
+        modalElement = document.getElementById('modalAddPart');
+    }
+
+    if (modalElement) {
+        // Ensure aria-hidden is removed before showing
+        modalElement.removeAttribute('aria-hidden'); 
+        const bsModal = new bootstrap.Modal(modalElement);
+        bsModal.show();
     }
 }
-
 /**
  * Database Action Handler
  * Prepares form data to be sent to the Neon API
