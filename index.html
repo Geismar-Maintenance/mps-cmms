@@ -8,8 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@neondatabase/neon-js@latest/dist/ui.css">
-    <script src="https://cdn.jsdelivr.net/npm/@neondatabase/neon-js@latest/dist/index.bundle.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@neondatabase/auth-client@latest/dist/ui.css">
 
     <style>
         :root { --sidebar-width: 260px; }
@@ -28,7 +27,7 @@
         .active-app #sidebar { display: flex; width: var(--sidebar-width); height: 100vh; position: fixed; background: #212529; color: white; flex-direction: column; z-index: 1000; }
         .active-app #main-content { display: block; margin-left: var(--sidebar-width); padding: 40px; min-height: 100vh; }
 
-        .nav-link { color: #adb5bd; cursor: pointer; border-radius: 6px; margin: 4px 0; }
+        .nav-link { color: #adb5bd; cursor: pointer; border-radius: 6px; margin: 4px 0; transition: 0.2s; }
         .nav-link:hover, .nav-link.active { color: #fff; background: #343a40; }
         .module-section { display: none; }
         .module-section.active { display: block; animation: fadeIn 0.3s ease-out; }
@@ -50,17 +49,17 @@
             <small class="text-muted">Industrial Operations</small>
         </div>
         <ul class="nav nav-pills flex-column mb-auto">
-            <li class="nav-item"><a class="nav-link active" onclick="switchModule('wo-mgmt')" id="link-wo"><i class="bi bi-tools me-2"></i> Work Orders</a></li>
-            <li class="nav-item"><a class="nav-link" onclick="switchModule('part-mgmt')" id="link-parts"><i class="bi bi-gear-wide-connected me-2"></i> Master Parts</a></li>
+            <li class="nav-item"><a class="nav-link active" id="link-wo"><i class="bi bi-tools me-2"></i> Work Orders</a></li>
+            <li class="nav-item"><a class="nav-link" id="link-parts"><i class="bi bi-gear-wide-connected me-2"></i> Master Parts</a></li>
         </ul>
         <hr class="text-secondary">
-        <button class="btn btn-outline-danger btn-sm w-100" onclick="handleSignOut()">Sign Out</button>
+        <button class="btn btn-outline-danger btn-sm w-100" id="btnSignOut">Sign Out</button>
     </nav>
 
     <main id="main-content">
         <header class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-            <h2 id="module-title" class="fw-bold m-0">Work Order Management</h2>
-            <button class="btn btn-primary shadow-sm" onclick="openAddModal()">Add New Record</button>
+            <h2 id="module-title" class="fw-bold m-0 text-dark">Work Order Management</h2>
+            <button class="btn btn-primary shadow-sm" onclick="alert('Module loading...')">Add New Record</button>
         </header>
 
         <section id="wo-mgmt" class="module-section active">
@@ -83,6 +82,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="app.js"></script>
+    
+    <script type="module" src="app.js"></script>
 </body>
 </html>
