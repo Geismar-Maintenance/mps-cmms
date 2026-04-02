@@ -3,116 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MPS_CMMS | Industrial Maintenance</title>
+    <title>MPS-CMMS | Operations Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .navbar { background-color: #2c3e50; }
-        .card { border: none; border-radius: 10px; }
-        .nav-tabs .nav-link { color: #2c3e50; font-weight: 500; }
-        .nav-tabs .nav-link.active { background-color: #fff; border-bottom: 3px solid #3498db; }
-        #auth-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 9999; display: flex;
-            align-items: center; justify-content: center;
-        }
+        :root { --sidebar-width: 260px; }
+        body { background-color: #f4f7f6; overflow-x: hidden; }
+        #sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; background: #1a1d20; color: #fff; z-index: 1000; }
+        #main-content { margin-left: var(--sidebar-width); padding: 30px; min-height: 100vh; }
+        .nav-link { color: #adb5bd; transition: 0.2s; cursor: pointer; border-radius: 5px; margin: 2px 0; }
+        .nav-link:hover, .nav-link.active { color: #fff; background: #343a40; }
+        .module-section { display: none; animation: fadeIn 0.3s; }
+        .module-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div id="auth-overlay">
-        <div class="card p-4 text-center shadow-lg" style="width: 400px;">
-            <h3 class="mb-3">🔐 System Login</h3>
-            <p class="text-muted small">Authentication bypass active for testing.</p>
-            <button onclick="document.getElementById('auth-overlay').style.display='none'" class="btn btn-primary w-100">Enter System</button>
+    <nav id="sidebar" class="d-flex flex-column p-3 shadow">
+        <div class="text-center mb-4">
+            <h4 class="fw-bold text-primary">MPS-CMMS</h4>
+            <span class="badge bg-secondary">Baton Rouge Facility</span>
+        </div>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item"><a class="nav-link active" onclick="showModule('wo-mgmt')"><i class="bi bi-tools me-2"></i> WO Management</a></li>
+            <li><a class="nav-link" onclick="showModule('asset-mgmt')"><i class="bi bi-box-seam me-2"></i> Asset Management</a></li>
+            <li><a class="nav-link" onclick="showModule('part-mgmt')"><i class="bi bi-gear-wide-connected me-2"></i> Part Management</a></li>
+            <li><a class="nav-link" onclick="showModule('loc-mgmt')"><i class="bi bi-geo-alt me-2"></i> Location Management</a></li>
+            <li><a class="nav-link" onclick="showModule('tech-mgmt')"><i class="bi bi-person-badge me-2"></i> Technicians</a></li>
+        </ul>
+        <hr>
+        <div class="small text-muted text-center">System Status: <span class="text-success">Online</span></div>
+    </nav>
+
+    <main id="main-content">
+        <header class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+            <h2 id="module-title" class="fw-bold">Work Order Management</h2>
+            <button class="btn btn-primary shadow-sm" onclick="openCreateModal()">
+                <i class="bi bi-plus-lg me-1"></i> Add New Record
+            </button>
+        </header>
+
+        <section id="wo-mgmt" class="module-section active">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr><th>WO#</th><th>Asset</th><th>Description</th><th>Priority</th><th>Status</th><th>Due</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody id="wo-table-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="part-mgmt" class="module-section">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr><th>Part#</th><th>Manufacturer</th><th>Model</th><th>Cost</th><th>Stock Level</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody id="parts-table-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="asset-mgmt" class="module-section text-center py-5"><h3>Asset Management</h3><p>Registry view coming soon.</p></section>
+        <section id="loc-mgmt" class="module-section text-center py-5"><h3>Location Management</h3><p>Inventory mapping coming soon.</p></section>
+        <section id="tech-mgmt" class="module-section text-center py-5"><h3>Technician Management</h3><p>Personnel tracking coming soon.</p></section>
+    </main>
+
+    <div class="modal fade" id="modalAddPart" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Master Part</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formAddPart">
+                    <div class="modal-body row g-3">
+                        <div class="col-md-6"><label class="form-label">Part Number</label><input type="text" class="form-control" name="PartNumber" required></div>
+                        <div class="col-md-6"><label class="form-label">Manufacturer</label><input type="text" class="form-control" name="Manufacturer"></div>
+                        <div class="col-12"><label class="form-label">Description</label><textarea class="form-control" name="Description" rows="2"></textarea></div>
+                        <div class="col-md-6"><label class="form-label">Cost ($)</label><input type="number" step="0.01" class="form-control" name="Cost"></div>
+                        <div class="col-md-6"><label class="form-label">Reorder Level</label><input type="number" class="form-control" name="ReorderLevel"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary w-100">Save Part to Database</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
-    <nav class="navbar navbar-dark shadow-sm mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center" href="#">
-                <span class="fs-4 fw-bold">⚙️ MPS_CMMS</span>
-                <span class="badge bg-primary ms-2">BETA v1.2</span>
-            </a>
-            <div class="text-light small" id="connection-status">Connected to Neon DB</div>
-        </div>
-    </nav>
-
-    <div class="container">
-        <ul class="nav nav-tabs mb-4" id="cmmsTabs" role="tablist">
-            <li class="nav-item">
-                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#parts-pane" type="button">📦 Master Parts</button>
-            </li>
-        </ul>
-
-        <div class="tab-content" id="cmmsContent">
-            <div class="tab-pane fade show active" id="parts-pane">
-                <div class="row">
-                    <div class="col-lg-5">
-                        <div class="card shadow-sm p-4">
-                            <h5 class="card-title border-bottom pb-2 mb-3 text-primary">Add New Master Part</h5>
-                            <form id="partsForm" onsubmit="event.preventDefault(); dbAction('masterparts', 'addPart');">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label for="partnumber" class="form-label small fw-bold">Part Number</label>
-                                        <input type="text" id="partnumber" class="form-control form-control-sm" placeholder="ID-123" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="modelnumber" class="form-label small fw-bold">Model Number</label>
-                                        <input type="text" id="modelnumber" class="form-control form-control-sm">
-                                    </div>
-                                    <div class="col-12">
-                                        <label for="manufacturer" class="form-label small fw-bold">Manufacturer</label>
-                                        <input type="text" id="manufacturer" class="form-control form-control-sm">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="category" class="form-label small fw-bold">Category</label>
-                                        <select id="category" class="form-select form-select-sm">
-                                            <option value="Mechanical">Mechanical</option>
-                                            <option value="Electrical">Electrical</option>
-                                            <option value="Pneumatic">Pneumatic</option>
-                                            <option value="Lubrication">Lubrication</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="unitcost" class="form-label small fw-bold">Unit Cost ($)</label>
-                                        <input type="number" step="0.01" id="unitcost" class="form-control form-control-sm" value="0.00">
-                                    </div>
-                                    <div class="col-12">
-                                        <label for="description" class="form-label small fw-bold">Description</label>
-                                        <textarea id="description" class="form-control form-control-sm" rows="2" required></textarea>
-                                    </div>
-                                    <div class="col-12 mt-4">
-                                        <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">💾 Save to Database</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    
-                    <div class="col-lg-7">
-                        <div class="card shadow-sm p-4">
-                            <div class="d-flex justify-content-between border-bottom pb-2 mb-3">
-                                <h5 class="card-title">Inventory Preview</h5>
-                                <button onclick="location.reload()" class="btn btn-sm btn-outline-secondary">🔄 Refresh</button>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Part #</th>
-                                            <th>Description</th>
-                                            <th>Cost</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="parts-table-body">
-                                        <tr><td colspan="3" class="text-center text-muted">Awaiting database connection...</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+    <div class="modal fade" id="modalAddWO" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generate New Work Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
+                <form id="formAddWO">
+                    <div class="modal-body row g-3">
+                        <div class="col-md-6"><label class="form-label">Asset</label><select class="form-select" name="AssetID" required><option value="1">Conveyor Line 1</option></select></div>
+                        <div class="col-md-3"><label class="form-label">Priority</label><select class="form-select" name="Priority"><option value="1">Low</option><option value="2">Medium</option><option value="3" selected>High</option></select></div>
+                        <div class="col-md-3"><label class="form-label">Type</label><select class="form-select" name="WOType"><option value="1">Preventative</option><option value="2">Corrective</option></select></div>
+                        <div class="col-12"><label class="form-label">Job Description</label><textarea class="form-control" name="Description" rows="3" required></textarea></div>
+                        <div class="col-md-6"><label class="form-label">Assigned Tech</label><select class="form-select" name="AssignedTechnician"><option value="1">D. Tinsley</option></select></div>
+                        <div class="col-md-6"><label class="form-label">Due Date</label><input type="date" class="form-control" name="DueDate"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary w-100">Submit Work Order</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
