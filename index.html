@@ -3,84 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MPS-CMMS | Operations Portal</title>
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@neondatabase/neon-js@latest/ui.css">
-    <script src="https://cdn.jsdelivr.net/npm/@neondatabase/neon-js@latest/index.js"></script>
-
+    <title>MPS CMMS - Maintenance Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root { --sidebar-width: 260px; }
-        body { background-color: #1a1d20; margin: 0; padding: 0; transition: background-color 0.4s ease; font-family: system-ui, -apple-system, sans-serif; }
-        
-        /* Auth Container */
-        #auth-container { height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center; z-index: 2000; }
-        #neon-auth-ui { width: 100%; max-width: 420px; background: #ffffff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); min-height: 350px; }
-
-        /* Hidden elements until Login */
-        #sidebar, #main-content { display: none; }
-
-        /* Active App State */
-        .active-app { background-color: #f4f7f6; }
-        .active-app #auth-container { display: none !important; }
-        .active-app #sidebar { display: flex; width: var(--sidebar-width); height: 100vh; position: fixed; background: #212529; color: white; flex-direction: column; z-index: 1000; }
-        .active-app #main-content { display: block; margin-left: var(--sidebar-width); padding: 40px; min-height: 100vh; }
-
-        .nav-link { color: #adb5bd; cursor: pointer; border-radius: 6px; margin: 4px 0; transition: 0.2s; }
-        .nav-link:hover, .nav-link.active { color: #fff; background: #343a40; }
-        .module-section { display: none; }
-        .module-section.active { display: block; animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #app-body { display: none; padding: 20px; }
+        .active-app #app-body { display: block; }
+        .active-app #login-screen { display: none; }
+        #login-screen { padding-top: 100px; }
     </style>
 </head>
-<body id="app-body">
+<body>
 
-    <div id="auth-container">
-        <div id="neon-auth-ui" class="text-center d-flex flex-column justify-content-center">
-            <div class="spinner-border text-primary mx-auto mb-3" role="status"></div>
-            <p class="text-dark fw-bold mb-0">Connecting to MPS Secure Gateway...</p>
+    <div id="login-screen">
+        <div class="container" id="neon-auth-ui">
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p>Connecting to MPS Database...</p>
+            </div>
         </div>
     </div>
 
-    <nav id="sidebar" class="p-3 shadow">
-        <div class="text-center mb-4">
-            <h4 class="fw-bold text-primary mb-0">MPS-CMMS</h4>
-            <small class="text-muted">Industrial Operations</small>
+    <div id="app-body">
+        <nav class="navbar navbar-dark bg-dark mb-4">
+            <div class="container-fluid">
+                <span class="navbar-brand">MPS Inventory & Work Orders</span>
+                <button class="btn btn-outline-light btn-sm" id="signOut">Logout</button>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">Open Work Orders</div>
+                        <div class="card-body">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>WO #</th>
+                                        <th>Asset ID</th>
+                                        <th>Description</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="wo-table-body">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <ul class="nav nav-pills flex-column mb-auto">
-            <li class="nav-item"><a class="nav-link active" id="link-wo"><i class="bi bi-tools me-2"></i> Work Orders</a></li>
-            <li class="nav-item"><a class="nav-link" id="link-parts"><i class="bi bi-gear-wide-connected me-2"></i> Master Parts</a></li>
-        </ul>
-        <hr class="text-secondary">
-        <button class="btn btn-outline-danger btn-sm w-100" id="btnSignOut">Sign Out</button>
-    </nav>
+    </div>
 
-    <main id="main-content">
-        <header class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-            <h2 id="module-title" class="fw-bold m-0 text-dark">Work Order Management</h2>
-            <button class="btn btn-primary shadow-sm" onclick="alert('Module loading...')">Add New Record</button>
-        </header>
-
-        <section id="wo-mgmt" class="module-section active">
-            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th>WO#</th><th>Asset</th><th>Description</th><th>Priority</th><th>Status</th></tr></thead>
-                    <tbody id="wo-table-body"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="part-mgmt" class="module-section">
-            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th>Part#</th><th>Mfg</th><th>Model</th><th>Stock</th></tr></thead>
-                    <tbody id="parts-table-body"></tbody>
-                </table>
-            </div>
-        </section>
-    </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script type="module" src="app.js"></script>
 </body>
 </html>
