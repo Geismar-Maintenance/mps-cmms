@@ -1,4 +1,4 @@
-import { NeonBridge } from './neon-bridge.js';
+import { NeonBridge } from './neon-gateway.js';
 
 const NEON_AUTH_URL = 'https://ep-plain-mouse-aeznlgmn.neonauth.c-2.us-east-2.aws.neon.tech/neondb/auth';
 
