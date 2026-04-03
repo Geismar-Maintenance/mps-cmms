@@ -11,24 +11,23 @@ export class NeonBridge {
     }
 
     renderLogin(containerId) {
-        this.container = document.getElementById(containerId);
-        this.container.innerHTML = `
-            <div id="login-card" style="max-width: 400px; margin: auto; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                <h2 style="text-align: center; color: #333; margin-bottom: 1.5rem;">MPS Maintenance Portal</h2>
-                <div class="mb-3">
-                    <label class="form-label">Corporate Email</label>
-                    <input type="email" id="email" class="form-control" placeholder="d.tinsley@mauser.com">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Password</label>
-                    <input type="password" id="password" class="form-control" placeholder="••••••••">
-                </div>
-                <button id="auth-submit" class="btn btn-primary w-100 py-2">Sign In</button>
-                <div id="auth-msg" style="color: red; margin-top: 10px; font-size: 0.9rem; text-align: center;"></div>
-            </div>`;
+    this.container = document.getElementById(containerId);
+    this.container.innerHTML = `
+        <div style="text-align: center; padding: 2rem;">
+            <h2 class="mb-4">MPS Maintenance Portal</h2>
+            <p>Please sign in to access Work Orders & Inventory.</p>
+            <button id="btn-neon-direct" class="btn btn-primary btn-lg">
+                Sign In with Neon
+            </button>
+        </div>`;
 
-        document.getElementById('auth-submit').onclick = () => this.handleAuth();
-    }
+    document.getElementById('btn-neon-direct').onclick = () => {
+        // This sends the user to the Neon-hosted login page
+        // Once they log in, Neon sends them back to your GitHub page
+        const redirectUrl = window.location.origin + window.location.pathname;
+        window.location.href = `${this.authUrl}/login?redirect_uri=${encodeURIComponent(redirectUrl)}`;
+    };
+}
 
     async handleAuth() {
         const email = document.getElementById('email').value;
