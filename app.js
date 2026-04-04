@@ -1,78 +1,83 @@
-import { NeonBridge } from './neon-bridge.js';
+import { neon } from 'https://esm.sh/@neondatabase/serverless';
 
-/**
- * MAIN APPLICATION LOGIC
- * Initializes the connection and renders the Geismar Maintenance Dashboard.
- */
-async function initDashboard() {
-    const statusDot = document.getElementById('db-status-dot');
-    const statusText = document.getElementById('db-status-text');
-    const dataContainer = document.getElementById('data-container');
+// 1. Database Configuration
+const connectionString = "postgresql://authenticated@ep-plain-mouse-aeznlgmn-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
+const sql = neon(connectionString);
 
+// 2. Initialize UI Elements
+const statusDot = document.getElementById('db-status-dot');
+const statusText = document.getElementById('db-status-text');
+const tableContainer = document.getElementById('data-table-container');
+
+async function init() {
     try {
-        console.log("Initializing Geismar Maintenance Portal...");
-        const bridge = new NeonBridge();
-
-        // 1. Connection Heartbeat
-        const heartbeat = await bridge.query("SELECT NOW() as server_time;");
+        console.log("Starting Geismar Direct Pipe...");
+        const result = await sql`SELECT NOW()`;
         
-        if (heartbeat) {
-            console.log("Connection Established:", heartbeat[0].server_time);
-            statusDot.className = 'status-dot status-online'; // Turns Green
-            statusText.innerText = "Online (Direct Connection)";
-            
-            // 2. Fetch Data (Replace 'parts' with your actual table name)
-            // If you don't have a table yet, this will catch the error below.
-            const data = await bridge.query("SELECT * FROM parts LIMIT 20;");
-            
-            if (data && data.length > 0) {
-                renderTable(data, dataContainer);
-            } else {
-                dataContainer.innerHTML = `
-                    <div class="alert alert-info">
-                        Connected to Neon! No records found in the 'parts' table yet.
-                    </div>`;
-            }
+        if (result) {
+            statusDot.className = 'bi bi-circle-fill text-success me-1';
+            statusText.innerText = "Online (Direct)";
+            loadModuleData('parts'); // Default module
         }
     } catch (err) {
-        console.error("App Initialization Error:", err);
+        console.error("Connection Failed:", err);
+        statusDot.className = 'bi bi-circle-fill text-danger me-1';
         statusText.innerText = "Connection Failed";
-        dataContainer.innerHTML = `
-            <div class="alert alert-danger shadow-sm">
-                <strong>Connection Error:</strong> ${err.message}<br>
-                <small>Check your connection string and firewall settings.</small>
-            </div>`;
+        tableContainer.innerHTML = `<div class="p-4 text-danger">Error: ${err.message}</div>`;
     }
 }
 
 /**
- * Builds a Bootstrap table dynamically from any database result.
+ * Loads data based on the selected module
  */
-function renderTable(data, container) {
-    let html = `
-        <table class="table table-striped table-hover align-middle">
-            <thead class="table-dark">
-                <tr>`;
+async function loadModuleData(moduleName) {
+    tableContainer.innerHTML = `<div class="p-4 text-muted">Fetching ${moduleName}...</div>`;
     
-    // Create Headers from the first row keys
-    Object.keys(data[0]).forEach(key => {
-        html += `<th>${key.toUpperCase().replace('_', ' ')}</th>`;
-    });
-    
-    html += `</tr></thead><tbody>`;
-    
-    // Create Rows
-    data.forEach(row => {
-        html += `<tr>`;
-        Object.values(row).forEach(val => {
-            html += `<td>${val === null ? '-' : val}</td>`;
-        });
-        html += `</tr>`;
-    });
-    
-    html += `</tbody></table>`;
-    container.innerHTML = html;
+    // Map UI names to your actual SQL tables
+    const tableMap = {
+        'parts': 'parts', // Change these if your SQL tables have different names
+        'work-orders': 'work_orders',
+        'assets': 'assets',
+        'locations': 'locations',
+        'technicians': 'technicians'
+    };
+
+    const tableName = tableMap[moduleName];
+
+    try {
+        const data = await sql(`SELECT * FROM ${tableName} LIMIT 50`);
+        renderTable(data);
+    } catch (err) {
+        tableContainer.innerHTML = `<div class="p-4 text-warning text-center">
+            Table '${tableName}' not found or empty.<br>
+            <small>Verify table name in Neon SQL Editor.</small>
+        </div>`;
+    }
 }
 
-// Fire it up
-initDashboard();
+function renderTable(data) {
+    if (!data || data.length === 0) {
+        tableContainer.innerHTML = `<div class="p-4 text-center">No records found.</div>`;
+        return;
+    }
+
+    let html = `<table class="table table-hover mb-0"><thead><tr>`;
+    Object.keys(data[0]).forEach(key => html += `<th>${key.toUpperCase()}</th>`);
+    html += `</tr></thead><tbody>`;
+
+    data.forEach(row => {
+        html += `<tr>`;
+        Object.values(row).forEach(val => html += `<td>${val || '-'}</td>`);
+        html += `</tr>`;
+    });
+
+    html += `</tbody></table>`;
+    tableContainer.innerHTML = html;
+    document.getElementById('data-count').innerText = `${data.length} Records Found`;
+}
+
+// Attach to window so the HTML onclick can find it
+window.loadModuleData = loadModuleData;
+
+// Boot
+init();
