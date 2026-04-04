@@ -1,15 +1,19 @@
 import { neon } from 'https://esm.sh/@neondatabase/serverless';
 
-// 1. Connection using your Authenticated Pooler
-const connectionString = "postgresql://authenticated@ep-plain-mouse-aeznlgmn-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
+/**
+ * GEISMAR MAINTENANCE PORTAL - ANONYMOUS ACCESS MODE
+ * Uses the Neon Authenticated Pooler without a password.
+ */
+
+// We use the 'authenticated' user which Neon allows for public-facing apps
+const connectionString = "postgresql://authenticated@ep-plain-mouse-aeznlgmn-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require";
 const sql = neon(connectionString);
 
-// 2. UI Elements
+// UI Elements
 const statusDot = document.getElementById('db-status-dot');
 const statusText = document.getElementById('db-status-text');
 const tableContainer = document.getElementById('data-table-container');
 
-// 3. Table Mapping (Linking your Sidebar to your SQL Tables)
 const TABLE_MAP = {
     'parts': 'masterparts',
     'work-orders': 'workorders',
@@ -18,75 +22,66 @@ const TABLE_MAP = {
     'technicians': 'technicians'
 };
 
-/**
- * Initializes the connection and loads the default view
- */
 async function init() {
     try {
-        console.log("Checking DB Heartbeat...");
-        const result = await sql`SELECT NOW()`;
+        console.log("Attempting Anonymous Connection...");
+        // Heartbeat check
+        const result = await sql`SELECT 1`;
         
         if (result) {
             statusDot.className = 'bi bi-circle-fill text-success me-2';
-            statusText.innerText = "Online (Direct)";
-            loadModuleData('parts'); // Initial load
+            statusText.innerText = "Online (Anonymous)";
+            loadModuleData('parts'); 
         }
     } catch (err) {
-        console.error("Critical Connection Error:", err);
+        console.error("Anonymous Connection Failed:", err);
         statusDot.className = 'bi bi-circle-fill text-danger me-2';
-        statusText.innerText = "Connection Failed";
-        tableContainer.innerHTML = `<div class="p-5 text-center text-danger">
-            <h6>Database Access Denied</h6>
-            <small>${err.message}</small>
-        </div>`;
+        statusText.innerText = "Access Denied";
+        
+        // Detailed feedback for Geismar team
+        tableContainer.innerHTML = `
+            <div class="p-5 text-center">
+                <i class="bi bi-shield-lock fs-1 text-danger"></i>
+                <h5 class="mt-3">Database Locked</h5>
+                <p class="text-muted small">${err.message}</p>
+                <div class="alert alert-secondary d-inline-block mt-3">
+                    Verify that the <strong>'authenticated'</strong> role has 
+                    SELECT permissions in the Neon Console.
+                </div>
+            </div>`;
     }
 }
 
-/**
- * Fetches and renders data for a specific module
- */
 async function loadModuleData(moduleKey) {
     const tableName = TABLE_MAP[moduleKey];
-    tableContainer.innerHTML = `<div class="p-5 text-center text-muted">Loading ${tableName}...</div>`;
+    tableContainer.innerHTML = `<div class="p-5 text-center text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Loading ${tableName}...</div>`;
 
     try {
-        // Query the specific table provided in your list
         const data = await sql(`SELECT * FROM ${tableName} LIMIT 100`);
         renderTable(data);
     } catch (err) {
-        console.error(`Error loading ${tableName}:`, err);
+        console.error(`Query Error:`, err);
         tableContainer.innerHTML = `<div class="p-5 text-center text-warning">
-            <i class="bi bi-exclamation-triangle d-block mb-2 fs-3"></i>
-            Table <strong>${tableName}</strong> could not be loaded.<br>
-            <small>Verify schema permissions in Neon Console.</small>
+            <i class="bi bi-exclamation-triangle fs-2"></i><br>
+            Permission Denied for table: <strong>${tableName}</strong>
         </div>`;
     }
 }
 
-/**
- * Builds the HTML table dynamically
- */
 function renderTable(data) {
     if (!data || data.length === 0) {
-        tableContainer.innerHTML = `<div class="p-5 text-center text-muted">No records found in this table.</div>`;
+        tableContainer.innerHTML = `<div class="p-5 text-center text-muted">Table is empty.</div>`;
         return;
     }
 
     let html = `<table class="table table-hover align-middle mb-0">
                     <thead class="table-light"><tr>`;
-    
-    // Header row
-    Object.keys(data[0]).forEach(key => {
-        html += `<th class="text-uppercase small fw-bold text-muted">${key.replace('_', ' ')}</th>`;
-    });
+    Object.keys(data[0]).forEach(key => html += `<th class="small fw-bold text-muted text-uppercase">${key.replace('_', ' ')}</th>`);
     html += `</tr></thead><tbody>`;
 
-    // Data rows
     data.forEach(row => {
         html += `<tr>`;
-        Object.values(row).forEach(val => {
-            html += `<td>${val === null ? '<span class="text-muted">-</span>' : val}</td>`;
-        });
+        Object.values(row).forEach(val => html += `<td>${val || '-'}</td>`);
         html += `</tr>`;
     });
 
@@ -94,8 +89,5 @@ function renderTable(data) {
     tableContainer.innerHTML = html;
 }
 
-// Global exposure for the HTML onclick events
 window.loadModuleData = loadModuleData;
-
-// Run it
 init();
