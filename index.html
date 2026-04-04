@@ -3,61 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MPS CMMS - Maintenance Manager</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>MPS Geismar - Maintenance Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        #app-body { display: none; padding: 20px; }
-        .active-app #app-body { display: block; }
-        .active-app #login-screen { display: none; }
-        #login-screen { padding-top: 100px; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .navbar { background-color: #004a99; } /* Mauser Blue */
+        .status-dot { height: 10px; width: 10px; background-color: #bbb; border-radius: 50%; display: inline-block; }
+        .status-online { background-color: #28a745; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <div class="container" id="neon-auth-ui">
-            <div class="text-center">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p>Connecting to MPS Database...</p>
+    <nav class="navbar navbar-dark shadow-sm mb-4">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">MPS Geismar Maintenance</span>
+            <div class="text-light small">
+                System Status: <span id="db-status-dot" class="status-dot"></span>
+                <span id="db-status-text">Connecting...</span>
             </div>
         </div>
-    </div>
+    </nav>
 
-    <div id="app-body">
-        <nav class="navbar navbar-dark bg-dark mb-4">
-            <div class="container-fluid">
-                <span class="navbar-brand">MPS Inventory & Work Orders</span>
-                <button class="btn btn-outline-light btn-sm" id="signOut">Logout</button>
-            </div>
-        </nav>
-
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-primary text-white">Open Work Orders</div>
-                        <div class="card-body">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>WO #</th>
-                                        <th>Asset ID</th>
-                                        <th>Description</th>
-                                        <th>Priority</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="wo-table-body">
-                                    </tbody>
-                            </table>
-                        </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white font-weight-bold">
+                        Live Inventory / Work Orders
+                    </div>
+                    <div class="card-body">
+                        <div id="data-container" class="table-responsive">
+                            <p class="text-muted">Initializing direct database pipe...</p>
+                            </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script type="module" src="app.js"></script>
+    <script type="module">
+        import { NeonBridge } from './neon-bridge.js';
+
+        async function initApp() {
+            const statusDot = document.getElementById('db-status-dot');
+            const statusText = document.getElementById('db-status-text');
+            const dataContainer = document.getElementById('data-container');
+
+            try {
+                // 1. Initialize the direct bridge (No Login Required)
+                const bridge = new NeonBridge();
+                
+                // 2. Test the connection immediately
+                const result = await bridge.query("SELECT NOW() as current_time;");
+                
+                if (result) {
+                    statusDot.classList.add('status-online');
+                    statusText.innerText = "Online (Direct)";
+                    
+                    // 3. Try to fetch a real table (Example: 'parts')
+                    // Change 'parts' to whatever your actual table name is
+                    const parts = await bridge.query("SELECT * FROM parts LIMIT 10;");
+                    
+                    if (parts && parts.length > 0) {
+                        renderTable(parts);
+                    } else {
+                        dataContainer.innerHTML = `<div class="alert alert-info">Connection successful. Table is currently empty.</div>`;
+                    }
+                }
+            } catch (error) {
+                statusText.innerText = "Connection Failed";
+                dataContainer.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            }
+        }
+
+        function renderTable(data) {
+            const container = document.getElementById('data-container');
+            let html = `<table class="table table-hover"><thead><tr>`;
+            
+            // Generate Headers
+            Object.keys(data[0]).forEach(key => {
+                html += `<th>${key.toUpperCase()}</th>`;
+            });
+            
+            html += `</tr></thead><tbody>`;
+            
+            // Generate Rows
+            data.forEach(row => {
+                html += `<tr>`;
+                Object.values(row).forEach(val => {
+                    html += `<td>${val}</td>`;
+                });
+                html += `</tr>`;
+            });
+            
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        // Start the app
+        initApp();
+    </script>
 </body>
 </html>
