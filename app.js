@@ -1,15 +1,16 @@
-import { neon } from 'https://esm.sh/@neondatabase/serverless';
+/**
+ * GEISMAR MAINTENANCE PORTAL - REST API MODE
+ * Using the Neon REST Endpoint for standard HTTPS data fetching.
+ */
 
-// 1. Your Anonymous Connection String
-const connectionString = "postgresql://anonymous@ep-plain-mouse-aeznlgmn-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
-const sql = neon(connectionString);
+const API_BASE = "https://ep-plain-mouse-aeznlgmn.apirest.c-2.us-east-2.aws.neon.tech/neondb/rest/v1";
 
-// 2. UI Selectors
+// UI Selectors
 const statusDot = document.getElementById('db-status-dot');
 const statusText = document.getElementById('db-status-text');
 const tableContainer = document.getElementById('data-table-container');
 
-// 3. Mapping your specific Geismar tables to the sidebar
+// Mapping your Geismar tables
 const TABLE_MAP = {
     'parts': 'masterparts',
     'work-orders': 'workorders',
@@ -19,62 +20,62 @@ const TABLE_MAP = {
 };
 
 /**
- * Connect and load initial data
+ * Initialize and check API health
  */
 async function init() {
     try {
-        console.log("Connecting to Geismar Node via Anonymous Pooler...");
-        // Test connection
-        const result = await sql`SELECT 1`;
+        console.log("Pinging Geismar REST Endpoint...");
         
-        if (result) {
+        // A simple GET request to check connectivity
+        const response = await fetch(`${API_BASE}/tables`);
+        
+        if (response.ok) {
             statusDot.className = 'bi bi-circle-fill text-success me-2';
-            statusText.innerText = "Online (Anonymous)";
+            statusText.innerText = "Online (REST API)";
             loadModuleData('parts'); // Default view
+        } else {
+            throw new Error(`Server responded with ${response.status}`);
         }
     } catch (err) {
-        console.error("Connection Failed:", err);
+        console.error("REST Connection Failed:", err);
         statusDot.className = 'bi bi-circle-fill text-danger me-2';
-        statusText.innerText = "Connection Failed";
+        statusText.innerText = "API Offline";
         tableContainer.innerHTML = `
             <div class="p-5 text-center">
-                <i class="bi bi-shield-exclamation text-danger fs-1"></i>
-                <h5 class="mt-3">Anonymous Access Denied</h5>
-                <code class="d-block mb-3">${err.message}</code>
-                <div class="alert alert-info d-inline-block shadow-sm">
-                    Ensure the <strong>anonymous</strong> role has been granted 
-                    SELECT permissions in the Neon SQL Editor.
-                </div>
+                <i class="bi bi-cloud-slash text-danger fs-1"></i>
+                <h5 class="mt-3">REST API Connection Failed</h5>
+                <code>${err.message}</code>
             </div>`;
     }
 }
 
 /**
- * Fetches data for the selected management module
+ * Fetches data for the selected table via REST
  */
 async function loadModuleData(moduleKey) {
     const tableName = TABLE_MAP[moduleKey];
-    tableContainer.innerHTML = `
-        <div class="p-5 text-center text-muted">
-            <div class="spinner-border spinner-border-sm text-primary me-2"></div>
-            Accessing ${tableName}...
-        </div>`;
+    tableContainer.innerHTML = `<div class="p-5 text-center text-muted">Requesting ${tableName} via REST...</div>`;
 
     try {
-        const data = await sql(`SELECT * FROM ${tableName} LIMIT 100`);
-        renderTable(data);
+        // Neon REST API convention for fetching rows
+        const response = await fetch(`${API_BASE}/tables/${tableName}/rows`);
+        
+        if (!response.ok) throw new Error(`Could not fetch ${tableName}`);
+        
+        const result = await response.json();
+        renderTable(result.data || result); // Neon REST usually wraps data in a 'data' key
     } catch (err) {
-        console.error(`Query Error:`, err);
+        console.error(`REST Query Error:`, err);
         tableContainer.innerHTML = `
             <div class="p-5 text-center text-warning">
                 <i class="bi bi-lock-fill fs-2"></i><br>
-                Permissions required for table: <strong>${tableName}</strong>
+                REST Access Denied for: <strong>${tableName}</strong>
             </div>`;
     }
 }
 
 /**
- * Generates the Bootstrap table from database results
+ * Builds the Bootstrap table
  */
 function renderTable(data) {
     if (!data || data.length === 0) {
@@ -85,17 +86,17 @@ function renderTable(data) {
     let html = `<table class="table table-hover align-middle mb-0">
                     <thead class="table-light"><tr>`;
     
-    // Create headers from keys
+    // Headers
     Object.keys(data[0]).forEach(key => {
         html += `<th class="small fw-bold text-muted text-uppercase">${key.replace('_', ' ')}</th>`;
     });
     html += `</tr></thead><tbody>`;
 
-    // Create rows from values
+    // Rows
     data.forEach(row => {
         html += `<tr>`;
         Object.values(row).forEach(val => {
-            html += `<td>${val === null ? '<span class="text-muted">-</span>' : val}</td>`;
+            html += `<td>${val === null ? '-' : val}</td>`;
         });
         html += `</tr>`;
     });
@@ -104,8 +105,5 @@ function renderTable(data) {
     tableContainer.innerHTML = html;
 }
 
-// Ensure the HTML buttons can trigger the load
 window.loadModuleData = loadModuleData;
-
-// Start the engine
 init();
