@@ -1,8 +1,9 @@
-// MPS CMMS - Custom Neon Bridge 2026
+// MPS CMMS - Integrated Neon Bridge 2026
 export class NeonBridge {
-    constructor(config) {
-        this.authUrl = config.authUrl;
-        this.container = null;
+    constructor() {
+        // These are now handled by your GitHub/Neon Integration
+        this.projectId = "ep-plain-mouse-aeznlgmn"; 
+        this.baseUrl = `https://console.neon.tech/api/v1/projects/${this.projectId}`;
     }
 
     async getSession() {
@@ -11,47 +12,45 @@ export class NeonBridge {
     }
 
     renderLogin(containerId) {
-    this.container = document.getElementById(containerId);
-    this.container.innerHTML = `
-        <div style="text-align: center; padding: 2rem;">
-            <h2 class="mb-4">MPS Maintenance Portal</h2>
-            <p>Please sign in to access Work Orders & Inventory.</p>
-            <button id="btn-neon-direct" class="btn btn-primary btn-lg">
-                Sign In with Neon
-            </button>
-        </div>`;
+        const container = document.getElementById(containerId);
+        container.innerHTML = `
+            <div id="login-card" style="max-width: 400px; margin: auto; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <h2 style="text-align: center; color: #333; margin-bottom: 1.5rem;">MPS Maintenance</h2>
+                <div id="auth-form">
+                    <div class="mb-3">
+                        <label class="form-label">Work Email</label>
+                        <input type="email" id="email" class="form-control" placeholder="d.tinsley@mauser.com">
+                    </div>
+                    <button id="btn-login" class="btn btn-primary w-100 py-2">Enter Portal</button>
+                    <div id="auth-msg" style="margin-top:15px; text-align:center; font-size:0.85rem; color: #666;"></div>
+                </div>
+            </div>`;
 
-    document.getElementById('btn-neon-direct').onclick = () => {
-        // This sends the user to the Neon-hosted login page
-        // Once they log in, Neon sends them back to your GitHub page
-        const redirectUrl = window.location.origin + window.location.pathname;
-        window.location.href = `${this.authUrl}/login?redirect_uri=${encodeURIComponent(redirectUrl)}`;
-    };
-}
+        document.getElementById('btn-login').onclick = () => this.handleMagicLink();
+    }
 
-    async handleAuth() {
+    async handleMagicLink() {
         const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
         const msg = document.getElementById('auth-msg');
-
-        msg.innerText = "Authenticating with Neon...";
+        msg.innerText = "Requesting secure link...";
 
         try {
-            const response = await fetch(`${this.authUrl}/v1/login`, {
+            // This uses the Neon Auth API to send a Magic Link to your email
+            const response = await fetch(`https://${this.projectId}.neonauth.c-2.us-east-2.aws.neon.tech/neondb/auth/v1/login/magic-link`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ email })
             });
 
             if (response.ok) {
-                const data = await response.json();
-                localStorage.setItem('mps_session', JSON.stringify(data));
-                window.location.reload();
+                msg.style.color = "green";
+                msg.innerText = "Check your email! Click the link to log in.";
             } else {
-                msg.innerText = "Access Denied. Check credentials.";
+                msg.style.color = "red";
+                msg.innerText = "Access Denied. Ensure email is registered in Neon.";
             }
         } catch (e) {
-            msg.innerText = "Network Error: Port 443 blocked or Neon offline.";
+            msg.innerText = "Network Error: Port 443 blocked.";
         }
     }
 }
