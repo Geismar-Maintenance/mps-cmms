@@ -1,41 +1,34 @@
-/**
- * GEISMAR MAINTENANCE PORTAL - DIRECT CONNECTION BRIDGE
- * Bypassing Auth for Development
- */
-
 import { neon } from 'https://esm.sh/@neondatabase/serverless';
 
+/**
+ * GEISMAR MAINTENANCE PORTAL - DIRECT DB BRIDGE
+ * Bypasses Auth to provide immediate data access.
+ */
 export class NeonBridge {
     constructor() {
-        // PASTE YOUR CONNECTION STRING HERE FOR TESTING
-        // In a real 'Production' version, we would move this to a GitHub Secret
-        this.connectionString = "PASTE_YOUR_NEON_CONNECTION_STRING_HERE";
-        this.sql = neon(this.connectionString);
-    }
-
-    // We simulate a "logged in" state so your other code doesn't break
-    async getSession() {
-        return { user: { email: "admin@geismar-mps.local" }, role: "developer" };
-    }
-
-    // This renders nothing (skipping the login card)
-    renderLogin(containerId) {
-        console.log("Sign-in bypassed. Connecting to database...");
-        const container = document.getElementById(containerId);
-        if (container) container.innerHTML = `<p style="color:green; text-align:center;">Direct Connection Active</p>`;
+        // IMPORTANT: Use your actual string from the Neon Console here.
+        // It should look like: postgresql://neondb_owner:npg_xxxx@ep-plain-mouse...
+        const connectionString = "YOUR_ACTUAL_NEON_CONNECTION_STRING_HERE";
+        
+        if (connectionString.includes("YOUR_ACTUAL")) {
+            console.error("CRITICAL: You must paste your Neon Connection String into neon-bridge.js");
+        }
+        
+        this.sql = neon(connectionString);
     }
 
     /**
-     * Use this function to get your actual data!
-     * Example: const parts = await bridge.getData('SELECT * FROM spare_parts');
+     * Executes a SQL query directly against the Neon database.
+     * @param {string} text - The SQL query (e.g., 'SELECT * FROM inventory')
+     * @returns {Promise<Array>} - The rows from the database
      */
-    async getData(query) {
+    async query(text) {
         try {
-            const result = await this.sql(query);
+            const result = await this.sql(text);
             return result;
         } catch (error) {
-            console.error("Database Error:", error);
-            return null;
+            console.error("Database Query Failed:", error);
+            throw error; // Let app.js handle the UI error state
         }
     }
 }
