@@ -1,83 +1,101 @@
 import { neon } from 'https://esm.sh/@neondatabase/serverless';
 
-// 1. Database Configuration
+// 1. Connection using your Authenticated Pooler
 const connectionString = "postgresql://authenticated@ep-plain-mouse-aeznlgmn-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
 const sql = neon(connectionString);
 
-// 2. Initialize UI Elements
+// 2. UI Elements
 const statusDot = document.getElementById('db-status-dot');
 const statusText = document.getElementById('db-status-text');
 const tableContainer = document.getElementById('data-table-container');
 
+// 3. Table Mapping (Linking your Sidebar to your SQL Tables)
+const TABLE_MAP = {
+    'parts': 'masterparts',
+    'work-orders': 'workorders',
+    'assets': 'assets',
+    'locations': 'partlocations',
+    'technicians': 'technicians'
+};
+
+/**
+ * Initializes the connection and loads the default view
+ */
 async function init() {
     try {
-        console.log("Starting Geismar Direct Pipe...");
+        console.log("Checking DB Heartbeat...");
         const result = await sql`SELECT NOW()`;
         
         if (result) {
-            statusDot.className = 'bi bi-circle-fill text-success me-1';
+            statusDot.className = 'bi bi-circle-fill text-success me-2';
             statusText.innerText = "Online (Direct)";
-            loadModuleData('parts'); // Default module
+            loadModuleData('parts'); // Initial load
         }
     } catch (err) {
-        console.error("Connection Failed:", err);
-        statusDot.className = 'bi bi-circle-fill text-danger me-1';
+        console.error("Critical Connection Error:", err);
+        statusDot.className = 'bi bi-circle-fill text-danger me-2';
         statusText.innerText = "Connection Failed";
-        tableContainer.innerHTML = `<div class="p-4 text-danger">Error: ${err.message}</div>`;
-    }
-}
-
-/**
- * Loads data based on the selected module
- */
-async function loadModuleData(moduleName) {
-    tableContainer.innerHTML = `<div class="p-4 text-muted">Fetching ${moduleName}...</div>`;
-    
-    // Map UI names to your actual SQL tables
-    const tableMap = {
-        'parts': 'parts', // Change these if your SQL tables have different names
-        'work-orders': 'work_orders',
-        'assets': 'assets',
-        'locations': 'locations',
-        'technicians': 'technicians'
-    };
-
-    const tableName = tableMap[moduleName];
-
-    try {
-        const data = await sql(`SELECT * FROM ${tableName} LIMIT 50`);
-        renderTable(data);
-    } catch (err) {
-        tableContainer.innerHTML = `<div class="p-4 text-warning text-center">
-            Table '${tableName}' not found or empty.<br>
-            <small>Verify table name in Neon SQL Editor.</small>
+        tableContainer.innerHTML = `<div class="p-5 text-center text-danger">
+            <h6>Database Access Denied</h6>
+            <small>${err.message}</small>
         </div>`;
     }
 }
 
+/**
+ * Fetches and renders data for a specific module
+ */
+async function loadModuleData(moduleKey) {
+    const tableName = TABLE_MAP[moduleKey];
+    tableContainer.innerHTML = `<div class="p-5 text-center text-muted">Loading ${tableName}...</div>`;
+
+    try {
+        // Query the specific table provided in your list
+        const data = await sql(`SELECT * FROM ${tableName} LIMIT 100`);
+        renderTable(data);
+    } catch (err) {
+        console.error(`Error loading ${tableName}:`, err);
+        tableContainer.innerHTML = `<div class="p-5 text-center text-warning">
+            <i class="bi bi-exclamation-triangle d-block mb-2 fs-3"></i>
+            Table <strong>${tableName}</strong> could not be loaded.<br>
+            <small>Verify schema permissions in Neon Console.</small>
+        </div>`;
+    }
+}
+
+/**
+ * Builds the HTML table dynamically
+ */
 function renderTable(data) {
     if (!data || data.length === 0) {
-        tableContainer.innerHTML = `<div class="p-4 text-center">No records found.</div>`;
+        tableContainer.innerHTML = `<div class="p-5 text-center text-muted">No records found in this table.</div>`;
         return;
     }
 
-    let html = `<table class="table table-hover mb-0"><thead><tr>`;
-    Object.keys(data[0]).forEach(key => html += `<th>${key.toUpperCase()}</th>`);
+    let html = `<table class="table table-hover align-middle mb-0">
+                    <thead class="table-light"><tr>`;
+    
+    // Header row
+    Object.keys(data[0]).forEach(key => {
+        html += `<th class="text-uppercase small fw-bold text-muted">${key.replace('_', ' ')}</th>`;
+    });
     html += `</tr></thead><tbody>`;
 
+    // Data rows
     data.forEach(row => {
         html += `<tr>`;
-        Object.values(row).forEach(val => html += `<td>${val || '-'}</td>`);
+        Object.values(row).forEach(val => {
+            html += `<td>${val === null ? '<span class="text-muted">-</span>' : val}</td>`;
+        });
         html += `</tr>`;
     });
 
     html += `</tbody></table>`;
     tableContainer.innerHTML = html;
-    document.getElementById('data-count').innerText = `${data.length} Records Found`;
 }
 
-// Attach to window so the HTML onclick can find it
+// Global exposure for the HTML onclick events
 window.loadModuleData = loadModuleData;
 
-// Boot
+// Run it
 init();
