@@ -1,4 +1,75 @@
-/**
+import { neon } from 'https://esm.sh/@neondatabase/serverless';
+
+let sql = null;
+
+const TABLE_MAP = {
+    'parts': 'masterparts',
+    'work-orders': 'workorders',
+    'assets': 'assets'
+};
+
+document.getElementById('btn-connect').addEventListener('click', async () => {
+    const password = document.getElementById('db-password').value;
+    const errorDiv = document.getElementById('login-error');
+    
+    if (!password) {
+        errorDiv.innerText = "Password required.";
+        return;
+    }
+
+    // Build the string dynamically using your input
+    const connectionString = `postgresql://neondb_owner:${password}@ep-plain-mouse-aeznlgmn-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require`;
+    
+    try {
+        const tempSql = neon(connectionString);
+        // Test the password
+        await tempSql`SELECT 1`;
+        
+        // If successful, save the connection and hide login
+        sql = tempSql;
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('db-status-dot').className = 'bi bi-circle-fill text-success me-2';
+        document.getElementById('db-status-text').innerText = "Online";
+        
+        loadModuleData('parts');
+    } catch (err) {
+        console.error(err);
+        errorDiv.innerText = "Invalid Password or Connection Failed.";
+    }
+});
+
+async function loadModuleData(moduleKey) {
+    if (!sql) return;
+    const tableName = TABLE_MAP[moduleKey];
+    const container = document.getElementById('data-table-container');
+    container.innerHTML = `<div class="p-5 text-center text-muted">Loading ${tableName}...</div>`;
+
+    try {
+        const data = await sql(`SELECT * FROM ${tableName} LIMIT 100`);
+        renderTable(data, container);
+    } catch (err) {
+        container.innerHTML = `<div class="p-5 text-center text-warning">Error accessing ${tableName}.</div>`;
+    }
+}
+
+function renderTable(data, container) {
+    if (!data || data.length === 0) {
+        container.innerHTML = `<div class="p-5 text-center text-muted">No records found.</div>`;
+        return;
+    }
+    let html = `<table class="table table-hover align-middle mb-0"><thead class="table-light"><tr>`;
+    Object.keys(data[0]).forEach(key => html += `<th class="small fw-bold text-muted text-uppercase">${key}</th>`);
+    html += `</tr></thead><tbody>`;
+    data.forEach(row => {
+        html += `<tr>`;
+        Object.values(row).forEach(val => html += `<td>${val || '-'}</td>`);
+        html += `</tr>`;
+    });
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+
+window.loadModuleData = loadModuleData;/**
  * GEISMAR MAINTENANCE PORTAL - REST API MODE
  * Using the Neon REST Endpoint for standard HTTPS data fetching.
  */
