@@ -2,79 +2,81 @@ import { neon } from 'https://esm.sh/@neondatabase/serverless';
 
 let sql = null;
 
-// 1. MODULE CONFIG
-const MODULE_CONFIG = {
-    'parts': { title: 'Master Inventory', query: () => sql`SELECT p.part_number, p.description, p.quantity_on_hand, l.location_code FROM masterparts p LEFT JOIN partlocations l ON p.location_id = l.id ORDER BY l.location_code ASC` },
-    'wo-search': { title: 'Work Orders', query: () => sql`SELECT id, description, status FROM workorders` },
-    'locations': { title: 'Bin Addresses', query: () => sql`SELECT location_code, loc_type FROM partlocations ORDER BY location_code` }
+const TABLE_MAP = {
+    'parts': 'masterparts',
+    'work-orders': 'workorders',
+    'locations': 'partlocations'
 };
 
-// 2. CONNECT LOGIC
+// 1. Connection Logic
 document.getElementById('btn-connect').addEventListener('click', async () => {
     const password = document.getElementById('db-password').value.trim();
     const errorDiv = document.getElementById('login-error');
+    
     if (!password) return;
 
     const connStr = `postgresql://neondb_owner:${password}@ep-plain-mouse-aeznlgmn-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require`;
     
     try {
         const tempSql = neon(connStr);
-        await tempSql`SELECT 1`;
-        sql = tempSql;
+        await tempSql`SELECT 1`; // Test
         
+        sql = tempSql;
         document.getElementById('login-overlay').style.display = 'none';
-        const dot = document.getElementById('db-status-dot');
-        if (dot) dot.className = 'status-dot bg-success';
+        document.getElementById('db-status-dot').className = 'status-dot bg-success';
         document.getElementById('db-status-text').innerText = "Online";
         
-        window.showModule('parts');
+        loadModuleData('parts'); // Initial load
+
     } catch (err) {
-        if (errorDiv) errorDiv.innerText = "Connection Failed.";
+        console.error("Connection Failed:", err);
+        errorDiv.innerText = "Invalid Password or Neon Error.";
     }
 });
 
-// 3. NAVIGATION
-window.showModule = async (key) => {
+// 2. Data Fetching
+async function loadModuleData(moduleKey) {
     if (!sql) return;
+
+    const tableName = TABLE_MAP[moduleKey];
     const container = document.getElementById('data-table-container');
-    document.getElementById('module-title').innerText = MODULE_CONFIG[key].title;
-    container.innerHTML = '<div class="spinner-border text-primary m-5"></div>';
+    document.getElementById('module-title').innerText = moduleKey.replace('-', ' ');
+
+    container.innerHTML = '<div class="text-center p-5"><div class="spinner-border"></div><br>Querying Geismar Node...</div>';
 
     try {
-        const data = await MODULE_CONFIG[key].query();
+        // Simple query to ensure it doesn't hang
+        const data = await sql`SELECT * FROM ${sql.unsafe(tableName)} LIMIT 100`;
         renderTable(data, container);
     } catch (err) {
-        container.innerHTML = "Error loading data.";
+        console.error("Query Error:", err);
+        container.innerHTML = `<div class="alert alert-danger">Access Denied to ${tableName}</div>`;
     }
-};
+}
 
+// 3. Rendering
 function renderTable(data, container) {
-    if (!data.length) { container.innerHTML = "Table empty."; return; }
-    let html = `<table class="table table-hover border"><thead><tr>${Object.keys(data[0]).map(k => `<th>${k.toUpperCase()}</th>`).join('')}</tr></thead><tbody>`;
-    data.forEach(row => { html += `<tr>${Object.values(row).map(v => `<td>${v || '-'}</td>`).join('')}</tr>`; });
+    if (!data || data.length === 0) {
+        container.innerHTML = "Table is empty.";
+        return;
+    }
+
+    let html = `<table class="table table-hover table-bordered bg-white shadow-sm"><thead><tr>`;
+    Object.keys(data[0]).forEach(key => {
+        html += `<th class="bg-light text-uppercase small">${key.replace('_', ' ')}</th>`;
+    });
+    html += `</tr></thead><tbody>`;
+
+    data.forEach(row => {
+        html += `<tr>`;
+        Object.values(row).forEach(val => {
+            html += `<td class="small">${val === null ? '-' : val}</td>`;
+        });
+        html += `</tr>`;
+    });
+
     container.innerHTML = html + `</tbody></table>`;
 }
 
-// 4. MODAL LOGIC
-window.openModal = function(type) {
-    const body = document.getElementById('modal-body-content');
-    const title = document.getElementById('modal-title-text');
-    const submit = document.getElementById('modal-submit-btn');
-
-    if (type === 'add-part') {
-        title.innerText = "Admin: Add New Part";
-        body.innerHTML = `<input id="p-num" class="form-control mb-2" placeholder="Part #"><input id="p-desc" class="form-control" placeholder="Description">`;
-        submit.onclick = () => alert("Add Logic Pending");
-    } else if (type === 'issue-part') {
-        title.innerText = "Issue Part (-)";
-        body.innerHTML = `<input id="i-num" class="form-control mb-2" placeholder="Part #"><input type="number" id="i-qty" class="form-control" placeholder="Qty">`;
-        submit.onclick = () => alert("Issue Logic Pending");
-    }
-
-    new bootstrap.Modal(document.getElementById('actionModal')).show();
-};
-
-window.filterTable = () => {
-    const val = document.getElementById('global-search').value.toLowerCase();
-    document.querySelectorAll('tbody tr').forEach(r => r.style.display = r.innerText.toLowerCase().includes(val) ? '' : 'none');
-};
+// Ensure functions are available to HTML
+window.loadModuleData = loadModuleData;
