@@ -2,12 +2,21 @@ import { neon } from 'https://esm.sh/@neondatabase/serverless';
 
 let sql = null;
 
+// Combined Mapping for all your Geismar tables
 const TABLE_MAP = {
     'parts': 'masterparts',
     'work-orders': 'workorders',
-    'assets': 'assets'
+    'assets': 'assets',
+    'locations': 'partlocations',
+    'technicians': 'technicians'
 };
 
+// UI Selectors
+const statusDot = document.getElementById('db-status-dot');
+const statusText = document.getElementById('db-status-text');
+const tableContainer = document.getElementById('data-table-container');
+
+// 1. Handle the Connection Login
 document.getElementById('btn-connect').addEventListener('click', async () => {
     const password = document.getElementById('db-password').value;
     const errorDiv = document.getElementById('login-error');
@@ -17,137 +26,54 @@ document.getElementById('btn-connect').addEventListener('click', async () => {
         return;
     }
 
-    // Build the string dynamically using your input
+    // Use your pooled connection string
     const connectionString = `postgresql://neondb_owner:${password}@ep-plain-mouse-aeznlgmn-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require`;
     
     try {
+        errorDiv.innerText = "Connecting to Geismar Node...";
         const tempSql = neon(connectionString);
-        // Test the password
+        
+        // Test connection
         await tempSql`SELECT 1`;
         
-        // If successful, save the connection and hide login
+        // Success: Clear overlay and set global sql object
         sql = tempSql;
         document.getElementById('login-overlay').style.display = 'none';
-        document.getElementById('db-status-dot').className = 'bi bi-circle-fill text-success me-2';
-        document.getElementById('db-status-text').innerText = "Online";
+        statusDot.className = 'bi bi-circle-fill text-success me-2';
+        statusText.innerText = "Online (Authenticated)";
         
+        // Load default view
         loadModuleData('parts');
     } catch (err) {
-        console.error(err);
-        errorDiv.innerText = "Invalid Password or Connection Failed.";
+        console.error("Auth Error:", err);
+        errorDiv.innerText = "Invalid Password or Access Denied.";
     }
 });
 
+// 2. Fetch Data using the established SQL connection
 async function loadModuleData(moduleKey) {
     if (!sql) return;
+    
     const tableName = TABLE_MAP[moduleKey];
-    const container = document.getElementById('data-table-container');
-    container.innerHTML = `<div class="p-5 text-center text-muted">Loading ${tableName}...</div>`;
+    tableContainer.innerHTML = `<div class="p-5 text-center text-muted">
+        <div class="spinner-border spinner-border-sm me-2"></div> Querying ${tableName}...
+    </div>`;
 
     try {
+        // Fetch rows using the serverless driver
         const data = await sql(`SELECT * FROM ${tableName} LIMIT 100`);
-        renderTable(data, container);
+        renderTable(data);
     } catch (err) {
-        container.innerHTML = `<div class="p-5 text-center text-warning">Error accessing ${tableName}.</div>`;
-    }
-}
-
-function renderTable(data, container) {
-    if (!data || data.length === 0) {
-        container.innerHTML = `<div class="p-5 text-center text-muted">No records found.</div>`;
-        return;
-    }
-    let html = `<table class="table table-hover align-middle mb-0"><thead class="table-light"><tr>`;
-    Object.keys(data[0]).forEach(key => html += `<th class="small fw-bold text-muted text-uppercase">${key}</th>`);
-    html += `</tr></thead><tbody>`;
-    data.forEach(row => {
-        html += `<tr>`;
-        Object.values(row).forEach(val => html += `<td>${val || '-'}</td>`);
-        html += `</tr>`;
-    });
-    html += `</tbody></table>`;
-    container.innerHTML = html;
-}
-
-window.loadModuleData = loadModuleData;/**
- * GEISMAR MAINTENANCE PORTAL - REST API MODE
- * Using the Neon REST Endpoint for standard HTTPS data fetching.
- */
-
-const API_BASE = "https://ep-plain-mouse-aeznlgmn.apirest.c-2.us-east-2.aws.neon.tech/neondb/rest/v1";
-
-// UI Selectors
-const statusDot = document.getElementById('db-status-dot');
-const statusText = document.getElementById('db-status-text');
-const tableContainer = document.getElementById('data-table-container');
-
-// Mapping your Geismar tables
-const TABLE_MAP = {
-    'parts': 'masterparts',
-    'work-orders': 'workorders',
-    'assets': 'assets',
-    'locations': 'partlocations',
-    'technicians': 'technicians'
-};
-
-/**
- * Initialize and check API health
- */
-async function init() {
-    try {
-        console.log("Pinging Geismar REST Endpoint...");
-        
-        // A simple GET request to check connectivity
-        const response = await fetch(`${API_BASE}/tables`);
-        
-        if (response.ok) {
-            statusDot.className = 'bi bi-circle-fill text-success me-2';
-            statusText.innerText = "Online (REST API)";
-            loadModuleData('parts'); // Default view
-        } else {
-            throw new Error(`Server responded with ${response.status}`);
-        }
-    } catch (err) {
-        console.error("REST Connection Failed:", err);
-        statusDot.className = 'bi bi-circle-fill text-danger me-2';
-        statusText.innerText = "API Offline";
-        tableContainer.innerHTML = `
-            <div class="p-5 text-center">
-                <i class="bi bi-cloud-slash text-danger fs-1"></i>
-                <h5 class="mt-3">REST API Connection Failed</h5>
-                <code>${err.message}</code>
-            </div>`;
-    }
-}
-
-/**
- * Fetches data for the selected table via REST
- */
-async function loadModuleData(moduleKey) {
-    const tableName = TABLE_MAP[moduleKey];
-    tableContainer.innerHTML = `<div class="p-5 text-center text-muted">Requesting ${tableName} via REST...</div>`;
-
-    try {
-        // Neon REST API convention for fetching rows
-        const response = await fetch(`${API_BASE}/tables/${tableName}/rows`);
-        
-        if (!response.ok) throw new Error(`Could not fetch ${tableName}`);
-        
-        const result = await response.json();
-        renderTable(result.data || result); // Neon REST usually wraps data in a 'data' key
-    } catch (err) {
-        console.error(`REST Query Error:`, err);
+        console.error(`Query Error:`, err);
         tableContainer.innerHTML = `
             <div class="p-5 text-center text-warning">
-                <i class="bi bi-lock-fill fs-2"></i><br>
-                REST Access Denied for: <strong>${tableName}</strong>
+                <i class="bi bi-exclamation-triangle fs-2"></i><br>
+                Error accessing <strong>${tableName}</strong>. Check table permissions.
             </div>`;
     }
 }
 
-/**
- * Builds the Bootstrap table
- */
+// 3. Render the Bootstrap Table
 function renderTable(data) {
     if (!data || data.length === 0) {
         tableContainer.innerHTML = `<div class="p-5 text-center text-muted">No records found.</div>`;
@@ -155,9 +81,9 @@ function renderTable(data) {
     }
 
     let html = `<table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr>`;
+                <thead class="table-light"><tr>`;
     
-    // Headers
+    // Headers - replace underscores with spaces for cleaner look
     Object.keys(data[0]).forEach(key => {
         html += `<th class="small fw-bold text-muted text-uppercase">${key.replace('_', ' ')}</th>`;
     });
@@ -176,5 +102,12 @@ function renderTable(data) {
     tableContainer.innerHTML = html;
 }
 
+// Make functions available to the HTML onclick events
 window.loadModuleData = loadModuleData;
-init();
+window.showModule = function(moduleId) {
+    // UI update for sidebar
+    document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+    // Trigger data load
+    document.getElementById('module-title').innerText = moduleId.replace('-', ' ').toUpperCase();
+    loadModuleData(moduleId);
+};
