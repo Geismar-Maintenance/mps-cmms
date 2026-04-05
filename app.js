@@ -94,3 +94,42 @@ function renderTable(data, container) {
     }
 
     let html = `<table class="table table-hover align-middle mb-0">
+<thead class="table-light"><tr>`;
+    
+    // Dynamic Headers
+    Object.keys(data[0]).forEach(key => {
+        html += `<th class="small fw-bold text-muted text-uppercase">${key.replace('_', ' ')}</th>`;
+    });
+    
+    html += `</tr></thead><tbody>`;
+
+    // Dynamic Rows
+    data.forEach(row => {
+        html += `<tr>`;
+        Object.values(row).forEach(val => {
+            html += `<td class="small">${val === null ? '<span class="text-muted">-</span>' : val}</td>`;
+        });
+        html += `</tr>`;
+    });
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+
+/**
+ * 5. Bridge to HTML
+ */
+window.loadModuleData = loadModuleData;
+window.showModule = function(moduleId) {
+    // Update Sidebar Active State
+    document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+    const activeLink = document.querySelector(`[onclick="showModule('${moduleId}')"]`);
+    if (activeLink) activeLink.classList.add('active');
+
+    // Update Header and Fetch
+    const titleElement = document.getElementById('module-title');
+    if (titleElement) {
+        titleElement.innerText = moduleId.replace('-', ' ').toUpperCase();
+    }
+    loadModuleData(moduleId);
+};
