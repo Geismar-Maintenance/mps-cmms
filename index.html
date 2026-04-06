@@ -2,10 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>MPS Geismar | CMMS Dashboard</title>
+  <title>MPS Geismar | CMMS</title>
 
   <!-- Bootstrap 5 -->
-  https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
 
   <style>
     body {
@@ -26,17 +29,29 @@
     .sidebar .nav-link {
       cursor: pointer;
       color: #333;
-      border-radius: 0.25rem;
-      margin-bottom: 0.25rem;
+      border-radius: 4px;
+      margin-bottom: 4px;
+      padding: 8px 10px;
     }
 
     .sidebar .nav-link.active {
       background-color: #0d6efd;
       color: #ffffff;
+      font-weight: 500;
     }
 
-    .dashboard-card {
-      height: 100%;
+    .module {
+      display: none;
+    }
+
+    .module.active {
+      display: block;
+    }
+
+    .module-header {
+      border-bottom: 1px solid #dee2e6;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
     }
 
     .table thead th {
@@ -49,7 +64,7 @@
 
 <body>
 
-<!-- ===== TOP NAV ===== -->
+<!-- ================= TOP NAV ================= -->
 <nav class="navbar navbar-dark bg-dark px-3">
   <span class="navbar-brand">
     MPS Geismar — Maintenance CMMS
@@ -59,114 +74,228 @@
 <div class="container-fluid">
   <div class="row">
 
-    <!-- ===== LEFT NAV / MODULES ===== -->
+    <!-- ================= LEFT NAV ================= -->
     <aside class="col-md-2 sidebar p-3">
       <h6 class="text-muted mb-3">Modules</h6>
 
-      <nav class="nav flex-column">
-        <a class="nav-link active">
+      <nav class="nav flex-column" id="module-nav">
+        <a class="nav-link active" onclick="switchModule('dashboard', this)">
           Dashboard
         </a>
-        <a class="nav-link">
+        <a class="nav-link" onclick="switchModule('parts', this)">
           Parts Management
         </a>
-        <a class="nav-link">
+        <a class="nav-link" onclick="switchModule('workorders', this)">
           Work Orders
         </a>
-        <a class="nav-link">
+        <a class="nav-link" onclick="switchModule('admin', this)">
           Administration
         </a>
       </nav>
     </aside>
 
-    <!-- ===== DASHBOARD CONTENT ===== -->
+    <!-- ================= MAIN CONTENT ================= -->
     <main class="col-md-10 p-4">
 
-      <h4 class="mb-4">Dashboard</h4>
+      <!-- ==================================================
+           DASHBOARD
+           ================================================== -->
+      <section id="module-dashboard" class="module active">
 
-      <div class="row g-4">
+        <h4 class="mb-4">Dashboard</h4>
 
-        <!-- ===== LOW STOCK ALERTS ===== -->
-        <div class="col-md-12">
-          <div class="card shadow-sm dashboard-card">
-            <div class="card-header bg-white">
-              <strong>Low Stock Alerts</strong>
+        <div class="row g-4">
+
+          <!-- ===== LOW STOCK ALERTS ===== -->
+          <div class="col-12">
+            <div class="card shadow-sm">
+              <div class="card-header bg-white">
+                <strong>Low Stock Alerts</strong>
+              </div>
+              <div class="card-body p-0">
+                <table class="table table-sm table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th>Part #</th>
+                      <th>Description</th>
+                      <th>On Hand</th>
+                      <th>Reorder</th>
+                      <th>Location</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="table-warning">
+                      <td>MOP001</td>
+                      <td>Testing</td>
+                      <td>3</td>
+                      <td>5</td>
+                      <td>CAB1.A.03</td>
+                    </tr>
+                    <tr class="table-warning">
+                      <td>BELT004</td>
+                      <td>Drive Belt</td>
+                      <td>2</td>
+                      <td>4</td>
+                      <td>TC02.B.14</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <div class="card-body p-0">
-              <table class="table table-sm table-hover mb-0">
-                <thead>
-                  <tr>
-                    <th>Part #</th>
-                    <th>Description</th>
-                    <th>On Hand</th>
-                    <th>Reorder Level</th>
-                    <th>Location</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr class="table-warning">
-                    <td>MOP001</td>
-                    <td>Testing</td>
-                    <td>3</td>
-                    <td>5</td>
-                    <td>CAB1.A.03</td>
-                  </tr>
-                  <tr class="table-warning">
-                    <td>BELT004</td>
-                    <td>Drive Belt</td>
-                    <td>2</td>
-                    <td>4</td>
-                    <td>TC02.B.14</td>
-                  </tr>
-                </tbody>
-              </table>
+          </div>
+
+          <!-- ===== WORK ORDERS DUE / LATE ===== -->
+          <div class="col-12">
+            <div class="card shadow-sm">
+              <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <strong>Work Orders Due Soon / Late</strong>
+                <small class="text-muted">Next 5 days or overdue</small>
+              </div>
+              <div class="card-body p-0">
+                <table class="table table-sm table-bordered mb-0">
+                  <thead>
+                    <tr>
+                      <th>WO #</th>
+                      <th>Asset</th>
+                      <th>Description</th>
+                      <th>Due Date</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="table-danger">
+                      <td>WO-10231</td>
+                      <td>P-201</td>
+                      <td>Seal leak</td>
+                      <td>03-Apr-2026</td>
+                      <td>Late</td>
+                    </tr>
+                    <tr class="table-warning">
+                      <td>WO-10245</td>
+                      <td>M-114</td>
+                      <td>Motor overheating</td>
+                      <td>08-Apr-2026</td>
+                      <td>Due Soon</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================================================
+           PARTS MANAGEMENT
+           ================================================== -->
+      <section id="module-parts" class="module">
+
+        <div class="module-header d-flex justify-content-between align-items-center">
+          <h4>Parts Management</h4>
+          <div>
+            <button class="btn btn-sm btn-outline-primary me-2">Issue Part</button>
+            <button class="btn btn-sm btn-outline-success">Receive Part</button>
           </div>
         </div>
 
-        <!-- ===== WORK ORDERS DUE / LATE ===== -->
-        <div class="col-md-12">
-          <div class="card shadow-sm dashboard-card">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-              <strong>Work Orders Due Soon / Late</strong>
-              <small class="text-muted">Next 5 days or overdue</small>
-            </div>
-            <div class="card-body p-0">
-              <table class="table table-sm table-bordered mb-0">
-                <thead>
-                  <tr>
-                    <th>WO #</th>
-                    <th>Asset</th>
-                    <th>Description</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr class="table-danger">
-                    <td>WO‑10231</td>
-                    <td>P‑201</td>
-                    <td>Seal leak</td>
-                    <td>03‑APR‑2026</td>
-                    <td>Late</td>
-                  </tr>
-                  <tr class="table-warning">
-                    <td>WO‑10245</td>
-                    <td>M‑114</td>
-                    <td>Motor overheating</td>
-                    <td>08‑APR‑2026</td>
-                    <td>Due Soon</td>
-                  </tr>
-                </tbody>
-              </table>
+        <div class="card shadow-sm">
+          <div class="card-body p-0">
+            <table class="table table-sm table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Part #</th>
+                  <th>Description</th>
+                  <th>On Hand</th>
+                  <th>Reorder</th>
+                  <th>Location</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- populated later -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           WORK ORDERS
+           ================================================== -->
+      <section id="module-workorders" class="module">
+
+        <div class="module-header d-flex justify-content-between align-items-center">
+          <h4>Work Orders</h4>
+          <button class="btn btn-sm btn-outline-primary">New Work Order</button>
+        </div>
+
+        <div class="card shadow-sm">
+          <div class="card-body p-0">
+            <table class="table table-sm table-bordered mb-0">
+              <thead>
+                <tr>
+                  <th>WO #</th>
+                  <th>Asset</th>
+                  <th>Description</th>
+                  <th>Status</th>
+                  <th>Assigned To</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- populated later -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           ADMINISTRATION
+           ================================================== -->
+      <section id="module-admin" class="module">
+
+        <div class="module-header">
+          <h4>Administration</h4>
+        </div>
+
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="list-group">
+              <div class="list-group-item">Part Master Maintenance</div>
+              <div class="list-group-item">Inventory Adjustments</div>
+              <div class="list-group-item">Asset Management</div>
+              <div class="list-group-item">System Tables</div>
             </div>
           </div>
         </div>
+      </section>
 
-      </div>
     </main>
   </div>
 </div>
 
+<!-- ================= MODULE SWITCH SCRIPT ================= -->
+<script>
+  function switchModule(moduleName, clickedLink) {
+    // Hide all modules
+    document.querySelectorAll(".module").forEach(section =>
+      section.classList.remove("active")
+    );
+
+    // Show selected module
+    document
+      .getElementById("module-" + moduleName)
+      .classList.add("active");
+
+    // Update sidebar state
+    document.querySelectorAll("#module-nav .nav-link").forEach(link =>
+      link.classList.remove("active")
+    );
+
+    clickedLink.classList.add("active");
+  }
+</script>
+
 </body>
 </html>
+``
