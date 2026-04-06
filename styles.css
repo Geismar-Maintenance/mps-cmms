@@ -1,0 +1,18 @@
+/* Hide all modules by default */
+.module {
+  display: none;
+}
+
+/* Only the active module is shown */
+.module.active {
+  display: block;
+}
+
+/* Optional visual polish */
+.sidebar {
+  min-height: calc(100vh - 56px);
+}
+
+.nav-link {
+  cursor: pointer;
+}
