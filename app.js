@@ -1,82 +1,83 @@
-import { neon } from 'https://esm.sh/@neondatabase/serverless';
+const API_BASE = "http://localhost:3000/api";
 
-let sql = null;
+const tableContainer = document.getElementById("data-table-container");
+const statusDot = document.getElementById("db-status-dot");
+const statusText = document.getElementById("db-status-text");
 
-const TABLE_MAP = {
-    'parts': 'masterparts',
-    'work-orders': 'workorders',
-    'locations': 'partlocations'
-};
+/**
+ * Backend connection check
+ */
+document.getElementById("btn-connect").addEventListener("click", async () => {
+  const errorDiv = document.getElementById("login-error");
 
-// 1. Connection Logic
-document.getElementById('btn-connect').addEventListener('click', async () => {
-    const password = document.getElementById('db-password').value.trim();
-    const errorDiv = document.getElementById('login-error');
-    
-    if (!password) return;
+  try {
+    const res = await fetch(`${API_BASE}/health`);
+    if (!res.ok) throw new Error();
 
-    const connStr = `postgresql://neondb_owner:${password}@ep-plain-mouse-aeznlgmn-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require`;
-    
-    try {
-        const tempSql = neon(connStr);
-        await tempSql`SELECT 1`; // Test
-        
-        sql = tempSql;
-        document.getElementById('login-overlay').style.display = 'none';
-        document.getElementById('db-status-dot').className = 'status-dot bg-success';
-        document.getElementById('db-status-text').innerText = "Online";
-        
-        loadModuleData('parts'); // Initial load
+    document.getElementById("login-overlay").style.display = "none";
+    statusDot.className = "status-dot bg-success";
+    statusText.innerText = "Online";
 
-    } catch (err) {
-        console.error("Connection Failed:", err);
-        errorDiv.innerText = "Invalid Password or Neon Error.";
-    }
+    loadModuleData("parts");
+  } catch {
+    errorDiv.innerText = "Maintenance server unavailable.";
+  }
 });
 
-// 2. Data Fetching
+/**
+ * Load data from backend
+ */
 async function loadModuleData(moduleKey) {
-    if (!sql) return;
+  document.getElementById("module-title").innerText =
+    moduleKey.replace("-", " ");
 
-    const tableName = TABLE_MAP[moduleKey];
-    const container = document.getElementById('data-table-container');
-    document.getElementById('module-title').innerText = moduleKey.replace('-', ' ');
+  tableContainer.innerHTML = `
+    <div class="text-center p-5">
+      <div class="spinner-border"></div><br>
+      Querying Geismar Node...
+    </div>`;
 
-    container.innerHTML = '<div class="text-center p-5"><div class="spinner-border"></div><br>Querying Geismar Node...</div>';
-
-    try {
-        // Simple query to ensure it doesn't hang
-        const data = await sql`SELECT * FROM ${sql.unsafe(tableName)} LIMIT 100`;
-        renderTable(data, container);
-    } catch (err) {
-        console.error("Query Error:", err);
-        container.innerHTML = `<div class="alert alert-danger">Access Denied to ${tableName}</div>`;
-    }
+  try {
+    const res = await fetch(`${API_BASE}/${moduleKey}`);
+    const data = await res.json();
+    renderTable(data);
+  } catch {
+    tableContainer.innerHTML =
+      `<div class="alert alert-danger">
+        Unable to load ${moduleKey}
+      </div>`;
+  }
 }
 
-// 3. Rendering
-function renderTable(data, container) {
-    if (!data || data.length === 0) {
-        container.innerHTML = "Table is empty.";
-        return;
-    }
+/**
+ * Render data table
+ */
+function renderTable(data) {
+  if (!data || data.length === 0) {
+    tableContainer.innerHTML = "Table is empty.";
+    return;
+  }
 
-    let html = `<table class="table table-hover table-bordered bg-white shadow-sm"><thead><tr>`;
-    Object.keys(data[0]).forEach(key => {
-        html += `<th class="bg-light text-uppercase small">${key.replace('_', ' ')}</th>`;
+  let html = `
+    <table class="table table-hover table-bordered bg-white shadow-sm">
+      <thead><tr>`;
+
+  Object.keys(data[0]).forEach(key => {
+    html += `<th class="bg-light text-uppercase small">${key.replace("_", " ")}</th>`;
+  });
+
+  html += `</tr></thead><tbody>`;
+
+  data.forEach(row => {
+    html += "<tr>";
+    Object.values(row).forEach(val => {
+      html += `<td class="small">${val ?? "-"}</td>`;
     });
-    html += `</tr></thead><tbody>`;
+    html += "</tr>";
+  });
 
-    data.forEach(row => {
-        html += `<tr>`;
-        Object.values(row).forEach(val => {
-            html += `<td class="small">${val === null ? '-' : val}</td>`;
-        });
-        html += `</tr>`;
-    });
-
-    container.innerHTML = html + `</tbody></table>`;
+  html += "</tbody></table>";
+  tableContainer.innerHTML = html;
 }
 
-// Ensure functions are available to HTML
 window.loadModuleData = loadModuleData;
