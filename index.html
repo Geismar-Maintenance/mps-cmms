@@ -2,13 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>MPS Geismar | CMMS</title>
+  <title>MPS Geismar | CMMS Dashboard</title>
 
   <!-- Bootstrap 5 -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
+  https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css
 
   <style>
     body {
@@ -38,10 +35,8 @@
       color: #ffffff;
     }
 
-    .module-header {
-      border-bottom: 1px solid #dee2e6;
-      padding-bottom: 0.5rem;
-      margin-bottom: 1rem;
+    .dashboard-card {
+      height: 100%;
     }
 
     .table thead th {
@@ -49,20 +44,12 @@
       font-size: 0.75rem;
       background-color: #f1f3f5;
     }
-
-    .module {
-      display: none;
-    }
-
-    .module.active {
-      display: block;
-    }
   </style>
 </head>
 
 <body>
 
-<!-- ================= TOP NAV ================= -->
+<!-- ===== TOP NAV ===== -->
 <nav class="navbar navbar-dark bg-dark px-3">
   <span class="navbar-brand">
     MPS Geismar — Maintenance CMMS
@@ -72,176 +59,44 @@
 <div class="container-fluid">
   <div class="row">
 
-    <!-- ================= SIDEBAR ================= -->
+    <!-- ===== LEFT NAV / MODULES ===== -->
     <aside class="col-md-2 sidebar p-3">
       <h6 class="text-muted mb-3">Modules</h6>
 
-      <nav class="nav flex-column" id="module-nav">
-        <a class="nav-link active" onclick="switchModule('parts', this)">
+      <nav class="nav flex-column">
+        <a class="nav-link active">
+          Dashboard
+        </a>
+        <a class="nav-link">
           Parts Management
         </a>
-        <a class="nav-link" onclick="switchModule('workorders', this)">
+        <a class="nav-link">
           Work Orders
         </a>
-        <a class="nav-link" onclick="switchModule('admin', this)">
+        <a class="nav-link">
           Administration
         </a>
       </nav>
     </aside>
 
-    <!-- ================= MAIN CONTENT ================= -->
+    <!-- ===== DASHBOARD CONTENT ===== -->
     <main class="col-md-10 p-4">
 
-      <!-- ===== PARTS MANAGEMENT ===== -->
-      <section id="module-parts" class="module active">
+      <h4 class="mb-4">Dashboard</h4>
 
-        <div class="module-header d-flex justify-content-between align-items-center">
-          <h4>Parts Management</h4>
-          <div>
-            <button class="btn btn-sm btn-outline-primary me-2">
-              Issue Part
-            </button>
-            <button class="btn btn-sm btn-outline-success">
-              Receive Part
-            </button>
-          </div>
-        </div>
+      <div class="row g-4">
 
-<div class="row mb-3">
-  <div class="col-md-5">
-    <input
-      type="text"
-      id="part-search-input"
-      class="form-control form-control-sm"
-      placeholder="Search by ID, part #, manufacturer, or model"
-    />
-  </div>
-</div>
-        
-        <div class="card shadow-sm">
-          <div class="card-body p-0">
-            <table class="table table-sm table-hover mb-0">
-              <thead>
-                <tr>
-                  <th>Part #</th>
-                  <th>Description</th>
-                  <th>On Hand</th>
-                  <th>Reorder Level</th>
-                  <th>Location</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="table-warning">
-                  <td>MOP001</td>
-                  <td>Testing</td>
-                  <td>3</td>
-                  <td>5</td>
-                  <td>Warehouse</td>
-                </tr>
-                <tr>
-                  <td>BELT004</td>
-                  <td>Drive Belt</td>
-                  <td>10</td>
-                  <td>4</td>
-                  <td>Tool Crib</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- ===== WORK ORDERS ===== -->
-      <section id="module-workorders" class="module">
-
-        <div class="module-header d-flex justify-content-between align-items-center">
-          <h4>Work Orders</h4>
-          <button class="btn btn-sm btn-outline-primary">
-            New Work Order
-          </button>
-        </div>
-
-        <div class="card shadow-sm">
-          <div class="card-body p-0">
-            <table class="table table-sm table-bordered mb-0">
-              <thead>
-                <tr>
-                  <th>WO #</th>
-                  <th>Asset</th>
-                  <th>Description</th>
-                  <th>Status</th>
-                  <th>Assigned To</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>WO‑10231</td>
-                  <td>P‑201</td>
-                  <td>Seal leak</td>
-                  <td>Open</td>
-                  <td>J. Smith</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- ===== ADMINISTRATION ===== -->
-      <section id="module-admin" class="module">
-
-        <div class="module-header">
-          <h4>Administration</h4>
-        </div>
-
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <div class="list-group">
-              <div class="list-group-item">
-                Part Master Maintenance
-              </div>
-              <div class="list-group-item">
-                Inventory Adjustments
-              </div>
-              <div class="list-group-item">
-                Asset Management
-              </div>
-              <div class="list-group-item">
-                System Tables
-              </div>
+        <!-- ===== LOW STOCK ALERTS ===== -->
+        <div class="col-md-12">
+          <div class="card shadow-sm dashboard-card">
+            <div class="card-header bg-white">
+              <strong>Low Stock Alerts</strong>
             </div>
-          </div>
-        </div>
-
-      </section>
-
-    </main>
-  </div>
-</div>
-
-<!-- ================= MODULE SWITCH SCRIPT ================= -->
-<script>
-  function switchModule(moduleName, clickedLink) {
-    // Hide all modules
-    document.querySelectorAll(".module").forEach(section =>
-      section.classList.remove("active")
-    );
-
-    // Show selected module
-    document
-      .getElementById("module-" + moduleName)
-      .classList.add("active");
-
-    // Update sidebar highlight
-    document.querySelectorAll("#module-nav .nav-link").forEach(link =>
-      link.classList.remove("active")
-    );
-
-    clickedLink.classList.add("active");
-  }
-</script>
-
-</body>
-</html>
+            <div class="card-body p-0">
+              <table class="table table-sm table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Part #</th>
+                    <th>Description</th>
+                    <th>On Hand</th>
+                    <th>Reorder Level</th>
