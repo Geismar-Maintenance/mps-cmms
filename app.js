@@ -1,3 +1,5 @@
+const API_BASE = "https://mps-geismar-backend-hkxb.vercel.app";
+
 /* =========================================================
    GLOBAL STATE
    ========================================================= */
@@ -61,7 +63,7 @@ function initPartsModule() {
 
 async function loadParts() {
   try {
-    const res = await fetch("/api/parts");
+    const res = await fetch(`${API_BASE}/api/parts`);
     if (!res.ok) {
       throw new Error("Failed to load parts");
     }
