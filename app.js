@@ -1,111 +1,141 @@
 /*************************************************
- * CONFIG
+ * CMMS Frontend Controller
+ * app.js
  *************************************************/
-const API_BASE = "https://mps-geismar-backend-hkxb.vercel.app/api";
+
+/**
+ * Current active module
+ * parts | workorders | admin
+ */
+let currentModule = "parts";
 
 /*************************************************
- * ENTRY POINT
+ * Page Initialize
  *************************************************/
 document.addEventListener("DOMContentLoaded", () => {
-  loadParts();
+  initModuleNavigation();
+  switchModule("parts");
 });
 
 /*************************************************
- * MODULE LOADERS
+ * Module Navigation
  *************************************************/
-async function loadParts() {
-  setTitle("Parts Inventory");
-  setLoading();
+function initModuleNavigation() {
+  const links = document.querySelectorAll("#module-nav .nav-link");
 
-  try {
-    const res = await fetch(`${API_BASE}/parts`);
-    if (!res.ok) throw new Error("Failed to load parts");
-
-    const data = await res.json();
-    renderPartsTable(data);
-  } catch (err) {
-    showError(err.message);
-  }
+  links.forEach(link => {
+    link.addEventListener("click", function () {
+      const moduleName = getModuleFromLink(this);
+      switchModule(moduleName);
+    });
+  });
 }
 
-/*************************************************
- * RENDERING
- *************************************************/
-function renderPartsTable(parts) {
-  if (!parts.length) {
-    document.getElementById("table-container").innerHTML =
-      "<div class='text-muted'>No parts found.</div>";
-    return;
-  }
+/**
+ * Determine module name from sidebar link text
+ */
+function getModuleFromLink(link) {
+  const text = link.textContent.toLowerCase();
 
-  let html = `
-    <table class="table table-bordered table-hover table-sm align-middle">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Part #</th>
-          <th>Description</th>
-          <th>Manufacturer</th>
-          <th>Model</th>
-          <th>Cost</th>
-          <th>Reorder Level</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+  if (text.includes("work")) return "workorders";
+  if (text.includes("admin")) return "admin";
+  return "parts";
+}
 
-  parts.forEach(p => {
-    const lowStockClass =
-      p.reorderlevel !== null && p.reorderlevel > 0
-        ? "table-warning"
-        : "";
+/**
+ * Switch active module
+ */
+function switchModule(moduleName) {
+  currentModule = moduleName;
 
-    html += `
-      <tr class="${lowStockClass}">
-        <td>${p.partid}</td>
-        <td>${escapeHtml(p.partnumber)}</td>
-        <td>${escapeHtml(p.description)}</td>
-        <td>${escapeHtml(p.manufacturer)}</td>
-        <td>${escapeHtml(p.model)}</td>
-        <td>$${Number(p.cost).toFixed(2)}</td>
-        <td>${p.reorderlevel ?? "-"}</td>
-      </tr>
-    `;
+  // Hide all modules
+  document.querySelectorAll(".module").forEach(section => {
+    section.classList.remove("active");
   });
 
-  html += "</tbody></table>";
+  // Show selected module
+  const activeSection = document.getElementById("module-" + moduleName);
+  if (activeSection) {
+    activeSection.classList.add("active");
+  }
 
-  document.getElementById("table-container").innerHTML = html;
+  // Update sidebar active state
+  updateSidebarState(moduleName);
+
+  // Hook for future module-specific logic
+  handleModuleLoad(moduleName);
+}
+
+/**
+ * Highlight active sidebar item
+ */
+function updateSidebarState(moduleName) {
+  const links = document.querySelectorAll("#module-nav .nav-link");
+
+  links.forEach(link => {
+    link.classList.remove("active");
+
+    const text = link.textContent.toLowerCase();
+    if (
+      (moduleName === "parts" && text.includes("parts")) ||
+      (moduleName === "workorders" && text.includes("work")) ||
+      (moduleName === "admin" && text.includes("admin"))
+    ) {
+      link.classList.add("active");
+    }
+  });
 }
 
 /*************************************************
- * UI HELPERS
+ * Module Load Hooks (Future Expansion)
  *************************************************/
-function setLoading() {
-  document.getElementById("table-container").innerHTML =
-    "<div class='text-muted'>Loading data…</div>";
-}
+function handleModuleLoad(moduleName) {
+  switch (moduleName) {
+    case "parts":
+      onPartsModuleLoad();
+      break;
 
-function showError(message) {
-  document.getElementById("table-container").innerHTML = `
-    <div class="alert alert-danger">
-      ${message}
-    </div>
-  `;
-}
+    case "workorders":
+      onWorkOrdersModuleLoad();
+      break;
 
-function setTitle(title) {
-  document.getElementById("module-title").innerText = title;
+    case "admin":
+      onAdminModuleLoad();
+      break;
+  }
 }
 
 /*************************************************
- * SECURITY
+ * Parts Management Hooks
  *************************************************/
-function escapeHtml(text) {
-  if (!text) return "";
-  return text
-    .toString()
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+function onPartsModuleLoad() {
+  console.log("Parts Management loaded");
+
+  // Future:
+  // loadPartsFromAPI();
+  // setupIssuePartModal();
+  // setupReceivePartModal();
 }
+
+/*************************************************
+ * Work Orders Hooks
+ *************************************************/
+function onWorkOrdersModuleLoad() {
+  console.log("Work Orders loaded");
+
+  // Future:
+  // loadWorkOrders();
+  // setupNewWorkOrderForm();
+}
+
+/*************************************************
+ * Administration Hooks
+ *************************************************/
+function onAdminModuleLoad() {
+  console.log("Administration loaded");
+
+  // Future:
+  // checkAdminPermission();
+  // loadAdminTables();
+}
+``
