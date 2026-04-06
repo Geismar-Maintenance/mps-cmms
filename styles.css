@@ -16,3 +16,111 @@
 .nav-link {
   cursor: pointer;
 }
+/* =====================================================
+   Mauser Packaging Solutions Branding
+   ===================================================== */
+
+:root {
+  --mps-blue: #003A8F;
+  --mps-blue-dark: #002B6C;
+  --mps-gray-dark: #2B2E34;
+  --mps-gray-light: #F4F6F8;
+  --mps-accent-orange: #F36F21;
+}
+
+/* Page background */
+body {
+  background-color: var(--mps-gray-light);
+  font-size: 0.9rem;
+}
+
+/* Top navbar */
+.navbar {
+  background-color: var(--mps-blue) !important;
+}
+
+.navbar-brand {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* Sidebar */
+aside {
+  background-color: #ffffff;
+  border-right: 1px solid #e0e0e0;
+}
+
+#module-nav .nav-link {
+  color: var(--mps-gray-dark);
+  border-radius: 4px;
+  margin-bottom: 4px;
+  padding: 8px 10px;
+}
+
+#module-nav .nav-link.active {
+  background-color: var(--mps-blue);
+  color: white;
+  font-weight: 500;
+}
+
+#module-nav .nav-link:hover {
+  background-color: var(--mps-blue-dark);
+  color: white;
+}
+
+/* Cards */
+.card {
+  border-radius: 6px;
+}
+
+.card-header {
+  background-color: #ffffff;
+  border-bottom: 2px solid var(--mps-blue);
+}
+
+/* Table headers */
+.table thead th {
+  background-color: #e9edf3;
+  color: #333;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+/* Low stock & alerts */
+.table-warning {
+  background-color: rgba(243, 111, 33, 0.15) !important;
+}
+
+.table-danger {
+  background-color: rgba(220, 53, 69, 0.12) !important;
+}
+
+/* Buttons */
+.btn-outline-primary {
+  border-color: var(--mps-blue);
+  color: var(--mps-blue);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--mps-blue);
+  color: white;
+}
+
+.btn-outline-success {
+  border-color: var(--mps-accent-orange);
+  color: var(--mps-accent-orange);
+}
+
+.btn-outline-success:hover {
+  background-color: var(--mps-accent-orange);
+  color: white;
+}
+
+/* Modules */
+.module {
+  display: none;
+}
+
+.module.active {
+  display: block;
+}
