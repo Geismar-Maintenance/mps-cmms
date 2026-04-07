@@ -112,11 +112,11 @@ function renderPartsTable(parts) {
         <td>${p.model}</td>
         <td>${p.total_qty}</td>
    <td>
-     
-<button class="btn btn-sm btn-outline-primary"
-        onclick="alert('Issue clicked for part ${p.partid}')">
+  <button class="btn btn-sm btn-outline-primary"
+        onclick="openIssueModal(${p.partid})">
   Issue
-</button>
+   </button>
+
 
      <button class="btn btn-sm btn-outline-success"
              onclick="openReceiveModal(${p.partid})">
