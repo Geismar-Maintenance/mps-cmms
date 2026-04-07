@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>MPS | CMMS</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>Mauser Packaging Solutions | CMMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Bootstrap -->
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
     rel="stylesheet"
-  />
+  >
 
-  <!-- App Styles -->
-  <link rel="stylesheet" href="styles.css" />
+  <!-- App styles -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-<!-- TOP BAR -->
+<!-- Top Bar -->
 <nav class="navbar navbar-dark px-3">
   <span class="navbar-brand">
-    MPS | Geismar CMMS
+    Mauser Packaging Solutions | Geismar CMMS
   </span>
 </nav>
 
 <div class="container-fluid">
   <div class="row">
 
-    <!-- SIDEBAR -->
+    <!-- Sidebar -->
     <aside class="col-md-2 p-3 border-end">
       <h6 class="text-muted mb-3">Modules</h6>
       <nav class="nav flex-column" id="module-nav">
@@ -38,18 +38,18 @@
       </nav>
     </aside>
 
-    <!-- MAIN -->
+    <!-- Main -->
     <main class="col-md-10 p-4">
 
-      <!-- DASHBOARD -->
+      <!-- Dashboard -->
       <section id="module-dashboard" class="module active">
-        <h4 class="mb-3">Dashboard</h4>
+        <h4>Dashboard</h4>
         <p class="text-muted">
-          Low stock alerts and due work orders will appear here.
+          Low stock and work order alerts will appear here.
         </p>
       </section>
 
-      <!-- PARTS -->
+      <!-- Parts -->
       <section id="module-parts" class="module">
         <h4 class="mb-3">Parts Management</h4>
 
@@ -57,7 +57,7 @@
           id="part-search"
           class="form-control form-control-sm mb-3"
           placeholder="Search by part #, manufacturer, or model"
-        />
+        >
 
         <table id="parts-table" class="table table-sm table-hover">
           <thead>
@@ -74,13 +74,13 @@
         </table>
       </section>
 
-      <!-- WORK ORDERS -->
+      <!-- Work Orders -->
       <section id="module-workorders" class="module">
         <h4>Work Orders</h4>
         <p class="text-muted">Coming next.</p>
       </section>
 
-      <!-- ADMIN -->
+      <!-- Admin -->
       <section id="module-admin" class="module">
         <h4>Administration</h4>
         <p class="text-muted">Admin tools coming next.</p>
@@ -90,9 +90,13 @@
   </div>
 </div>
 
-<!-- SCRIPTS -->
+<!-- Bootstrap JS -->
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+</script>
+
+<!-- App JS -->
 <script src="app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
