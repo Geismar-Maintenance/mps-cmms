@@ -1,102 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Mauser Packaging Solutions | CMMS</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+document.addEventListener("DOMContentLoaded", () => {
+  const links = document.querySelectorAll("#module-nav .nav-link");
 
-  <!-- Bootstrap -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  >
+  links.forEach(link => {
+    link.addEventListener("click", () => {
+      const moduleName = link.dataset.module;
 
-  <!-- App styles -->
-  <link rel="stylesheet" href="styles.css">
-</head>
+      // Hide all modules
+      document.querySelectorAll(".module").forEach(section => {
+        section.classList.remove("active");
+      });
 
-<body>
+      // Show selected module
+      const target = document.getElementById("module-" + moduleName);
+      if (target) {
+        target.classList.add("active");
+      } else {
+        console.error("Missing module:", moduleName);
+      }
 
-<!-- Top Bar -->
-<nav class="navbar navbar-dark px-3">
-  <span class="navbar-brand">
-    Mauser Packaging Solutions | Geismar CMMS
-  </span>
-</nav>
+      // Update nav highlight
+      links.forEach(l => l.classList.remove("active"));
+      link.classList.add("active");
+    });
+  });
 
-<div class="container-fluid">
-  <div class="row">
-
-    <!-- Sidebar -->
-    <aside class="col-md-2 p-3 border-end">
-      <h6 class="text-muted mb-3">Modules</h6>
-      <nav class="nav flex-column" id="module-nav">
-        <a class="nav-link active" data-module="dashboard">Dashboard</a>
-        <a class="nav-link" data-module="parts">Parts</a>
-        <a class="nav-link" data-module="workorders">Work Orders</a>
-        <a class="nav-link" data-module="admin">Administration</a>
-      </nav>
-    </aside>
-
-    <!-- Main -->
-    <main class="col-md-10 p-4">
-
-      <!-- Dashboard -->
-      <section id="module-dashboard" class="module active">
-        <h4>Dashboard</h4>
-        <p class="text-muted">
-          Low stock and work order alerts will appear here.
-        </p>
-      </section>
-
-      <!-- Parts -->
-      <section id="module-parts" class="module">
-        <h4 class="mb-3">Parts Management</h4>
-
-        <input
-          id="part-search"
-          class="form-control form-control-sm mb-3"
-          placeholder="Search by part #, manufacturer, or model"
-        >
-
-        <table id="parts-table" class="table table-sm table-hover">
-          <thead>
-            <tr>
-              <th>Part #</th>
-              <th>Description</th>
-              <th>Manufacturer</th>
-              <th>Model</th>
-              <th>Total Qty</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </section>
-
-      <!-- Work Orders -->
-      <section id="module-workorders" class="module">
-        <h4>Work Orders</h4>
-        <p class="text-muted">Coming next.</p>
-      </section>
-
-      <!-- Admin -->
-      <section id="module-admin" class="module">
-        <h4>Administration</h4>
-        <p class="text-muted">Admin tools coming next.</p>
-      </section>
-
-    </main>
-  </div>
-</div>
-
-<!-- Bootstrap JS -->
-<script
-  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
-</script>
-
-<!-- App JS -->
-<script src="app.js"></script>
-
-</body>
-</html>
+  console.log("Navigation initialized"); // <--- PROOF
+});
+``
