@@ -45,10 +45,15 @@ function switchModule(moduleName, el) {
   currentModule = moduleName;
 
   // Module hooks
-  if (moduleName === "parts") {
+
+if (moduleName === "parts") {
+  try {
     loadParts();
+  } catch (e) {
+    console.warn("Parts load failed, navigation preserved:", e);
   }
 }
+
 
 /* =========================================================
    PARTS MODULE
