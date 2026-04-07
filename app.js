@@ -111,14 +111,20 @@ function renderPartsTable(parts) {
         <td>${p.manufacturer}</td>
         <td>${p.model}</td>
         <td>${p.total_qty}</td>
-        <td>
-          <button class="btn btn-sm btn-outline-primary"
-            onclick="openIssueModal(${p.partid})">Issue</button>
-          <button class="btn btn-sm btn-outline-success"
-            onclick="openReceiveModal(${p.partid})">Receive</button>
-          <button class="btn btn-sm btn-outline-secondary"
-            onclick="openMoveModal(${p.partid})">Move</button>
-        </td>
+   <td>
+     <button class="btn btn-sm btn-outline-primary"
+             onclick="openIssueModal(${p.partid})">
+       Issue
+     </button>
+     <button class="btn btn-sm btn-outline-success"
+             onclick="openReceiveModal(${p.partid})">
+       Receive
+     </button>
+     <button class="btn btn-sm btn-outline-secondary"
+             onclick="openMoveModal(${p.partid})">
+       Move
+     </button>
+</td>
       </tr>`;
   });
 }
