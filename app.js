@@ -1,146 +1,102 @@
-/* =====================================================
-   CONFIG
-===================================================== */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mauser Packaging Solutions | CMMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-const API_BASE = "https://mps-geismar-backend-hkxb.vercel.app";
+  <!-- Bootstrap -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
 
-/* =====================================================
-   GLOBAL STATE
-===================================================== */
+  <!-- App styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
 
-let allParts = [];
-let selectedPart = null;
+<body>
 
-/* =====================================================
-   INIT
-===================================================== */
+<!-- Top Bar -->
+<nav class="navbar navbar-dark px-3">
+  <span class="navbar-brand">
+    Mauser Packaging Solutions | Geismar CMMS
+  </span>
+</nav>
 
-document.addEventListener("DOMContentLoaded", () => {
-  setupNavigation();
-  hideAllModules();
-  showModule("dashboard");
-});
+<div class="container-fluid">
+  <div class="row">
 
-/* =====================================================
-   NAVIGATION (SOLID & SAFE)
-===================================================== */
+    <!-- Sidebar -->
+    <aside class="col-md-2 p-3 border-end">
+      <h6 class="text-muted mb-3">Modules</h6>
+      <nav class="nav flex-column" id="module-nav">
+        <a class="nav-link active" data-module="dashboard">Dashboard</a>
+        <a class="nav-link" data-module="parts">Parts</a>
+        <a class="nav-link" data-module="workorders">Work Orders</a>
+        <a class="nav-link" data-module="admin">Administration</a>
+      </nav>
+    </aside>
 
-function setupNavigation() {
-  const links = document.querySelectorAll("#module-nav .nav-link");
+    <!-- Main -->
+    <main class="col-md-10 p-4">
 
-  links.forEach(link => {
-    link.addEventListener("click", () => {
-      const moduleName = link.dataset.module;
-      hideAllModules();
-      setActiveNav(link);
-      showModule(moduleName);
+      <!-- Dashboard -->
+      <section id="module-dashboard" class="module active">
+        <h4>Dashboard</h4>
+        <p class="text-muted">
+          Low stock and work order alerts will appear here.
+        </p>
+      </section>
 
-      if (moduleName === "parts") {
-        loadParts();
-      }
-    });
-  });
-}
+      <!-- Parts -->
+      <section id="module-parts" class="module">
+        <h4 class="mb-3">Parts Management</h4>
 
-function hideAllModules() {
-  document.querySelectorAll(".module").forEach(m => {
-    m.classList.remove("active");
-  });
-}
+        <input
+          id="part-search"
+          class="form-control form-control-sm mb-3"
+          placeholder="Search by part #, manufacturer, or model"
+        >
 
-function showModule(name) {
-  const section = document.getElementById(`module-${name}`);
-  if (!section) {
-    console.error("Module not found:", name);
-    return;
-  }
-  section.classList.add("active");
-}
+        <table id="parts-table" class="table table-sm table-hover">
+          <thead>
+            <tr>
+              <th>Part #</th>
+              <th>Description</th>
+              <th>Manufacturer</th>
+              <th>Model</th>
+              <th>Total Qty</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
 
-function setActiveNav(activeLink) {
-  document.querySelectorAll("#module-nav .nav-link").forEach(l => {
-    l.classList.remove("active");
-  });
-  activeLink.classList.add("active");
-}
+      <!-- Work Orders -->
+      <section id="module-workorders" class="module">
+        <h4>Work Orders</h4>
+        <p class="text-muted">Coming next.</p>
+      </section>
 
-/* =====================================================
-   PARTS (SAFE LOADER)
-===================================================== */
+      <!-- Admin -->
+      <section id="module-admin" class="module">
+        <h4>Administration</h4>
+        <p class="text-muted">Admin tools coming next.</p>
+      </section>
 
-async function loadParts() {
-  try {
-    const res = await fetch(`${API_BASE}/api/parts`);
-    if (!res.ok) throw new Error("Failed to load parts");
+    </main>
+  </div>
+</div>
 
-    const data = await res.json();
-    allParts = data;
-    renderPartsTable(data);
-  } catch (err) {
-    console.error(err);
-    alert("Error loading parts");
-  }
-}
+<!-- Bootstrap JS -->
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+</script>
 
-function renderPartsTable(parts) {
-  const tbody = document.querySelector("#parts-table tbody");
-  tbody.innerHTML = "";
+<!-- App JS -->
+<script src="app.js"></script>
 
-  if (!Array.isArray(parts) || parts.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6" class="text-center text-muted">
-          No parts found
-        </td>
-      </tr>
-    `;
-    return;
-  }
-
-  parts.forEach(p => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${p.partnumber}</td>
-        <td>${p.description}</td>
-        <td>${p.manufacturer}</td>
-        <td>${p.model}</td>
-        <td>${p.total_qty}</td>
-<td>
-  <button
-    class="btn btn-sm btn-outline-primary"
-    onclick="openIssueModal(${p.partid})">
-    Issue
-  </button>
-  <button
-    class="btn btn-sm btn-outline-success"
-    onclick="openReceiveModal(${p.partid})">
-    Receive
-  </button>
-  <button
-    class="btn btn-sm btn-outline-secondary"
-    onclick="openMoveModal(${p.partid})">
-    Move
-  </button>
-</td>
-      </tr>
-    `;
-  });
-}
-
-/* =====================================================
-   SEARCH (SAFE)
-===================================================== */
-
-document.addEventListener("input", event => {
-  if (event.target.id !== "part-search") return;
-
-  const q = event.target.value.toLowerCase();
-  const filtered = allParts.filter(p =>
-    p.partnumber.toLowerCase().includes(q) ||
-    p.manufacturer.toLowerCase().includes(q) ||
-    p.model.toLowerCase().includes(q) ||
-    p.description.toLowerCase().includes(q)
-  );
-
-  renderPartsTable(filtered);
-});
+</body>
+</html>
