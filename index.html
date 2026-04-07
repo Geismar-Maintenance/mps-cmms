@@ -1,50 +1,63 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MPS Geismar | CMMS</title>
+  <meta charset="UTF-8" />
+  <title>Mauser Packaging Solutions | CMMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <!-- Bootstrap -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
 
-  <link rel="stylesheet" href="styles.css">
+  <!-- App Styles -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
 
-<nav class="navbar navbar-dark bg-dark px-3">
-  <span class="navbar-brand">MPS Geismar — CMMS</span>
+<!-- TOP BAR -->
+<nav class="navbar navbar-dark px-3">
+  <span class="navbar-brand">
+    Mauser Packaging Solutions | Geismar CMMS
+  </span>
 </nav>
 
 <div class="container-fluid">
   <div class="row">
 
+    <!-- SIDEBAR -->
     <aside class="col-md-2 p-3 border-end">
       <h6 class="text-muted mb-3">Modules</h6>
       <nav class="nav flex-column" id="module-nav">
-        <a class="nav-link active" onclick="switchModule('dashboard', this)">Dashboard</a>
-        <a class="nav-link" onclick="switchModule('parts', this)">Parts</a>
-        <a class="nav-link" onclick="switchModule('workorders', this)">Work Orders</a>
-        <a class="nav-link" onclick="switchModule('admin', this)">Administration</a>
+        <a class="nav-link active" data-module="dashboard">Dashboard</a>
+        <a class="nav-link" data-module="parts">Parts</a>
+        <a class="nav-link" data-module="workorders">Work Orders</a>
+        <a class="nav-link" data-module="admin">Administration</a>
       </nav>
     </aside>
 
+    <!-- MAIN -->
     <main class="col-md-10 p-4">
 
+      <!-- DASHBOARD -->
       <section id="module-dashboard" class="module active">
-        <h4 class="mb-4">Dashboard</h4>
-        <p class="text-muted">Low stock and work order alerts will appear here.</p>
+        <h4 class="mb-3">Dashboard</h4>
+        <p class="text-muted">
+          Low stock alerts and due work orders will appear here.
+        </p>
       </section>
 
+      <!-- PARTS -->
       <section id="module-parts" class="module">
-        <h4>Parts Management</h4>
+        <h4 class="mb-3">Parts Management</h4>
 
         <input
           id="part-search"
           class="form-control form-control-sm mb-3"
-          placeholder="Search by part #, manufacturer, or model">
+          placeholder="Search by part #, manufacturer, or model"
+        />
 
         <table id="parts-table" class="table table-sm table-hover">
           <thead>
@@ -57,16 +70,17 @@
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
-          </tbody>
+          <tbody></tbody>
         </table>
       </section>
 
+      <!-- WORK ORDERS -->
       <section id="module-workorders" class="module">
         <h4>Work Orders</h4>
         <p class="text-muted">Coming next.</p>
       </section>
 
+      <!-- ADMIN -->
       <section id="module-admin" class="module">
         <h4>Administration</h4>
         <p class="text-muted">Admin tools coming next.</p>
@@ -76,60 +90,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="issueModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content p-3">
-      <h5>Issue Part</h5>
-      <p id="issue-partname"></p>
-
-      <select id="issue-location" class="form-select mb-2"></select>
-      <input id="issue-qty" type="number" class="form-control mb-2" placeholder="Quantity">
-      <input id="issue-wo" class="form-control mb-2" placeholder="Work Order #">
-
-      <button class="btn btn-primary" onclick="submitIssue()">Issue</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="receiveModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content p-3">
-      <h5>Receive Part</h5>
-      <p id="receive-partname"></p>
-
-      <input id="rec-cabinet" class="form-control mb-2" placeholder="Cabinet">
-      <input id="rec-section" class="form-control mb-2" placeholder="Section">
-      <input id="rec-bin" class="form-control mb-2" placeholder="Bin">
-      <input id="rec-qty" type="number" class="form-control mb-2" placeholder="Quantity">
-
-      <button class="btn btn-success" onclick="submitReceive()">Receive</button>
-    </div>
-  </div>
-</div>
-<div class="modal fade" id="moveModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content p-3">
-
-      <h5>Move Part</h5>
-      <p id="move-partname"></p>
-
-      <label class="form-label">From Location</label>
-      <select id="move-from-location" class="form-select mb-2"></select>
-
-      <label class="form-label">To Location</label>
-      <input id="move-to-cabinet" class="form-control mb-1" placeholder="Cabinet">
-      <input id="move-to-section" class="form-control mb-1" placeholder="Section">
-      <input id="move-to-bin" class="form-control mb-2" placeholder="Bin">
-
-      <label class="form-label">Quantity</label>
-      <input id="move-qty" type="number" class="form-control mb-3">
-
-      <button class="btn btn-secondary" onclick="submitMove()">Move</button>
-
-    </div>
-  </div>
-</div>
-
+<!-- SCRIPTS -->
 <script src="app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
