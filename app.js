@@ -239,3 +239,32 @@ async function submitReceive() {
     alert(err.message);
   }
 }
+/* =========================================================
+   Move PART
+   ========================================================= */
+function openMoveModal(partid) {
+  selectedPart = allParts.find(p => p.partid === partid);
+  if (!selectedPart) return;
+
+  document.getElementById("move-partname").innerText =
+    `${selectedPart.partnumber} (${selectedPart.model})`;
+
+  const fromSelect = document.getElementById("move-from-location");
+  fromSelect.innerHTML = "";
+
+  selectedPart.locations.forEach(loc => {
+    fromSelect.innerHTML += `
+      <option value="${loc.locationid}">
+        ${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.qty})
+      </option>
+    `;
+  });
+
+  document.getElementById("move-qty").value = "";
+  document.getElementById("move-to-cabinet").value = "";
+  document.getElementById("move-to-section").value = "";
+  document.getElementById("move-to-bin").value = "";
+
+  new bootstrap.Modal(document.getElementById("moveModal")).show();
+}
+}

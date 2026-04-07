@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -102,6 +103,29 @@
       <input id="rec-qty" type="number" class="form-control mb-2" placeholder="Quantity">
 
       <button class="btn btn-success" onclick="submitReceive()">Receive</button>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="moveModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content p-3">
+
+      <h5>Move Part</h5>
+      <p id="move-partname"></p>
+
+      <label class="form-label">From Location</label>
+      <select id="move-from-location" class="form-select mb-2"></select>
+
+      <label class="form-label">To Location</label>
+      <input id="move-to-cabinet" class="form-control mb-1" placeholder="Cabinet">
+      <input id="move-to-section" class="form-control mb-1" placeholder="Section">
+      <input id="move-to-bin" class="form-control mb-2" placeholder="Bin">
+
+      <label class="form-label">Quantity</label>
+      <input id="move-qty" type="number" class="form-control mb-3">
+
+      <button class="btn btn-secondary" onclick="submitMove()">Move</button>
+
     </div>
   </div>
 </div>
