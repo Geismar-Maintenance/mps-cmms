@@ -136,8 +136,13 @@ function renderPartsTable(parts) {
 ===================================================== */
 
 function openIssueModal(partid) {
+  console.log("Opening Issue modal for part:", partid);
+
   selectedPart = allParts.find(p => p.partid === partid);
-  if (!selectedPart || !selectedPart.locations) return;
+  if (!selectedPart) {
+    alert("Selected part not found");
+    return;
+  }
 
   document.getElementById("issue-partname").innerText =
     `${selectedPart.partnumber} (${selectedPart.model})`;
@@ -145,17 +150,25 @@ function openIssueModal(partid) {
   const select = document.getElementById("issue-location");
   select.innerHTML = "";
 
+  if (!selectedPart.locations || selectedPart.locations.length === 0) {
+    alert("No locations available for this part");
+    return;
+  }
+
   selectedPart.locations.forEach(loc => {
     select.innerHTML += `
       <option value="${loc.locationid}">
         ${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.qty})
-      </option>`;
+      </option>
+    `;
   });
 
   document.getElementById("issue-qty").value = "";
   document.getElementById("issue-wo").value = "";
 
-  new bootstrap.Modal(document.getElementById("issueModal")).show();
+  const modalEl = document.getElementById("issueModal");
+  const modal = new bootstrap.Modal(modalEl);
+  modal.show();
 }
 
 async function submitIssue() {
