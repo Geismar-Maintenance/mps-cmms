@@ -1,100 +1,92 @@
+/* =====================================================
+   CONFIG
+===================================================== */
+
 const API_BASE = "https://mps-geismar-backend-hkxb.vercel.app";
 
-/* =========================================================
+/* =====================================================
    GLOBAL STATE
-   ========================================================= */
+===================================================== */
 
-let currentModule = "dashboard";
 let allParts = [];
 let selectedPart = null;
 
-/* =========================================================
-   INITIALIZATION
-   ========================================================= */
+/* =====================================================
+   INIT
+===================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
-  switchModule("dashboard", document.querySelector("#module-nav .nav-link"));
-  initPartsModule();
+  setupNavigation();
+  hideAllModules();
+  showModule("dashboard");
 });
 
-/* =========================================================
-   MODULE NAVIGATION
-   ========================================================= */
+/* =====================================================
+   NAVIGATION (SOLID & SAFE)
+===================================================== */
 
-function switchModule(moduleName, el) {
-  // Hide all modules
-  document.querySelectorAll(".module").forEach(section => {
-    section.classList.remove("active");
+function setupNavigation() {
+  const links = document.querySelectorAll("#module-nav .nav-link");
+
+  links.forEach(link => {
+    link.addEventListener("click", () => {
+      const moduleName = link.dataset.module;
+      hideAllModules();
+      setActiveNav(link);
+      showModule(moduleName);
+
+      if (moduleName === "parts") {
+        loadParts();
+      }
+    });
   });
-
-  // Show selected module
-  const active = document.getElementById("module-" + moduleName);
-  if (active) {
-    active.classList.add("active");
-  }
-
-  // Update nav
-  document.querySelectorAll("#module-nav .nav-link").forEach(link => {
-    link.classList.remove("active");
-  });
-
-  if (el) {
-    el.classList.add("active");
-  }
-
-  currentModule = moduleName;
-
-  // Module hooks
-  if (moduleName === "parts") {
-    loadParts();
-  }
 }
 
-/* =========================================================
-   PARTS MODULE
-   ========================================================= */
-
-function initPartsModule() {
-  const search = document.getElementById("part-search");
-  if (search) {
-    search.addEventListener("input", handlePartSearch);
-  }
+function hideAllModules() {
+  document.querySelectorAll(".module").forEach(m => {
+    m.classList.remove("active");
+  });
 }
+
+function showModule(name) {
+  const section = document.getElementById(`module-${name}`);
+  if (!section) {
+    console.error("Module not found:", name);
+    return;
+  }
+  section.classList.add("active");
+}
+
+function setActiveNav(activeLink) {
+  document.querySelectorAll("#module-nav .nav-link").forEach(l => {
+    l.classList.remove("active");
+  });
+  activeLink.classList.add("active");
+}
+
+/* =====================================================
+   PARTS (SAFE LOADER)
+===================================================== */
 
 async function loadParts() {
   try {
     const res = await fetch(`${API_BASE}/api/parts`);
-    if (!res.ok) {
-      throw new Error("Failed to load parts");
-    }
+    if (!res.ok) throw new Error("Failed to load parts");
 
     const data = await res.json();
     allParts = data;
-    renderPartsTable(allParts);
+    renderPartsTable(data);
   } catch (err) {
     console.error(err);
     alert("Error loading parts");
   }
 }
 
-function handlePartSearch(e) {
-  const q = e.target.value.toLowerCase().trim();
-
-  const filtered = allParts.filter(p =>
-    p.partnumber.toLowerCase().includes(q) ||
-    p.manufacturer.toLowerCase().includes(q) ||
-    p.model.toLowerCase().includes(q) ||
-    p.description.toLowerCase().includes(q)
-  );
-
-  renderPartsTable(filtered);
-}
-
 function renderPartsTable(parts) {
   const tbody = document.querySelector("#parts-table tbody");
   tbody.innerHTML = "";
 
-  if (parts.length === 0) {
+  if (!Array.isArray(parts) || parts.length === 0) {
     tbody.innerHTML = `
       <tr>
         <td colspan="6" class="text-center text-muted">
@@ -114,13 +106,14 @@ function renderPartsTable(parts) {
         <td>${p.model}</td>
         <td>${p.total_qty}</td>
         <td>
-          <button class="btn btn-sm btn-outline-primary"
-            onclick="openIssueModal(${p.partid})">
+          <button class="btn btn-sm btn-outline-primary" disabled>
             Issue
           </button>
-          <button class="btn btn-sm btn-outline-success"
-            onclick="openReceiveModal(${p.partid})">
+          <button class="btn btn-sm btn-outline-success" disabled>
             Receive
+          </button>
+          <button class="btn btn-sm btn-outline-secondary" disabled>
+            Move
           </button>
         </td>
       </tr>
@@ -128,143 +121,20 @@ function renderPartsTable(parts) {
   });
 }
 
-/* =========================================================
-   ISSUE PART
-   ========================================================= */
+/* =====================================================
+   SEARCH (SAFE)
+===================================================== */
 
-function openIssueModal(partid) {
-  selectedPart = allParts.find(p => p.partid === partid);
-  if (!selectedPart) return;
+document.addEventListener("input", event => {
+  if (event.target.id !== "part-search") return;
 
-  document.getElementById("issue-partname").innerText =
-    selectedPart.partnumber + " (" + selectedPart.model + ")";
+  const q = event.target.value.toLowerCase();
+  const filtered = allParts.filter(p =>
+    p.partnumber.toLowerCase().includes(q) ||
+    p.manufacturer.toLowerCase().includes(q) ||
+    p.model.toLowerCase().includes(q) ||
+    p.description.toLowerCase().includes(q)
+  );
 
-  const select = document.getElementById("issue-location");
-  select.innerHTML = "";
-
-  selectedPart.locations.forEach(loc => {
-    select.innerHTML += `
-      <option value="${loc.locationid}">
-        ${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.qty})
-      </option>
-    `;
-  });
-
-  document.getElementById("issue-qty").value = "";
-  document.getElementById("issue-wo").value = "";
-
-  new bootstrap.Modal(document.getElementById("issueModal")).show();
-}
-
-async function submitIssue() {
-  const locationid = document.getElementById("issue-location").value;
-  const qty = Number(document.getElementById("issue-qty").value);
-  const workOrder = document.getElementById("issue-wo").value;
-
-  if (!locationid || qty <= 0) {
-    alert("Invalid issue quantity or location");
-    return;
-  }
-
-  try {
-    const res = await fetch("/api/parts/issue", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        partid: selectedPart.partid,
-        from_locationid: locationid,
-        qty: qty,
-        assetid: workOrder,
-        performed_by: "tech"
-      })
-    });
-
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.error);
-
-    loadParts();
-    bootstrap.Modal.getInstance(document.getElementById("issueModal")).hide();
-  } catch (err) {
-    alert(err.message);
-  }
-}
-
-/* =========================================================
-   RECEIVE PART
-   ========================================================= */
-
-function openReceiveModal(partid) {
-  selectedPart = allParts.find(p => p.partid === partid);
-  if (!selectedPart) return;
-
-  document.getElementById("receive-partname").innerText =
-    selectedPart.partnumber + " (" + selectedPart.model + ")";
-
-  document.getElementById("rec-cabinet").value = "";
-  document.getElementById("rec-section").value = "";
-  document.getElementById("rec-bin").value = "";
-  document.getElementById("rec-qty").value = "";
-
-  new bootstrap.Modal(document.getElementById("receiveModal")).show();
-}
-
-async function submitReceive() {
-  const qty = Number(document.getElementById("rec-qty").value);
-
-  if (qty <= 0) {
-    alert("Invalid receive quantity");
-    return;
-  }
-
-  try {
-    const res = await fetch("/api/parts/receive", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        partid: selectedPart.partid,
-        cabinet: document.getElementById("rec-cabinet").value,
-        section: document.getElementById("rec-section").value,
-        bin: document.getElementById("rec-bin").value,
-        qty: qty,
-        performed_by: "tech"
-      })
-    });
-
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.error);
-
-    loadParts();
-    bootstrap.Modal.getInstance(document.getElementById("receiveModal")).hide();
-  } catch (err) {
-    alert(err.message);
-  }
-}
-/* =========================================================
-   Move PART
-   ========================================================= */
-function openMoveModal(partid) {
-  selectedPart = allParts.find(p => p.partid === partid);
-  if (!selectedPart) return;
-
-  document.getElementById("move-partname").innerText =
-    `${selectedPart.partnumber} (${selectedPart.model})`;
-
-  const fromSelect = document.getElementById("move-from-location");
-  fromSelect.innerHTML = "";
-
-  selectedPart.locations.forEach(loc => {
-    fromSelect.innerHTML += `
-      <option value="${loc.locationid}">
-        ${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.qty})
-      </option>
-    `;
-  });
-
-  document.getElementById("move-qty").value = "";
-  document.getElementById("move-to-cabinet").value = "";
-  document.getElementById("move-to-section").value = "";
-  document.getElementById("move-to-bin").value = "";
-
-  new bootstrap.Modal(document.getElementById("moveModal")).show();
-}
-}
+  renderPartsTable(filtered);
+});
