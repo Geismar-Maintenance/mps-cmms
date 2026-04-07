@@ -1,27 +1,27 @@
 const API_BASE = "https://mps-geismar-backend-hkxb.vercel.app";
 
-/* =========================================================
+/* =====================================================
    GLOBAL STATE
-   ========================================================= */
+===================================================== */
 
 let currentModule = "dashboard";
 let allParts = [];
 let selectedPart = null;
 
-/* =========================================================
+/* =====================================================
    INITIALIZATION
-   ========================================================= */
+===================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
   switchModule("dashboard", document.querySelector("#module-nav .nav-link"));
   initPartsModule();
 });
 
-/* =========================================================
-   MODULE NAVIGATION
-   ========================================================= */
+/* =====================================================
+   MODULE NAVIGATION (SAFE)
+===================================================== */
 
-function switchModule(moduleName, el) {
+function switchModule(moduleName, clickedLink) {
   // Hide all modules
   document.querySelectorAll(".module").forEach(section => {
     section.classList.remove("active");
@@ -33,31 +33,30 @@ function switchModule(moduleName, el) {
     active.classList.add("active");
   }
 
-  // Update nav
+  // Update nav state
   document.querySelectorAll("#module-nav .nav-link").forEach(link => {
     link.classList.remove("active");
   });
 
-  if (el) {
-    el.classList.add("active");
+  if (clickedLink) {
+    clickedLink.classList.add("active");
   }
 
   currentModule = moduleName;
 
-  // Module hooks
-
-if (moduleName === "parts") {
-  try {
-    loadParts();
-  } catch (e) {
-    console.warn("Parts load failed, navigation preserved:", e);
+  // Load parts ONLY after navigation succeeds
+  if (moduleName === "parts") {
+    try {
+      loadParts();
+    } catch (e) {
+      console.warn("Parts load failed but navigation preserved", e);
+    }
   }
 }
 
-
-/* =========================================================
+/* =====================================================
    PARTS MODULE
-   ========================================================= */
+===================================================== */
 
 function initPartsModule() {
   const search = document.getElementById("part-search");
@@ -67,19 +66,14 @@ function initPartsModule() {
 }
 
 async function loadParts() {
-  try {
-    const res = await fetch(`${API_BASE}/api/parts`);
-    if (!res.ok) {
-      throw new Error("Failed to load parts");
-    }
-
-    const data = await res.json();
-    allParts = data;
-    renderPartsTable(allParts);
-  } catch (err) {
-    console.error(err);
-    alert("Error loading parts");
+  const res = await fetch(`${API_BASE}/api/parts`);
+  if (!res.ok) {
+    throw new Error("Failed to load parts");
   }
+
+  const data = await res.json();
+  allParts = data;
+  renderPartsTable(allParts);
 }
 
 function handlePartSearch(e) {
@@ -99,14 +93,13 @@ function renderPartsTable(parts) {
   const tbody = document.querySelector("#parts-table tbody");
   tbody.innerHTML = "";
 
-  if (parts.length === 0) {
+  if (!parts || parts.length === 0) {
     tbody.innerHTML = `
       <tr>
         <td colspan="6" class="text-center text-muted">
           No parts found
         </td>
-      </tr>
-    `;
+      </tr>`;
     return;
   }
 
@@ -120,29 +113,26 @@ function renderPartsTable(parts) {
         <td>${p.total_qty}</td>
         <td>
           <button class="btn btn-sm btn-outline-primary"
-            onclick="openIssueModal(${p.partid})">
-            Issue
-          </button>
+            onclick="openIssueModal(${p.partid})">Issue</button>
           <button class="btn btn-sm btn-outline-success"
-            onclick="openReceiveModal(${p.partid})">
-            Receive
-          </button>
+            onclick="openReceiveModal(${p.partid})">Receive</button>
+          <button class="btn btn-sm btn-outline-secondary"
+            onclick="openMoveModal(${p.partid})">Move</button>
         </td>
-      </tr>
-    `;
+      </tr>`;
   });
 }
 
-/* =========================================================
+/* =====================================================
    ISSUE PART
-   ========================================================= */
+===================================================== */
 
 function openIssueModal(partid) {
   selectedPart = allParts.find(p => p.partid === partid);
-  if (!selectedPart) return;
+  if (!selectedPart || !selectedPart.locations) return;
 
   document.getElementById("issue-partname").innerText =
-    selectedPart.partnumber + " (" + selectedPart.model + ")";
+    `${selectedPart.partnumber} (${selectedPart.model})`;
 
   const select = document.getElementById("issue-location");
   select.innerHTML = "";
@@ -151,8 +141,7 @@ function openIssueModal(partid) {
     select.innerHTML += `
       <option value="${loc.locationid}">
         ${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.qty})
-      </option>
-    `;
+      </option>`;
   });
 
   document.getElementById("issue-qty").value = "";
@@ -162,48 +151,19 @@ function openIssueModal(partid) {
 }
 
 async function submitIssue() {
-  const locationid = document.getElementById("issue-location").value;
-  const qty = Number(document.getElementById("issue-qty").value);
-  const workOrder = document.getElementById("issue-wo").value;
-
-  if (!locationid || qty <= 0) {
-    alert("Invalid issue quantity or location");
-    return;
-  }
-
-  try {
-    const res = await fetch("/api/parts/issue", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        partid: selectedPart.partid,
-        from_locationid: locationid,
-        qty: qty,
-        assetid: workOrder,
-        performed_by: "tech"
-      })
-    });
-
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.error);
-
-    loadParts();
-    bootstrap.Modal.getInstance(document.getElementById("issueModal")).hide();
-  } catch (err) {
-    alert(err.message);
-  }
+  alert("Issue logic re-enabled later");
 }
 
-/* =========================================================
+/* =====================================================
    RECEIVE PART
-   ========================================================= */
+===================================================== */
 
 function openReceiveModal(partid) {
   selectedPart = allParts.find(p => p.partid === partid);
   if (!selectedPart) return;
 
   document.getElementById("receive-partname").innerText =
-    selectedPart.partnumber + " (" + selectedPart.model + ")";
+    `${selectedPart.partnumber} (${selectedPart.model})`;
 
   document.getElementById("rec-cabinet").value = "";
   document.getElementById("rec-section").value = "";
@@ -214,42 +174,16 @@ function openReceiveModal(partid) {
 }
 
 async function submitReceive() {
-  const qty = Number(document.getElementById("rec-qty").value);
-
-  if (qty <= 0) {
-    alert("Invalid receive quantity");
-    return;
-  }
-
-  try {
-    const res = await fetch("/api/parts/receive", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        partid: selectedPart.partid,
-        cabinet: document.getElementById("rec-cabinet").value,
-        section: document.getElementById("rec-section").value,
-        bin: document.getElementById("rec-bin").value,
-        qty: qty,
-        performed_by: "tech"
-      })
-    });
-
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.error);
-
-    loadParts();
-    bootstrap.Modal.getInstance(document.getElementById("receiveModal")).hide();
-  } catch (err) {
-    alert(err.message);
-  }
+  alert("Receive logic re-enabled later");
 }
-/* =========================================================
-   Move PART
-   ========================================================= */
+
+/* =====================================================
+   MOVE PART
+===================================================== */
+
 function openMoveModal(partid) {
   selectedPart = allParts.find(p => p.partid === partid);
-  if (!selectedPart) return;
+  if (!selectedPart || !selectedPart.locations) return;
 
   document.getElementById("move-partname").innerText =
     `${selectedPart.partnumber} (${selectedPart.model})`;
@@ -261,8 +195,7 @@ function openMoveModal(partid) {
     fromSelect.innerHTML += `
       <option value="${loc.locationid}">
         ${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.qty})
-      </option>
-    `;
+      </option>`;
   });
 
   document.getElementById("move-qty").value = "";
@@ -272,41 +205,7 @@ function openMoveModal(partid) {
 
   new bootstrap.Modal(document.getElementById("moveModal")).show();
 }
+
 async function submitMove() {
-  const payload = {
-    partid: selectedPart.partid,
-    from_locationid: document.getElementById("move-from-location").value,
-    cabinet: document.getElementById("move-to-cabinet").value,
-    section: document.getElementById("move-to-section").value,
-    bin: document.getElementById("move-to-bin").value,
-    qty: Number(document.getElementById("move-qty").value),
-    performed_by: "tech"
-  };
-
-  if (!payload.cabinet || !payload.section || !payload.bin || payload.qty <= 0) {
-    alert("Invalid move data");
-    return;
-  }
-
-  try {
-    const res = await fetch(
-      `${API_BASE}/api/parts/move`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }
-    );
-
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.error);
-
-    loadParts();
-    bootstrap.Modal.getInstance(
-      document.getElementById("moveModal")
-    ).hide();
-
-  } catch (err) {
-    alert(err.message);
-  }
+  alert("Move logic re-enabled later");
 }
