@@ -157,7 +157,39 @@ function openIssueModal(partid) {
 }
 
 async function submitIssue() {
-  alert("Issue logic re-enabled later");
+  const locationid = document.getElementById("issue-location").value;
+  const qty = Number(document.getElementById("issue-qty").value);
+  const workOrder = document.getElementById("issue-wo").value;
+
+  if (!locationid || qty <= 0) {
+    alert("Invalid issue quantity or location");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/parts/issue`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        partid: selectedPart.partid,
+        from_locationid: locationid,
+        qty,
+        assetid: workOrder || null,
+        performed_by: "tech"
+      })
+    });
+
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error);
+
+    loadParts(); // refresh inventory
+    bootstrap.Modal.getInstance(
+      document.getElementById("issueModal")
+    ).hide();
+
+  } catch (err) {
+    alert("Issue failed: " + err.message);
+  }
 }
 
 /* =====================================================
