@@ -78,6 +78,7 @@ function renderPartsTable(parts) {
         </button>
       </td>
     `;
+
     tbody.appendChild(tr);
   });
 }
