@@ -10,14 +10,18 @@ let selectedPart = null;
 
 async function loadAssetsForIssue() {
   const select = document.getElementById("issue-asset");
-
   if (!select) {
     console.error("issue-asset select not found in DOM");
     return;
   }
 
   // Reset dropdown
-  select.innerHTML = '<option value="">Select Asset</option>';
+  select.replaceChildren(
+    Object.assign(document.createElement("option"), {
+      value: "",
+      textContent: "Select Asset"
+    })
+  );
 
   try {
     const res = await fetch(`${API_BASE}/api/assets`);
@@ -27,14 +31,14 @@ async function loadAssetsForIssue() {
 
     const assets = await res.json();
 
-    assets.forEach(asset => {
-      const option = document.createElement("option");
-      option.value = asset.assetid;
-      option.textContent = `${asset.assettag} – ${asset.description}`;
-      select.appendChild(option);
+    assets.forEach(a => {
+      const opt = document.createElement("option");
+      opt.value = a.assetid;
+      opt.textContent = `${a.assetnumber} – ${a.assetname}`;
+      select.appendChild(opt);
     });
   } catch (err) {
-    console.error("Failed to load assets:", err);
+    console.error("Unable to load assets:", err);
     alert("Unable to load assets for issue");
   }
 }
