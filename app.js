@@ -66,14 +66,30 @@ function initPartsModule() {
 }
 
 async function loadParts() {
-  const res = await fetch(`${API_BASE}/api/parts`);
-  if (!res.ok) {
-    throw new Error("Failed to load parts");
-  }
+  try {
+    const res = await fetch(`${API_BASE}/api/parts`);
 
-  const data = await res.json();
-  allParts = data;
-  renderPartsTable(allParts);
+    // Only treat real HTTP errors as failures
+    if (!res.ok) {
+      throw new Error(`Failed to load parts (${res.status})`);
+    }
+
+    const data = await res.json();
+
+    // Normalize data defensively
+    allParts = data.map(p => ({
+      ...p,
+      total_qty: Number(p.total_qty ?? 0),
+      locations: Array.isArray(p.locations) ? p.locations : []
+    }));
+
+    console.log("Parts loaded:", allParts);
+
+    renderPartsTable(allParts);
+  } catch (err) {
+    console.error("loadParts failed:", err);
+    alert(`Unable to load parts: ${err.message}`);
+  }
 }
 
 function handlePartSearch(e) {
