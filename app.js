@@ -72,17 +72,36 @@ function renderPartsTable(parts) {
   parts.forEach(p => {
     const tr = document.createElement("tr");
 
+    // ✅ Build location display
+    let locationDisplay = "—";
+    if (Array.isArray(p.locations) && p.locations.length > 0) {
+      locationDisplay = p.locations
+        .map(loc =>
+          `${loc.cabinet}.${loc.section}.${loc.bin} (${loc.qty})`
+        )
+        .join("<br>");
+    }
+
     tr.innerHTML = `
       <td>${p.partnumber}</td>
       <td>${p.description}</td>
       <td>${p.manufacturer}</td>
       <td>${p.model}</td>
       <td>${p.total_qty}</td>
+      <td>${locationDisplay}</td>
       <td>
         <button class="btn btn-sm btn-outline-primary"
                 ${p.total_qty === 0 ? "disabled" : ""}
                 onclick="openIssueModal(${p.partid})">
           Issue
+        </button>
+        <button class="btn btn-sm btn-outline-success"
+                onclick="openReceiveModal(${p.partid})">
+          Receive
+        </button>
+        <button class="btn btn-sm btn-outline-secondary"
+                onclick="openMoveModal(${p.partid})">
+          Move
         </button>
       </td>
     `;
@@ -90,7 +109,6 @@ function renderPartsTable(parts) {
     tbody.appendChild(tr);
   });
 }
-
 /* ================= Issue Modal ================= */
 
 function openIssueModal(partid) {
