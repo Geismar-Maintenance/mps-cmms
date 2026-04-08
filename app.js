@@ -20,15 +20,19 @@ function switchModule(moduleName, el) {
 
 /* ================= Parts Search ================= */
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("part-search")
-    .addEventListener("input", handlePartSearch);
-});
+document.getElementById("part-search")
+  .addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      runPartSearch();
+    }
+  });
 
-async function handlePartSearch(e) {
-  const query = e.target.value.trim();
+async function runPartSearch() {
+  const input = document.getElementById("part-search");
+  const query = input.value.trim();
 
   if (query.length < 2) {
+    allParts = [];
     renderPartsTable([]);
     document.getElementById("parts-placeholder").style.display = "block";
     return;
@@ -38,7 +42,11 @@ async function handlePartSearch(e) {
     const res = await fetch(
       `${API_BASE}/api/parts?search=${encodeURIComponent(query)}`
     );
-    if (!res.ok) throw new Error("Failed to search parts");
+    if (!res.ok) {
+      console.error("Search failed:", await res.text());
+      renderPartsTable([]);
+      return;
+    }
 
     const data = await res.json();
 
@@ -52,8 +60,8 @@ async function handlePartSearch(e) {
     renderPartsTable(allParts);
 
   } catch (err) {
-    alert("Error loading parts");
-    console.error(err);
+    console.error("Search error:", err);
+    alert("Error searching parts");
   }
 }
 
