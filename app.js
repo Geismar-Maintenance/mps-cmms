@@ -8,6 +8,37 @@ let currentModule = "dashboard";
 let allParts = [];
 let selectedPart = null;
 
+async function loadAssetsForIssue() {
+  const select = document.getElementById("issue-asset");
+
+  if (!select) {
+    console.error("issue-asset select not found in DOM");
+    return;
+  }
+
+  // Reset dropdown
+  select.innerHTML = '<option value="">Select Asset</option>';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/assets`);
+    if (!res.ok) {
+      throw new Error(`Failed to load assets (${res.status})`);
+    }
+
+    const assets = await res.json();
+
+    assets.forEach(asset => {
+      const option = document.createElement("option");
+      option.value = asset.assetid;
+      option.textContent = `${asset.assettag} – ${asset.description}`;
+      select.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Failed to load assets:", err);
+    alert("Unable to load assets for issue");
+  }
+}
+
 /* =====================================================
    INITIALIZATION
 ===================================================== */
