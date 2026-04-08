@@ -183,27 +183,41 @@ function renderPartsTable(parts) {
 ===================================================== */
 
 function openIssueModal(partid) {
-  selectedPart = allParts.find(p => p.partid === partid);
-  if (!selectedPart) return;
+  console.log("Opening Issue modal for part:", partid);
+  console.log("Current allParts:", allParts);
 
-  const modalEl = document.getElementById("issueModal");
-  if (!modalEl) {
-    alert("Issue modal not available");
+  if (!Array.isArray(allParts) || allParts.length === 0) {
+    alert("Parts data not loaded yet");
+    return;
+  }
+
+  selectedPart = allParts.find(
+    p => Number(p.partid) === Number(partid)
+  );
+
+  console.log("Selected part:", selectedPart);
+
+  if (!selectedPart) {
+    alert("Selected part not found");
+    return;
+  }
+
+  if (!Array.isArray(selectedPart.locations)) {
+    console.error("locations missing on selectedPart", selectedPart);
+    alert("Inventory locations are missing for this part");
+    return;
+  }
+
+  if (selectedPart.locations.length === 0) {
+    alert("No inventory available for this part");
     return;
   }
 
   document.getElementById("issue-partname").innerText =
     `${selectedPart.partnumber} (${selectedPart.model})`;
 
-  // Populate locations
   const locSelect = document.getElementById("issue-location");
-  locSelect.innerHTML = "";
-
-  if (!Array.isArray(selectedPart.locations) ||
-      selectedPart.locations.length === 0) {
-    alert("No inventory available for this part");
-    return;
-  }
+  locSelect.replaceChildren();
 
   selectedPart.locations.forEach(loc => {
     const opt = document.createElement("option");
@@ -213,13 +227,9 @@ function openIssueModal(partid) {
     locSelect.appendChild(opt);
   });
 
-  // Load assets (required)
   loadAssetsForIssue();
 
-  // Reset fields
-  document.getElementById("issue-qty").value = "";
-  document.getElementById("issue-wo").value = "";
-
+  const modalEl = document.getElementById("issueModal");
   bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 async function submitIssue() {
