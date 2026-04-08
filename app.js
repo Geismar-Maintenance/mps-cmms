@@ -152,41 +152,45 @@ function renderPartsTable(parts) {
 ===================================================== */
 
 function openIssueModal(partid) {
-  console.log("Opening Issue modal for part:", partid);
-
   selectedPart = allParts.find(p => p.partid === partid);
-  if (!selectedPart) {
-    alert("Selected part not found");
+  if (!selectedPart) return;
+
+  const modalEl = document.getElementById("issueModal");
+  if (!modalEl) {
+    alert("Issue modal not available");
     return;
   }
 
   document.getElementById("issue-partname").innerText =
     `${selectedPart.partnumber} (${selectedPart.model})`;
 
-  const select = document.getElementById("issue-location");
-  select.innerHTML = "";
+  // Populate locations
+  const locSelect = document.getElementById("issue-location");
+  locSelect.innerHTML = "";
 
-  if (!selectedPart.locations || selectedPart.locations.length === 0) {
-    alert("No locations available for this part");
+  if (!Array.isArray(selectedPart.locations) ||
+      selectedPart.locations.length === 0) {
+    alert("No inventory available for this part");
     return;
   }
 
   selectedPart.locations.forEach(loc => {
-    select.innerHTML += `
-      <option value="${loc.locationid}">
-        ${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.qty})
-      </option>
-    `;
+    const opt = document.createElement("option");
+    opt.value = loc.locationid;
+    opt.textContent =
+      `${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.qty})`;
+    locSelect.appendChild(opt);
   });
 
+  // Load assets (required)
+  loadAssetsForIssue();
+
+  // Reset fields
   document.getElementById("issue-qty").value = "";
   document.getElementById("issue-wo").value = "";
 
-  const modalEl = document.getElementById("issueModal");
-  const modal = new bootstrap.Modal(modalEl);
-  modal.show();
+  bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
-
 async function submitIssue() {
   const locationid = document.getElementById("issue-location").value;
   const qty = Number(document.getElementById("issue-qty").value);
