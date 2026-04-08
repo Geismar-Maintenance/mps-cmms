@@ -155,7 +155,35 @@
   <div class="modal fade" id="issueModal" tabindex="-1">
     ...
   </div>
+async function loadAssetsForIssue() {
+  const select = document.getElementById("issue-asset");
 
+  if (!select) {
+    console.error("issue-asset select not found");
+    return;
+  }
+
+  select.innerHTML = '<option value="">Select Asset</option>';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/assets`);
+    if (!res.ok) {
+      throw new Error(`Failed to load assets (${res.status})`);
+    }
+
+    const assets = await res.json();
+
+    assets.forEach(asset => {
+      const option = document.createElement("option");
+      option.value = asset.assetid;
+      option.textContent = `${asset.assettag} – ${asset.description}`;
+      select.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Failed to load assets:", err);
+    alert("Unable to load assets");
+  }
+}
   <!-- ✅ RECEIVE MODAL -->
   <div class="modal fade" id="receiveModal" tabindex="-1">
     ...
