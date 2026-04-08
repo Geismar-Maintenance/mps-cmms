@@ -76,17 +76,6 @@ function switchModule(moduleName, clickedLink) {
   if (clickedLink) {
     clickedLink.classList.add("active");
   }
-
-  currentModule = moduleName;
-
-  // Load parts ONLY after navigation succeeds
-  if (moduleName === "parts") {
-    try {
-      loadParts();
-    } catch (e) {
-      console.warn("Parts load failed but navigation preserved", e);
-    }
-  }
 }
 
 /* =====================================================
