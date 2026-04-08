@@ -1,27 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Mauser Packaging Solutions | CMMS</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Geismar Maintenance CMMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- ✅ Bootstrap CSS (REQUIRED for layout) -->
+  <!-- Bootstrap CSS -->
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
     rel="stylesheet"
-  >
+  />
 
-  <!-- ✅ App CSS -->
-  <link rel="stylesheet" href="styles.css">
+  <!-- Optional styling -->
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .sidebar {
+      min-height: 100vh;
+      background-color: #ffffff;
+      border-right: 1px solid #ddd;
+    }
+    .nav-link {
+      cursor: pointer;
+    }
+    .module {
+      display: none;
+    }
+    .module.active {
+      display: block;
+    }
+  </style>
 </head>
 
 <body>
 
 <!-- Top Navbar -->
-<nav class="navbar navbar-dark px-3">
-  <span class="navbar-brand">
-    Mauser Packaging Solutions | Geismar CMMS
-  </span>
+<nav class="navbar navbar-dark bg-primary px-3">
+  <span class="navbar-brand">Geismar Maintenance CMMS</span>
 </nav>
 
 <div class="container-fluid">
@@ -31,23 +47,23 @@
     <aside class="col-md-2 sidebar p-3">
       <h6 class="text-muted mb-3">Modules</h6>
       <nav class="nav flex-column" id="module-nav">
-  <button class="nav-link btn btn-link text-start active"
-          onclick="switchModule('dashboard', this)">
-    Dashboard
-  </button>
-  <button class="nav-link btn btn-link text-start"
-          onclick="switchModule('parts', this)">
-    Parts
-  </button>
-  <button class="nav-link btn btn-link text-start"
-          onclick="switchModule('workorders', this)">
-    Work Orders
-  </button>
-  <button class="nav-link btn btn-link text-start"
-          onclick="switchModule('admin', this)">
-    Administration
-  </button>
-</nav>
+        <button class="nav-link btn btn-link text-start active"
+                onclick="switchModule('dashboard', this)">
+          Dashboard
+        </button>
+        <button class="nav-link btn btn-link text-start"
+                onclick="switchModule('parts', this)">
+          Parts
+        </button>
+        <button class="nav-link btn btn-link text-start"
+                onclick="switchModule('workorders', this)">
+          Work Orders
+        </button>
+        <button class="nav-link btn btn-link text-start"
+                onclick="switchModule('admin', this)">
+          Administration
+        </button>
+      </nav>
     </aside>
 
     <!-- Main Content -->
@@ -55,13 +71,10 @@
 
       <!-- Dashboard -->
       <section id="module-dashboard" class="module active">
-        <h4 class="mb-4">Dashboard</h4>
-
-        <div class="card shadow-sm mb-3">
-          <div class="card-body text-muted">
-            Low stock and work order alerts will appear here.
-          </div>
-        </div>
+        <h4>Dashboard</h4>
+        <p class="text-muted">
+          Low stock alerts, recent issues, and KPIs will live here.
+        </p>
       </section>
 
       <!-- Parts -->
@@ -71,8 +84,12 @@
         <input
           id="part-search"
           class="form-control form-control-sm mb-3"
-          placeholder="Search by part #, manufacturer, or model"
-        >
+          placeholder="Search by part number, model, or description"
+        />
+
+        <div id="parts-placeholder" class="text-muted mb-2">
+          Search by part number, model, or description to view parts.
+        </div>
 
         <table id="parts-table" class="table table-sm table-hover">
           <thead>
@@ -92,86 +109,42 @@
       <!-- Work Orders -->
       <section id="module-workorders" class="module">
         <h4>Work Orders</h4>
-        <p class="text-muted">Coming next.</p>
+        <p class="text-muted">Work order management coming next.</p>
       </section>
 
       <!-- Admin -->
       <section id="module-admin" class="module">
         <h4>Administration</h4>
-        <p class="text-muted">Admin tools coming next.</p>
+        <p class="text-muted">Admin tools coming later.</p>
       </section>
 
     </main>
   </div>
 </div>
 
-    <h5>Issue Part</h5>
-  <p id="issue-partname"></p>
-
-  <select id="issue-location" class="form-select mb-2"></select>
-  <input id="issue-qty" type="number" class="form-control mb-2" placeholder="Quantity">
-  <input id="issue-wo" class="form-control mb-2" placeholder="Work Order #">
-
-  <button class="btn btn-primary" onclick="submitIssue()">
-    Issue
-  </button>
-
-</div>
-  <h5>Receive Part</h5>
-  <p id="receive-partname"></p>
-
-  <input id="rec-cabinet" class="form-control mb-2" placeholder="Cabinet">
-  <input id="rec-section" class="form-control mb-2" placeholder="Section">
-  <input id="rec-bin" class="form-control mb-2" placeholder="Bin">
-  <input id="rec-qty" type="number" class="form-control mb-2" placeholder="Quantity">
-
-  <button class="btn btn-success" onclick="submitReceive()">
-    Receive
-  </button>
-
-</div>
-
-   <h5>Move Part</h5>
-  <p id="move-partname"></p>
-
-  <label class="form-label">From Location</label>
-  <select id="move-from-location" class="form-select mb-2"></select>
-
-  <label class="form-label">To Location</label>
-  <input id="move-to-cabinet" class="form-control mb-1" placeholder="Cabinet">
-  <input id="move-to-section" class="form-control mb-1" placeholder="Section">
-  <input id="move-to-bin" class="form-control mb-2" placeholder="Bin">
-
-  <label class="form-label">Quantity</label>
-  <input id="move-qty" type="number" class="form-control mb-3">
-
-  <button class="btn btn-secondary" onclick="submitMove()">
-    Move
-  </button>
-
-</div>
-
-
 <!-- ================= ISSUE MODAL ================= -->
-<div class="modal fade" id="issueModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="issueModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content p-3">
 
       <h5>Issue Part</h5>
       <p id="issue-partname"></p>
 
-      <!-- ✅ REQUIRED: THIS SELECT MUST EXIST -->
+      <!-- Asset (Required) -->
       <label class="form-label">Asset (Required)</label>
       <select id="issue-asset" class="form-select mb-2">
         <option value="">Select Asset</option>
       </select>
 
+      <!-- Location -->
       <label class="form-label">From Location</label>
       <select id="issue-location" class="form-select mb-2"></select>
 
+      <!-- Quantity -->
       <label class="form-label">Quantity</label>
       <input id="issue-qty" type="number" class="form-control mb-2">
 
+      <!-- Work Order (Optional) -->
       <label class="form-label">Work Order (Optional)</label>
       <input id="issue-wo" class="form-control mb-3">
 
@@ -182,21 +155,12 @@
     </div>
   </div>
 </div>
-  <!-- ✅ RECEIVE MODAL -->
-  <div class="modal fade" id="receiveModal" tabindex="-1">
-    ...
-  </div>
 
-  <!-- ✅ MOVE MODAL -->
-  <div class="modal fade" id="moveModal" tabindex="-1">
-    ...
-  </div>
-
-  
-<!-- ✅ Bootstrap JS -->
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- ✅ App JS -->
+
+<!-- App JS -->
 <script src="app.js"></script>
-  
+
 </body>
 </html>
