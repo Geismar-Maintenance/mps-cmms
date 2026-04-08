@@ -1,216 +1,105 @@
 const API_BASE = "https://mps-geismar-backend-hkxb.vercel.app";
 
-/* =====================================================
-   GLOBAL STATE
-===================================================== */
-
-let currentModule = "dashboard";
 let allParts = [];
 let selectedPart = null;
 
-async function loadAssetsForIssue() {
-  const select = document.getElementById("issue-asset");
-  if (!select) {
-    console.error("issue-asset select not found in DOM");
+/* ================= Navigation ================= */
+
+function switchModule(moduleName, el) {
+  document.querySelectorAll(".module").forEach(m =>
+    m.classList.remove("active")
+  );
+
+  document.getElementById(`module-${moduleName}`).classList.add("active");
+
+  document.querySelectorAll("#module-nav .nav-link").forEach(l =>
+    l.classList.remove("active")
+  );
+  el.classList.add("active");
+}
+
+/* ================= Parts Search ================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("part-search")
+    .addEventListener("input", handlePartSearch);
+});
+
+async function handlePartSearch(e) {
+  const query = e.target.value.trim();
+
+  if (query.length < 2) {
+    renderPartsTable([]);
+    document.getElementById("parts-placeholder").style.display = "block";
     return;
   }
 
-  // Reset dropdown
-  select.replaceChildren(
-    Object.assign(document.createElement("option"), {
-      value: "",
-      textContent: "Select Asset"
-    })
-  );
-
   try {
-    const res = await fetch(`${API_BASE}/api/assets`);
-    if (!res.ok) {
-      throw new Error(`Failed to load assets (${res.status})`);
-    }
-
-    const assets = await res.json();
-
-    assets.forEach(a => {
-      const opt = document.createElement("option");
-      opt.value = a.assetid;
-      opt.textContent = `${a.assetnumber} – ${a.assetname}`;
-      select.appendChild(opt);
-    });
-  } catch (err) {
-    console.error("Unable to load assets:", err);
-    alert("Unable to load assets for issue");
-  }
-}
-
-/* =====================================================
-   INITIALIZATION
-===================================================== */
-
-document.addEventListener("DOMContentLoaded", () => {
-  switchModule("dashboard", document.querySelector("#module-nav .nav-link"));
-  initPartsModule();
-});
-
-/* =====================================================
-   MODULE NAVIGATION (SAFE)
-===================================================== */
-
-function switchModule(moduleName, clickedLink) {
-  // Hide all modules
-  document.querySelectorAll(".module").forEach(section => {
-    section.classList.remove("active");
-  });
-
-  // Show selected module
-  const active = document.getElementById("module-" + moduleName);
-  if (active) {
-    active.classList.add("active");
-  }
-
-  // Update nav state
-  document.querySelectorAll("#module-nav .nav-link").forEach(link => {
-    link.classList.remove("active");
-  });
-
-  if (clickedLink) {
-    clickedLink.classList.add("active");
-  }
-}
-
-/* =====================================================
-   PARTS MODULE
-===================================================== */
-
-function initPartsModule() {
-  const search = document.getElementById("part-search");
-  if (search) {
-    search.addEventListener("input", handlePartSearch);
-  }
-}
-
-async function loadParts() {
-  try {
-    const res = await fetch(`${API_BASE}/api/parts`);
-
-    // Only treat real HTTP errors as failures
-    if (!res.ok) {
-      throw new Error(`Failed to load parts (${res.status})`);
-    }
+    const res = await fetch(
+      `${API_BASE}/api/parts?search=${encodeURIComponent(query)}`
+    );
+    if (!res.ok) throw new Error("Failed to search parts");
 
     const data = await res.json();
 
-    // Normalize data defensively
     allParts = data.map(p => ({
       ...p,
       total_qty: Number(p.total_qty ?? 0),
       locations: Array.isArray(p.locations) ? p.locations : []
     }));
 
-    console.log("Parts loaded:", allParts);
-
+    document.getElementById("parts-placeholder").style.display = "none";
     renderPartsTable(allParts);
+
   } catch (err) {
-    console.error("loadParts failed:", err);
-    alert(`Unable to load parts: ${err.message}`);
+    alert("Error loading parts");
+    console.error(err);
   }
-}
-
-function handlePartSearch(e) {
-  const q = e.target.value.toLowerCase().trim();
-
-  const filtered = allParts.filter(p =>
-    p.partnumber.toLowerCase().includes(q) ||
-    p.manufacturer.toLowerCase().includes(q) ||
-    p.model.toLowerCase().includes(q) ||
-    p.description.toLowerCase().includes(q)
-  );
-
-  renderPartsTable(filtered);
 }
 
 function renderPartsTable(parts) {
   const tbody = document.querySelector("#parts-table tbody");
   tbody.innerHTML = "";
 
-  if (!parts || parts.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6" class="text-center text-muted">
-          No parts found
-        </td>
-      </tr>`;
-    return;
-  }
-
   parts.forEach(p => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${p.partnumber}</td>
-        <td>${p.description}</td>
-        <td>${p.manufacturer}</td>
-        <td>${p.model}</td>
-        <td>${p.total_qty}</td>
-   <td>
-  <button class="btn btn-sm btn-outline-primary"
-        onclick="openIssueModal(${p.partid})">
-  Issue
-   </button>
+    const tr = document.createElement("tr");
 
-
-     <button class="btn btn-sm btn-outline-success"
-             onclick="openReceiveModal(${p.partid})">
-       Receive
-     </button>
-     <button class="btn btn-sm btn-outline-secondary"
-             onclick="openMoveModal(${p.partid})">
-       Move
-     </button>
-</td>
-      </tr>`;
+    tr.innerHTML = `
+      <td>${p.partnumber}</td>
+      <td>${p.description}</td>
+      <td>${p.manufacturer}</td>
+      <td>${p.model}</td>
+      <td>${p.total_qty}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-primary"
+                ${p.total_qty === 0 ? "disabled" : ""}
+                onclick="openIssueModal(${p.partid})">
+          Issue
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
   });
 }
 
-/* =====================================================
-   ISSUE PART
-===================================================== */
+/* ================= Issue Modal ================= */
 
 function openIssueModal(partid) {
-  console.log("Opening Issue modal for part:", partid);
-  console.log("Current allParts:", allParts);
-
-  if (!Array.isArray(allParts) || allParts.length === 0) {
-    alert("Parts data not loaded yet");
-    return;
-  }
-
   selectedPart = allParts.find(
     p => Number(p.partid) === Number(partid)
   );
-
-  console.log("Selected part:", selectedPart);
-
-  if (!selectedPart) {
-    alert("Selected part not found");
-    return;
-  }
-
-  if (!Array.isArray(selectedPart.locations)) {
-    console.error("locations missing on selectedPart", selectedPart);
-    alert("Inventory locations are missing for this part");
-    return;
-  }
-
-  if (selectedPart.locations.length === 0) {
-    alert("No inventory available for this part");
-    return;
-  }
+  if (!selectedPart) return;
 
   document.getElementById("issue-partname").innerText =
     `${selectedPart.partnumber} (${selectedPart.model})`;
 
   const locSelect = document.getElementById("issue-location");
   locSelect.replaceChildren();
+
+  if (!selectedPart.locations.length) {
+    alert("No inventory available");
+    return;
+  }
 
   selectedPart.locations.forEach(loc => {
     const opt = document.createElement("option");
@@ -222,16 +111,50 @@ function openIssueModal(partid) {
 
   loadAssetsForIssue();
 
-  const modalEl = document.getElementById("issueModal");
-  bootstrap.Modal.getOrCreateInstance(modalEl).show();
+  bootstrap.Modal
+    .getOrCreateInstance(document.getElementById("issueModal"))
+    .show();
 }
+
+/* ================= Assets ================= */
+
+async function loadAssetsForIssue() {
+  const select = document.getElementById("issue-asset");
+  select.replaceChildren(
+    Object.assign(document.createElement("option"), {
+      value: "",
+      textContent: "Select Asset"
+    })
+  );
+
+  try {
+    const res = await fetch(`${API_BASE}/api/assets`);
+    if (!res.ok) throw new Error("Failed to load assets");
+
+    const assets = await res.json();
+
+    assets.forEach(a => {
+      const opt = document.createElement("option");
+      opt.value = a.assetid;
+      opt.textContent = `${a.assetnumber} – ${a.assetname}`;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    alert("Unable to load assets for issue");
+    console.error(err);
+  }
+}
+
+/* ================= Submit Issue ================= */
+
 async function submitIssue() {
+  const assetid = document.getElementById("issue-asset").value;
   const locationid = document.getElementById("issue-location").value;
   const qty = Number(document.getElementById("issue-qty").value);
-  const workOrder = document.getElementById("issue-wo").value;
+  const workorder = document.getElementById("issue-wo").value || null;
 
-  if (!locationid || qty <= 0) {
-    alert("Invalid issue quantity or location");
+  if (!assetid || !locationid || qty <= 0) {
+    alert("Asset, location, and quantity are required");
     return;
   }
 
@@ -243,7 +166,8 @@ async function submitIssue() {
         partid: selectedPart.partid,
         from_locationid: locationid,
         qty,
-        assetid: workOrder || null,
+        assetid,
+        workorder,
         performed_by: "tech"
       })
     });
@@ -251,68 +175,12 @@ async function submitIssue() {
     const result = await res.json();
     if (!res.ok) throw new Error(result.error);
 
-    loadParts(); // refresh inventory
-    bootstrap.Modal.getInstance(
-      document.getElementById("issueModal")
-    ).hide();
+    bootstrap.Modal
+      .getInstance(document.getElementById("issueModal"))
+      .hide();
 
   } catch (err) {
-    alert("Issue failed: " + err.message);
+    alert("Issue failed");
+    console.error(err);
   }
-}
-
-/* =====================================================
-   RECEIVE PART
-===================================================== */
-
-function openReceiveModal(partid) {
-  selectedPart = allParts.find(p => p.partid === partid);
-  if (!selectedPart) return;
-
-  document.getElementById("receive-partname").innerText =
-    `${selectedPart.partnumber} (${selectedPart.model})`;
-
-  document.getElementById("rec-cabinet").value = "";
-  document.getElementById("rec-section").value = "";
-  document.getElementById("rec-bin").value = "";
-  document.getElementById("rec-qty").value = "";
-
-  new bootstrap.Modal(document.getElementById("receiveModal")).show();
-}
-
-async function submitReceive() {
-  alert("Receive logic re-enabled later");
-}
-
-/* =====================================================
-   MOVE PART
-===================================================== */
-
-function openMoveModal(partid) {
-  selectedPart = allParts.find(p => p.partid === partid);
-  if (!selectedPart || !selectedPart.locations) return;
-
-  document.getElementById("move-partname").innerText =
-    `${selectedPart.partnumber} (${selectedPart.model})`;
-
-  const fromSelect = document.getElementById("move-from-location");
-  fromSelect.innerHTML = "";
-
-  selectedPart.locations.forEach(loc => {
-    fromSelect.innerHTML += `
-      <option value="${loc.locationid}">
-        ${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.qty})
-      </option>`;
-  });
-
-  document.getElementById("move-qty").value = "";
-  document.getElementById("move-to-cabinet").value = "";
-  document.getElementById("move-to-section").value = "";
-  document.getElementById("move-to-bin").value = "";
-
-  new bootstrap.Modal(document.getElementById("moveModal")).show();
-}
-
-async function submitMove() {
-  alert("Move logic re-enabled later");
 }
