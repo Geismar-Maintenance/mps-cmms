@@ -5,18 +5,22 @@ let selectedPart = null;
 
 /* ================= Navigation ================= */
 
-function switchModule(moduleName, el) {
+window.switchModule = function (moduleName, el) {
   document.querySelectorAll(".module").forEach(m =>
     m.classList.remove("active")
   );
 
-  document.getElementById(`module-${moduleName}`).classList.add("active");
+  const target = document.getElementById(`module-${moduleName}`);
+  if (target) {
+    target.classList.add("active");
+  }
 
   document.querySelectorAll("#module-nav .nav-link").forEach(l =>
     l.classList.remove("active")
   );
-  el.classList.add("active");
-}
+
+  if (el) el.classList.add("active");
+};
 
 /* ================= Parts Search ================= */
 
