@@ -216,6 +216,22 @@ async function submitIssue() {
   }
 }
 
+function openReceiveModal(partid) {
+  selectedPart = allParts.find(
+    p => Number(p.partid) === Number(partid)
+  );
+  if (!selectedPart) return;
+
+  document.getElementById("receive-partname").innerText =
+    `${selectedPart.partnumber} (${selectedPart.model})`;
+
+  document.getElementById("receive-qty").value = "";
+
+  bootstrap.Modal
+    .getOrCreateInstance(document.getElementById("receiveModal"))
+    .show();
+}
+
 async function submitReceive() {
   const qty = Number(document.getElementById("receive-qty").value);
 
