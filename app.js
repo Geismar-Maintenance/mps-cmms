@@ -246,17 +246,4 @@ async function submitReceive() {
   }
 }
 
-    // ✅ Close modal
-    bootstrap.Modal
-      .getInstance(document.getElementById("receiveModal"))
-      .hide();
-
-    // ✅ Refresh search results (inventory changed)
-    runPartSearch();
-
-  } catch (err) {
-    console.error("Receive error:", err);
-    alert("Receive failed");
-  }
-}
     
