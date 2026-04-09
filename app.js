@@ -242,10 +242,17 @@ window.openReceiveModal = function (partid) {
 
 /* ================= Submit Receive ================= */
 async function submitReceive() {
-  const qty = Number(document.getElementById("receive-qty").value);
+  if (!selectedPart || !Number.isInteger(Number(selectedPart.partid))) {
+    alert("No valid part selected.");
+    return;
+  }
 
-  if (qty <= 0) {
-    alert("Quantity must be greater than zero");
+  const qtyInput = document.getElementById("receive-qty");
+  const qty = parseInt(qtyInput.value, 10);
+
+  if (!Number.isInteger(qty) || qty <= 0) {
+    alert("Quantity must be a positive whole number.");
+    qtyInput.focus();
     return;
   }
 
@@ -254,14 +261,17 @@ async function submitReceive() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        partid: selectedPart.partid,
+        partid: Number(selectedPart.partid),
         qty,
         performed_by: "tech"
       })
     });
 
     const result = await res.json();
-    if (!res.ok) throw new Error(result.error);
+
+    if (!res.ok) {
+      throw new Error(result.error || "Receive failed");
+    }
 
     bootstrap.Modal
       .getInstance(document.getElementById("receiveModal"))
@@ -270,9 +280,10 @@ async function submitReceive() {
     runPartSearch();
 
   } catch (err) {
-    alert("Receive failed");
-    console.error(err);
+    alert(err.message);
+    console.error("Receive error:", err);
   }
 }
+
 
     
