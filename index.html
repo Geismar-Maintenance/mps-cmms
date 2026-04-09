@@ -165,11 +165,18 @@
       <h5>Receive Part</h5>
       <p id="receive-partname"></p>
 
-      <label class="form-label">To Location</label>
-      <select id="receive-location" class="form-select mb-2"></select>
+      <!-- ✅ Receiving location fixed -->
+      <div class="alert alert-secondary py-2 mb-3">
+        Receiving Location: <strong>RECV.000.000</strong>
+      </div>
 
       <label class="form-label">Quantity</label>
-      <input id="receive-qty" type="number" class="form-control mb-3">
+      <input
+        id="receive-qty"
+        type="number"
+        class="form-control mb-3"
+        min="1"
+      >
 
       <button class="btn btn-success" onclick="submitReceive()">
         Receive
