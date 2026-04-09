@@ -94,7 +94,8 @@
 </aside>
     <!-- Main Content -->
     <main class="col-md-10 p-4">
-
+      
+<!-- ================= dashboard module ================= -->
       <!-- Dashboard -->
       <section id="module-dashboard" class="module active">
         <h4>Dashboard</h4>
@@ -102,7 +103,8 @@
           Low stock alerts, recent issues, and KPIs will live here.
         </p>
       </section>
-
+      
+<!-- ================= parts management module ================= -->
       <!-- Parts -->
       <section id="module-parts" class="module">
         <h4 class="mb-3">Parts Management</h4>
@@ -133,13 +135,45 @@
         <tbody></tbody>
         </table>
       </section>
+      
+<!-- ================= parts history module ================= -->
+      <section id="module-parts-history" class="module">
+  <h4 class="mb-3">Parts History</h4>
 
+  <table class="table table-sm table-hover" id="parts-history-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Type</th>
+        <th>Part</th>
+        <th>Description</th>
+        <th>From</th>
+        <th>To</th>
+        <th>Qty</th>
+        <th>User</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<!-- ================= WO history module ================= -->
+
+  <section id="module-wo-history" class="module">
+    <h4 class="mb-3">Work Order History</h4>
+    <p class="text-muted">
+      Work order transaction history will appear here.
+    </p>
+  </section>
+
+ <!-- ================= WO module ================= -->
       <!-- Work Orders -->
       <section id="module-workorders" class="module">
         <h4>Work Orders</h4>
         <p class="text-muted">Work order management coming next.</p>
       </section>
 
+<!-- ================= Admin module ================= -->
       <!-- Admin -->
       <section id="module-admin" class="module">
         <h4>Administration</h4>
