@@ -285,5 +285,108 @@ async function submitReceive() {
   }
 }
 
+/* ================= Move Modal ================= */
+window.openMoveModal = function (partid) {
+  const part = allParts.find(p => Number(p.partid) === Number(partid));
+  if (!part) {
+    alert("Please search for a part first.");
+    return;
+  }
 
+  selectedPart = part;
+
+  document.getElementById("move-partname").innerText =
+    `${selectedPart.partnumber} (${selectedPart.model})`;
+
+  // FROM locations = where inventory exists
+  const fromSelect = document.getElementById("move-from-location");
+  fromSelect.replaceChildren();
+
+  selectedPart.locations.forEach(loc => {
+    const opt = document.createElement("option");
+    opt.value = loc.locationid;
+    opt.textContent =
+      `${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.qty})`;
+    fromSelect.appendChild(opt);
+  });
+
+  // TO locations = all available locations
+  loadAllLocationsForMove();
+
+  document.getElementById("move-qty").value = "";
+
+  bootstrap.Modal
+    .getOrCreateInstance(document.getElementById("moveModal"))
+    .show();
+};
+
+/* ================= Load Locations ================= */
+async function loadAllLocationsForMove() {
+  const toSelect = document.getElementById("move-to-location");
+  toSelect.replaceChildren();
+
+  try {
+    const res = await fetch(`${API_BASE}/api/locations`);
+    if (!res.ok) throw new Error("Failed to load locations");
+
+    const locations = await res.json();
+
+    locations.forEach(loc => {
+      const opt = document.createElement("option");
+      opt.value = loc.locationid;
+      opt.textContent = `${loc.cabinet}.${loc.section}.${loc.bin}`;
+      toSelect.appendChild(opt);
+    });
+
+  } catch (err) {
+    alert("Unable to load locations");
+    console.error(err);
+  }
+}
+
+/* ================= Submit Move ================= */
+async function submitMove() {
+  const from_locationid =
+    Number(document.getElementById("move-from-location").value);
+  const to_locationid =
+    Number(document.getElementById("move-to-location").value);
+  const qty = parseInt(document.getElementById("move-qty").value, 10);
+
+  if (!from_locationid || !to_locationid || from_locationid === to_locationid) {
+    alert("Please select different source and destination locations.");
+    return;
+  }
+
+  if (!Number.isInteger(qty) || qty <= 0) {
+    alert("Quantity must be a positive number.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/parts/move`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        partid: selectedPart.partid,
+        from_locationid,
+        to_locationid,
+        qty,
+        performed_by: "tech"
+      })
+    });
+
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error);
+
+    bootstrap.Modal
+      .getInstance(document.getElementById("moveModal"))
+      .hide();
+
+    runPartSearch();
+
+  } catch (err) {
+    alert(err.message || "Move failed");
+    console.error(err);
+  }
+}
     
