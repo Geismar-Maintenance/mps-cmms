@@ -211,65 +211,109 @@ async function submitIssue() {
     console.error(err);
   }
 }
-function openReceiveModal(partid) {
-  selectedPart = allParts.find(
-    p => Number(p.partid) === Number(partid)
-  );
-  if (!selectedPart) return;
 
-  document.getElementById("receive-partname").innerText =
-    `${selectedPart.partnumber} (${selectedPart.model})`;
+// ✅ SINGLE SOURCE OF TRUTH
+const RECEIVING_LOCATION_ID = 2;
 
-  const locSelect = document.getElementById("receive-location");
-  locSelect.replaceChildren();
+export default async function handler(req, res) {
+  // ✅ CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // ✅ Reuse known locations OR allow receiving into any location
-  if (Array.isArray(selectedPart.locations) && selectedPart.locations.length) {
-    selectedPart.locations.forEach(loc => {
-      const opt = document.createElement("option");
-      opt.value = loc.locationid;
-      opt.textContent = `${loc.cabinet}.${loc.section}.${loc.bin}`;
-      locSelect.appendChild(opt);
-    });
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
   }
 
-  document.getElementById("receive-qty").value = "";
-
-  bootstrap.Modal
-    .getOrCreateInstance(document.getElementById("receiveModal"))
-    .show();
-}
-async function submitReceive() {
-  const locationid = Number(
-    document.getElementById("receive-location").value
-  );
-  const qty = Number(
-    document.getElementById("receive-qty").value
-  );
-
-  if (!locationid || qty <= 0) {
-    alert("Location and quantity are required");
-    return;
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
+
+  const partid = Number(req.body.partid);
+  const qty = Number(req.body.qty);
+  const performed_by = req.body.performed_by ?? "system";
+
+  if (
+    !Number.isInteger(partid) ||
+    !Number.isInteger(qty) ||
+    qty <= 0
+  ) {
+    return res.status(400).json({ error: "Invalid receive data" });
+  }
+
+  const client = await pool.connect();
 
   try {
-    const res = await fetch(`${API_BASE}/api/parts/receive`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        partid: selectedPart.partid,
-        locationid,
+    await client.query("BEGIN");
+
+    // 1️⃣ Increment inventory in RECEIVING
+    const updateRes = await client.query(
+      `
+      UPDATE partlocations
+      SET qty = qty + $1
+      WHERE partid = $2
+        AND locationid = $3
+      RETURNING qty
+      `,
+      [qty, partid, RECEIVING_LOCATION_ID]
+    );
+
+    let finalQty;
+
+    if (updateRes.rowCount === 0) {
+      const insertRes = await client.query(
+        `
+        INSERT INTO partlocations (partid, locationid, qty)
+        VALUES ($1, $2, $3)
+        RETURNING qty
+        `,
+        [partid, RECEIVING_LOCATION_ID, qty]
+      );
+      finalQty = insertRes.rows[0].qty;
+    } else {
+      finalQty = updateRes.rows[0].qty;
+    }
+
+    // 2️⃣ Transaction record
+    await client.query(
+      `
+      INSERT INTO transactions (
+        transactiontypeid,
+        partid,
+        to_locationid,
         qty,
-        performed_by: "tech"
-      })
+        performed_by,
+        transactiondate
+      )
+      VALUES (
+        $1, $2, $3, $4, $5, NOW()
+      )
+      `,
+      [
+        TRANSACTION_TYPES.RECEIVE,
+        partid,
+        RECEIVING_LOCATION_ID,
+        qty,
+        performed_by
+      ]
+    );
+
+    await client.query("COMMIT");
+
+    return res.status(200).json({
+      success: true,
+      receiving_locationid: RECEIVING_LOCATION_ID,
+      new_qty: finalQty
     });
 
-    const result = await res.json();
-
-    if (!res.ok) {
-      alert(result.error || "Receive failed");
-      return;
-    }
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("RECEIVE FAILED:", err);
+    return res.status(400).json({ error: err.message });
+  } finally {
+    client.release();
+  }
+}
 
     // ✅ Close modal
     bootstrap.Modal
