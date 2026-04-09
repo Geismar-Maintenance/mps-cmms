@@ -198,6 +198,19 @@ async function submitIssue() {
         performed_by: "tech"
       })
     });
+    
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error);
+
+    bootstrap.Modal
+      .getInstance(document.getElementById("issueModal"))
+      .hide();
+
+  } catch (err) {
+    alert("Issue failed");
+    console.error(err);
+  }
+}
 function openReceiveModal(partid) {
   selectedPart = allParts.find(
     p => Number(p.partid) === Number(partid)
@@ -272,15 +285,3 @@ async function submitReceive() {
   }
 }
     
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.error);
-
-    bootstrap.Modal
-      .getInstance(document.getElementById("issueModal"))
-      .hide();
-
-  } catch (err) {
-    alert("Issue failed");
-    console.error(err);
-  }
-}
