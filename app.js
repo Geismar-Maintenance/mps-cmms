@@ -218,10 +218,16 @@ async function submitIssue() {
 
 /* ================= Receive Modal ================= */
 window.openReceiveModal = function (partid) {
-  selectedPart = allParts.find(
+  const part = allParts.find(
     p => Number(p.partid) === Number(partid)
   );
-  if (!selectedPart) return;
+
+  if (!part) {
+    alert("Please search for a part before receiving.");
+    return;
+  }
+
+  selectedPart = part;
 
   document.getElementById("receive-partname").innerText =
     `${selectedPart.partnumber} (${selectedPart.model})`;
@@ -232,6 +238,7 @@ window.openReceiveModal = function (partid) {
     .getOrCreateInstance(document.getElementById("receiveModal"))
     .show();
 };
+
 
 /* ================= Submit Receive ================= */
 async function submitReceive() {
