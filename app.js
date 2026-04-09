@@ -212,106 +212,37 @@ async function submitIssue() {
   }
 }
 
-// ✅ SINGLE SOURCE OF TRUTH
-const RECEIVING_LOCATION_ID = 2;
+async function submitReceive() {
+  const qty = Number(document.getElementById("receive-qty").value);
 
-export default async function handler(req, res) {
-  // ✅ CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
+  if (qty <= 0) {
+    alert("Quantity must be greater than zero");
+    return;
   }
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
-  const partid = Number(req.body.partid);
-  const qty = Number(req.body.qty);
-  const performed_by = req.body.performed_by ?? "system";
-
-  if (
-    !Number.isInteger(partid) ||
-    !Number.isInteger(qty) ||
-    qty <= 0
-  ) {
-    return res.status(400).json({ error: "Invalid receive data" });
-  }
-
-  const client = await pool.connect();
 
   try {
-    await client.query("BEGIN");
-
-    // 1️⃣ Increment inventory in RECEIVING
-    const updateRes = await client.query(
-      `
-      UPDATE partlocations
-      SET qty = qty + $1
-      WHERE partid = $2
-        AND locationid = $3
-      RETURNING qty
-      `,
-      [qty, partid, RECEIVING_LOCATION_ID]
-    );
-
-    let finalQty;
-
-    if (updateRes.rowCount === 0) {
-      const insertRes = await client.query(
-        `
-        INSERT INTO partlocations (partid, locationid, qty)
-        VALUES ($1, $2, $3)
-        RETURNING qty
-        `,
-        [partid, RECEIVING_LOCATION_ID, qty]
-      );
-      finalQty = insertRes.rows[0].qty;
-    } else {
-      finalQty = updateRes.rows[0].qty;
-    }
-
-    // 2️⃣ Transaction record
-    await client.query(
-      `
-      INSERT INTO transactions (
-        transactiontypeid,
-        partid,
-        to_locationid,
+    const res = await fetch(`${API_BASE}/api/parts/receive`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        partid: selectedPart.partid,
         qty,
-        performed_by,
-        transactiondate
-      )
-      VALUES (
-        $1, $2, $3, $4, $5, NOW()
-      )
-      `,
-      [
-        TRANSACTION_TYPES.RECEIVE,
-        partid,
-        RECEIVING_LOCATION_ID,
-        qty,
-        performed_by
-      ]
-    );
-
-    await client.query("COMMIT");
-
-    return res.status(200).json({
-      success: true,
-      receiving_locationid: RECEIVING_LOCATION_ID,
-      new_qty: finalQty
+        performed_by: "tech"
+      })
     });
 
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error);
+
+    bootstrap.Modal
+      .getInstance(document.getElementById("receiveModal"))
+      .hide();
+
+    runPartSearch();
+
   } catch (err) {
-    await client.query("ROLLBACK");
-    console.error("RECEIVE FAILED:", err);
-    return res.status(400).json({ error: err.message });
-  } finally {
-    client.release();
+    alert("Receive failed");
+    console.error(err);
   }
 }
 
