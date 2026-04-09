@@ -198,7 +198,80 @@ async function submitIssue() {
         performed_by: "tech"
       })
     });
+function openReceiveModal(partid) {
+  selectedPart = allParts.find(
+    p => Number(p.partid) === Number(partid)
+  );
+  if (!selectedPart) return;
 
+  document.getElementById("receive-partname").innerText =
+    `${selectedPart.partnumber} (${selectedPart.model})`;
+
+  const locSelect = document.getElementById("receive-location");
+  locSelect.replaceChildren();
+
+  // ✅ Reuse known locations OR allow receiving into any location
+  if (Array.isArray(selectedPart.locations) && selectedPart.locations.length) {
+    selectedPart.locations.forEach(loc => {
+      const opt = document.createElement("option");
+      opt.value = loc.locationid;
+      opt.textContent = `${loc.cabinet}.${loc.section}.${loc.bin}`;
+      locSelect.appendChild(opt);
+    });
+  }
+
+  document.getElementById("receive-qty").value = "";
+
+  bootstrap.Modal
+    .getOrCreateInstance(document.getElementById("receiveModal"))
+    .show();
+}
+async function submitReceive() {
+  const locationid = Number(
+    document.getElementById("receive-location").value
+  );
+  const qty = Number(
+    document.getElementById("receive-qty").value
+  );
+
+  if (!locationid || qty <= 0) {
+    alert("Location and quantity are required");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/parts/receive`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        partid: selectedPart.partid,
+        locationid,
+        qty,
+        performed_by: "tech"
+      })
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      alert(result.error || "Receive failed");
+      return;
+    }
+
+    // ✅ Close modal
+    bootstrap.Modal
+      .getInstance(document.getElementById("receiveModal"))
+      .hide();
+
+    // ✅ Refresh search results (inventory changed)
+    runPartSearch();
+
+  } catch (err) {
+    console.error("Receive error:", err);
+    alert("Receive failed");
+  }
+}
+    
     const result = await res.json();
     if (!res.ok) throw new Error(result.error);
 
