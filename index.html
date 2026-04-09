@@ -46,28 +46,52 @@
   <div class="row">
 
     <!-- Sidebar -->
-    <aside class="col-md-2 sidebar p-3">
-      <h6 class="text-muted mb-3">Modules</h6>
-      <nav class="nav flex-column" id="module-nav">
-        <button class="nav-link btn btn-link text-start active"
-                onclick="switchModule('dashboard', this)">
-          Dashboard
-        </button>
-        <button class="nav-link btn btn-link text-start"
-                onclick="switchModule('parts', this)">
-          Parts
-        </button>
-        <button class="nav-link btn btn-link text-start"
-                onclick="switchModule('workorders', this)">
-          Work Orders
-        </button>
-        <button class="nav-link btn btn-link text-start"
-                onclick="switchModule('admin', this)">
-          Administration
-        </button>
-      </nav>
-    </aside>
+<aside class="col-md-2 sidebar p-3">
+  <h6 class="text-muted mb-3">Modules</h6>
 
+  <nav class="nav flex-column" id="module-nav">
+
+    <!-- Dashboard -->
+    <button class="nav-link btn btn-link text-start active"
+            onclick="switchModule('dashboard', this)">
+      Dashboard
+    </button>
+
+    <!-- Parts Management -->
+    <button class="nav-link btn btn-link text-start"
+            onclick="switchModule('parts', this)">
+      Parts
+    </button>
+
+    <!-- History Section -->
+    <h6 class="text-muted mt-3 mb-2">History</h6>
+
+    <button class="nav-link btn btn-link text-start ms-3"
+            onclick="switchModule('parts-history', this)">
+      Parts History
+    </button>
+
+    <button class="nav-link btn btn-link text-start ms-3"
+            onclick="switchModule('wo-history', this)">
+      Work Order History
+    </button>
+
+    <!-- Work Orders -->
+    <h6 class="text-muted mt-3 mb-2">Operations</h6>
+
+    <button class="nav-link btn btn-link text-start"
+            onclick="switchModule('workorders', this)">
+      Work Orders
+    </button>
+
+    <!-- Administration -->
+    <button class="nav-link btn btn-link text-start"
+            onclick="switchModule('admin', this)">
+      Administration
+    </button>
+
+  </nav>
+</aside>
     <!-- Main Content -->
     <main class="col-md-10 p-4">
 
