@@ -216,7 +216,8 @@ async function submitIssue() {
   }
 }
 
-function openReceiveModal(partid) {
+/* ================= Receive Modal ================= */
+window.openReceiveModal = function (partid) {
   selectedPart = allParts.find(
     p => Number(p.partid) === Number(partid)
   );
@@ -230,8 +231,9 @@ function openReceiveModal(partid) {
   bootstrap.Modal
     .getOrCreateInstance(document.getElementById("receiveModal"))
     .show();
-}
+};
 
+/* ================= Submit Receive ================= */
 async function submitReceive() {
   const qty = Number(document.getElementById("receive-qty").value);
 
