@@ -478,11 +478,62 @@ async function loadWorkOrders() {
 }
 
 /* ================= Work Orders Modal ================= */
-window.openCreateWOModal = function () {
+window.openCreateWOModal = async function () {
+  await loadWOAssets();
+  await loadWOTypes();
+  await loadWOPriorities();
+
   bootstrap.Modal
     .getOrCreateInstance(document.getElementById("createWOModal"))
     .show();
 };
+
+async function loadWOAssets() {
+  const sel = document.getElementById("wo-asset");
+  sel.innerHTML = "<option value=''>Select Asset</option>";
+
+  const res = await fetch(`${API_BASE}/api/assets`);
+  const assets = await res.json();
+
+  assets.forEach(a => {
+    const opt = document.createElement("option");
+    opt.value = a.assetid;
+    opt.textContent = `${a.assetnumber} – ${a.assetname}`;
+    sel.appendChild(opt);
+  });
+}
+
+
+async function loadWOTypes() {
+  const sel = document.getElementById("wo-type");
+  sel.innerHTML = "<option value=''>Select Type</option>";
+
+  const res = await fetch(`${API_BASE}/api/wotypes`);
+  const types = await res.json();
+
+  types.forEach(t => {
+    const opt = document.createElement("option");
+    opt.value = t.id;
+    opt.textContent = t.name;
+    sel.appendChild(opt);
+  });
+}
+
+async function loadWOPriorities() {
+  const sel = document.getElementById("wo-priority");
+  sel.innerHTML = "<option value=''>Select Priority</option>";
+
+  const res = await fetch(`${API_BASE}/api/wopriorities`);
+  const prios = await res.json();
+
+  prios.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = p.id;
+    opt.textContent = p.name;
+    sel.appendChild(opt);
+  });
+}
+
 
 async function submitWorkOrder() {
   const assetid = document.getElementById("wo-asset").value;
