@@ -490,7 +490,12 @@ window.openCreateWOModal = async function () {
 
 async function loadWOAssets() {
   const sel = document.getElementById("wo-asset");
-  sel.innerHTML = "<option value=''>Select Asset</option>";
+  sel.replaceChildren();
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Select Asset";
+  sel.appendChild(placeholder);
 
   const res = await fetch(`${API_BASE}/api/assets`);
   const assets = await res.json();
@@ -506,7 +511,12 @@ async function loadWOAssets() {
 
 async function loadWOTypes() {
   const sel = document.getElementById("wo-type");
-  sel.innerHTML = "<option value=''>Select Type</option>";
+  sel.replaceChildren();
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Select Type";
+  sel.appendChild(placeholder);
 
   const res = await fetch(`${API_BASE}/api/lookups?type=wotypes`);
   const types = await res.json();
@@ -514,14 +524,19 @@ async function loadWOTypes() {
   types.forEach(t => {
     const opt = document.createElement("option");
     opt.value = t.id;
-    opt.textContent = t.name;
+    opt.textContent = t.type;   // ✅ CORRECT FIELD
     sel.appendChild(opt);
   });
 }
 
 async function loadWOPriorities() {
   const sel = document.getElementById("wo-priority");
-  sel.innerHTML = "<option value=''>Select Priority</option>";
+  sel.replaceChildren();
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Select Priority";
+  sel.appendChild(placeholder);
 
   const res = await fetch(`${API_BASE}/api/lookups?type=wopriorities`);
   const prios = await res.json();
@@ -529,7 +544,7 @@ async function loadWOPriorities() {
   prios.forEach(p => {
     const opt = document.createElement("option");
     opt.value = p.id;
-    opt.textContent = p.name;
+    opt.textContent = p.priority;   // ✅ CORRECT FIELD
     sel.appendChild(opt);
   });
 }
