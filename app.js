@@ -508,7 +508,7 @@ async function loadWOTypes() {
   const sel = document.getElementById("wo-type");
   sel.innerHTML = "<option value=''>Select Type</option>";
 
-  const res = await fetch(`${API_BASE}/api/wotypes`);
+  const res = await fetch(`${API_BASE}//api/lookups?type=wotypes`);
   const types = await res.json();
 
   types.forEach(t => {
@@ -523,7 +523,7 @@ async function loadWOPriorities() {
   const sel = document.getElementById("wo-priority");
   sel.innerHTML = "<option value=''>Select Priority</option>";
 
-  const res = await fetch(`${API_BASE}/api/wopriorities`);
+  const res = await fetch(`${API_BASE}/api/lookups?type=wopriorities`);
   const prios = await res.json();
 
   prios.forEach(p => {
