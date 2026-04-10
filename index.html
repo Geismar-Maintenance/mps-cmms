@@ -295,6 +295,36 @@
   </div>
 </div>
 
+    <!-- ================= Create WO MODAL ================= -->
+  <div class="modal fade" id="createWOModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content p-3">
+
+      <h5>Create Work Order</h5>
+
+      <label class="form-label">Asset</label>
+      <select id="wo-asset" class="form-select mb-2"></select>
+
+      <label class="form-label">Description</label>
+      <input id="wo-description" class="form-control mb-2">
+
+      <label class="form-label">Type</label>
+      <select id="wo-type" class="form-select mb-2"></select>
+
+      <label class="form-label">Priority</label>
+      <select id="wo-priority" class="form-select mb-2"></select>
+
+      <label class="form-label">Due Date</label>
+      <input type="date" id="wo-due" class="form-control mb-3">
+
+      <button class="btn btn-primary" onclick="submitWorkOrder()">
+        Create
+      </button>
+
+    </div>
+  </div>
+</div>
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
