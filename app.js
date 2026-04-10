@@ -22,6 +22,15 @@ window.switchModule = function (moduleName, el) {
   if (el) el.classList.add("active");
 };
 
+  if (moduleName === "parts-history") {
+    loadPartsHistory();
+  }
+
+  if (moduleName === "wo-history") {
+    loadWOHistory();
+  }
+
+
 /* ================= Parts Search ================= */
 
 document.getElementById("part-search")
@@ -389,4 +398,47 @@ async function submitMove() {
     console.error(err);
   }
 }
-    
+/* ================= Parts history ================= */
+async function loadPartsHistory() {
+  const tbody = document.querySelector("#parts-history-table tbody");
+  tbody.innerHTML = "";
+
+  try {
+    const res = await fetch(`${API_BASE}/api/history/parts`);
+    if (!res.ok) throw new Error("Failed to load parts history");
+
+    const rows = await res.json();
+
+    rows.forEach(h => {
+      const fromLoc = h.from_cabinet
+        ? `${h.from_cabinet}.${h.from_section}.${h.from_bin}`
+        : "—";
+
+      const toLoc = h.to_cabinet
+        ? `${h.to_cabinet}.${h.to_section}.${h.to_bin}`
+        : "—";
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${new Date(h.transactiondate).toLocaleString()}</td>
+        <td>${h.transactiontype}</td>
+        <td>${h.partnumber}</td>
+        <td>${h.description}</td>
+        <td>${fromLoc}</td>
+        <td>${toLoc}</td>
+        <td>${h.qty}</td>
+        <td>${h.performed_by}</td>
+      `;
+
+      tbody.appendChild(tr);
+    });
+
+  } catch (err) {
+    alert("Unable to load parts history");
+    console.error(err);
+  }
+}    
+/* ================= WO history ================= */
+async function loadWOHistory() {
+  // Placeholder for now
+}
