@@ -20,7 +20,6 @@ window.switchModule = function (moduleName, el) {
   );
 
   if (el) el.classList.add("active");
-};
 
   if (moduleName === "parts-history") {
     loadPartsHistory();
@@ -29,7 +28,7 @@ window.switchModule = function (moduleName, el) {
   if (moduleName === "wo-history") {
     loadWOHistory();
   }
-
+};
 
 /* ================= Parts Search ================= */
 
