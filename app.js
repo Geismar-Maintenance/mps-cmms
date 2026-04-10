@@ -508,7 +508,7 @@ async function loadWOTypes() {
   const sel = document.getElementById("wo-type");
   sel.innerHTML = "<option value=''>Select Type</option>";
 
-  const res = await fetch(`${API_BASE}//api/lookups?type=wotypes`);
+  const res = await fetch(`${API_BASE}/api/lookups?type=wotypes`);
   const types = await res.json();
 
   types.forEach(t => {
