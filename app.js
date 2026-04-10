@@ -441,3 +441,75 @@ async function loadPartsHistory() {
 async function loadWOHistory() {
   // Placeholder for now
 }
+
+/* ================= Work Orders Module ================= */
+async function loadWorkOrders() {
+  const tbody = document.querySelector("#wo-table tbody");
+  tbody.innerHTML = "";
+
+  try {
+    const res = await fetch(`${API_BASE}/api/workorders`);
+    if (!res.ok) throw new Error("Failed to load work orders");
+
+    const rows = await res.json();
+
+    rows.forEach(w => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${w.woid}</td>
+        <td>${w.assetname ?? "—"}</td>
+        <td>${w.description}</td>
+        <td>${w.type}</td>
+        <td>${w.priority}</td>
+        <td>${w.status}</td>
+        <td>${w.duedate ?? "—"}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+  } catch (err) {
+    alert("Unable to load work orders");
+    console.error(err);
+  }
+}
+
+/* ================= Work Orders Modal ================= */
+window.openCreateWOModal = function () {
+  bootstrap.Modal
+    .getOrCreateInstance(document.getElementById("createWOModal"))
+    .show();
+};
+
+async function submitWorkOrder() {
+  const assetid = document.getElementById("wo-asset").value;
+  const description = document.getElementById("wo-description").value;
+  const wotype = document.getElementById("wo-type").value;
+  const priority = document.getElementById("wo-priority").value;
+  const duedate = document.getElementById("wo-due").value || null;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/workorders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        assetid,
+        description,
+        wotype,
+        priority,
+        duedate
+      })
+    });
+
+    if (!res.ok) throw new Error("Create failed");
+
+    bootstrap.Modal
+      .getInstance(document.getElementById("createWOModal"))
+      .hide();
+
+    loadWorkOrders();
+
+  } catch (err) {
+    alert("Failed to create work order");
+    console.error(err);
+  }
+}
