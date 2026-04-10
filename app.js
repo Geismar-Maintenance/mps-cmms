@@ -28,6 +28,10 @@ window.switchModule = function (moduleName, el) {
   if (moduleName === "wo-history") {
     loadWOHistory();
   }
+ 
+  if (moduleName === "workorders") {
+  loadWorkOrders();
+}
 };
 
 /* ================= Parts Search ================= */
