@@ -167,12 +167,29 @@
   </section>
 
  <!-- ================= WO module ================= -->
-      <!-- Work Orders -->
-      <section id="module-workorders" class="module">
-        <h4>Work Orders</h4>
-        <p class="text-muted">Work order management coming next.</p>
-      </section>
+<section id="module-workorders" class="module">
+  <h4 class="mb-3">Work Orders</h4>
 
+  <button class="btn btn-sm btn-primary mb-3"
+          onclick="openCreateWOModal()">
+    Create Work Order
+  </button>
+
+  <table class="table table-sm table-hover" id="wo-table">
+    <thead>
+      <tr>
+        <th>WO #</th>
+        <th>Asset</th>
+        <th>Description</th>
+        <th>Type</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Due</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
 <!-- ================= Admin module ================= -->
       <!-- Admin -->
       <section id="module-admin" class="module">
