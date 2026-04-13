@@ -41,10 +41,21 @@ window.switchModule = function (moduleName, el) {
 
 /* ================= DASHBOARD ================= */
 async function loadDashboard() {
-  await loadWorkOrdersData();
-  await loadDashboardInventory();
+  try {
+    await loadWorkOrdersData();
+  } catch (e) {
+    console.warn("Work orders not available on dashboard load");
+  }
+
+  try {
+    await loadDashboardInventory();
+  } catch (e) {
+    console.warn("Inventory not available on dashboard load");
+  }
+
   renderDashboard();
 }
+
 function renderDashboard() {
   const today = new Date();
   const startOfWeek = new Date(today);
