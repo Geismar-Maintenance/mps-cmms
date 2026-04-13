@@ -466,6 +466,44 @@ async function loadWorkOrders() {
     console.error(err);
   }
 }
+function renderWOTable(rows) {
+  const tbody = document.querySelector("#wo-table tbody");
+  tbody.innerHTML = "";
+
+  rows.forEach(w => {
+    const tr = document.createElement("tr");
+
+    if (w.status === "Completed") {
+      tr.classList.add("table-secondary");
+    }
+
+    tr.innerHTML = `
+      <td>${w.woid}</td>
+      <td>${w.assetname ?? "—"}</td>
+      <td>${w.description}</td>
+      <td>${w.type}</td>
+      <td>${w.priority}</td>
+      <td>${w.status}</td>
+      <td>
+        ${w.duedate
+          ? new Date(w.duedate).toLocaleDateString()
+          : "—"}
+      </td>
+      <td>
+        ${
+          w.status !== "Completed"
+            ? `<button class="btn btn-sm btn-success"
+                       onclick="openCloseWOModal(${w.woid})">
+                 Complete
+               </button>`
+            : "—"
+        }
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
 function applyWOFilters() {
   const statusFilter =
     document.getElementById("wo-status-filter")?.value || "open";
