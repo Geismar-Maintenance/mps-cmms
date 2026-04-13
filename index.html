@@ -325,7 +325,17 @@
   </div>
 </div>
   
-   <!-- ================= Create WO MODAL ================= -->
+<div class="modal-footer">
+  <button class="btn btn-secondary" data-bs-dismiss="modal">
+    Cancel
+  </button>
+  <button class="btn btn-primary" onclick="submitWorkOrder()">
+    Create Work Order
+  </button>
+</div>
+
+  
+   <!-- ================= Close WO MODAL ================= -->
 <div class="modal fade" id="closeWOModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -357,6 +367,15 @@
       </div>
     </div>
   </div>
+</div>
+ 
+<div class="modal-footer">
+  <button class="btn btn-secondary" data-bs-dismiss="modal">
+    Cancel
+  </button>
+  <button class="btn btn-success" onclick="submitCloseWO()">
+    Complete Work Order
+  </button>
 </div>
   
 <!-- Bootstrap JS -->
