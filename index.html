@@ -295,45 +295,60 @@
   </div>
 </div>
 
-    <!-- ================= Create WO MODAL ================= -->
-  <div class="modal fade" id="createWOModal" tabindex="-1">
+  <!-- ================= Create WO MODAL ================= -->
+<div class="modal fade" id="createWOModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content p-3">
 
-      <h5>Create Work Order</h5>
+      <!-- Header -->
+      <div class="modal-header">
+        <h5 class="modal-title">Create Work Order</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
 
-      <label class="form-label">Asset</label>
-      <select id="wo-asset" class="form-select mb-2"></select>
+      <!-- Body -->
+      <div class="modal-body">
+        <label class="form-label">Asset</label>
+        <select id="wo-asset" class="form-select mb-2"></select>
 
-      <label class="form-label">Description</label>
-      <input id="wo-description" class="form-control mb-2">
+        <label class="form-label">Description</label>
+        <input id="wo-description" class="form-control mb-2">
 
-      <label class="form-label">Type</label>
-      <select id="wo-type" class="form-select mb-2"></select>
+        <label class="form-label">Type</label>
+        <select id="wo-type" class="form-select mb-2"></select>
 
-      <label class="form-label">Priority</label>
-      <select id="wo-priority" class="form-select mb-2"></select>
+        <label class="form-label">Priority</label>
+        <select id="wo-priority" class="form-select mb-2"></select>
 
-      <label class="form-label">Due Date</label>
-      <input type="date" id="wo-due" class="form-control mb-3">
+        <label class="form-label">Due Date</label>
+        <input type="date" id="wo-due" class="form-control">
+      </div>
 
-      <button class="btn btn-primary" onclick="submitWorkOrder()">
-        Create
-      </button>
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          onclick="submitWorkOrder()"
+        >
+          Create Work Order
+        </button>
+      </div>
 
     </div>
   </div>
 </div>
-  
-<div class="modal-footer">
-  <button class="btn btn-secondary" data-bs-dismiss="modal">
-    Cancel
-  </button>
-  <button class="btn btn-primary" onclick="submitWorkOrder()">
-    Create Work Order
-  </button>
-</div>
-
   
    <!-- ================= Close WO MODAL ================= -->
 <div class="modal fade" id="closeWOModal" tabindex="-1">
