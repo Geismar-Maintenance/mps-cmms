@@ -2,6 +2,7 @@ const API_BASE = "https://mps-geismar-backend-hkxb.vercel.app";
 
 let allParts = [];
 let selectedPart = null;
+let allWorkOrders = [];
 
 /* ================= Navigation ================= */
 
@@ -456,6 +457,12 @@ async function loadWorkOrders() {
     if (!res.ok) throw new Error("Failed to load work orders");
 
     const rows = await res.json();
+
+// ✅ Save full dataset
+allWorkOrders = rows;
+
+// ✅ Apply filter + render
+applyWOFilters();
    
     rows.sort((a, b) => {
   if (a.status === "Completed" && b.status !== "Completed") return 1;
@@ -496,6 +503,31 @@ async function loadWorkOrders() {
     alert("Unable to load work orders");
     console.error(err);
   }
+}
+function applyWOFilters() {
+  const statusFilter =
+    document.getElementById("wo-status-filter")?.value || "open";
+
+  let filtered = [...allWorkOrders];
+
+  if (statusFilter === "open") {
+    filtered = filtered.filter(w => w.status !== "Completed");
+  }
+
+  if (statusFilter === "completed") {
+    filtered = filtered.filter(w => w.status === "Completed");
+  }
+
+  // ✅ Keep completed at bottom when showing all
+  if (statusFilter === "all") {
+    filtered.sort((a, b) => {
+      if (a.status === "Completed" && b.status !== "Completed") return 1;
+      if (a.status !== "Completed" && b.status === "Completed") return -1;
+      return 0;
+    });
+  }
+
+  renderWOTable(filtered);
 }
 
 /* ================= Work Orders Modal ================= */
