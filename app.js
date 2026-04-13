@@ -749,3 +749,8 @@ async function submitCloseWO() {
   }
 }
 
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadDashboard();
+});
+
