@@ -467,7 +467,10 @@ async function loadWorkOrders() {
         <td>${w.type}</td>
         <td>${w.priority}</td>
         <td>${w.status}</td>
-        <td>${w.duedate ?? "—"}</td>
+        <td>${w.duedate? new Date(w.duedate).toLocaleDateString()
+    : "—"}
+</td>
+
         <td>
           ${
             w.status !== "Completed"
