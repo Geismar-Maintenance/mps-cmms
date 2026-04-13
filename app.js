@@ -459,6 +459,7 @@ async function loadWorkOrders() {
 
     rows.forEach(w => {
       const tr = document.createElement("tr");
+
       tr.innerHTML = `
         <td>${w.woid}</td>
         <td>${w.assetname ?? "—"}</td>
@@ -467,19 +468,20 @@ async function loadWorkOrders() {
         <td>${w.priority}</td>
         <td>${w.status}</td>
         <td>${w.duedate ?? "—"}</td>
+        <td>
+          ${
+            w.status !== "Completed"
+              ? `<button class="btn btn-sm btn-success"
+                         onclick="openCloseWOModal(${w.woid})">
+                   Complete
+                 </button>`
+              : "—"
+          }
+        </td>
       `;
-      tbody.appendChild(tr);
 
-      <td>
-  ${w.status !== "Completed"
-    ? `<button class="btn btn-sm btn-success"
-               onclick="openCloseWOModal(${w.woid})">
-         Complete
-       </button>`
-    : ""}
-</td>
+      tbody.appendChild(tr);
     });
-    
 
   } catch (err) {
     alert("Unable to load work orders");
