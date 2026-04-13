@@ -469,7 +469,17 @@ async function loadWorkOrders() {
         <td>${w.duedate ?? "—"}</td>
       `;
       tbody.appendChild(tr);
+
+      <td>
+  ${w.status !== "Completed"
+    ? `<button class="btn btn-sm btn-success"
+               onclick="openCloseWOModal(${w.woid})">
+         Complete
+       </button>`
+    : ""}
+</td>
     });
+    
 
   } catch (err) {
     alert("Unable to load work orders");
