@@ -22,6 +22,10 @@ window.switchModule = function (moduleName, el) {
 
   if (el) el.classList.add("active");
 
+  if (moduleName === "dashboard") {
+  loadDashboard();
+}
+  
   if (moduleName === "parts-history") {
     loadPartsHistory();
   }
@@ -34,6 +38,63 @@ window.switchModule = function (moduleName, el) {
   loadWorkOrders();
 }
 };
+
+/* ================= DASHBOARD ================= */
+async function loadDashboard() {
+  await loadWorkOrders();      // ensures allWorkOrders is populated
+  await loadDashboardInventory();
+  renderDashboard();
+}
+function renderDashboard() {
+  const today = new Date();
+  const startOfWeek = new Date(today);
+  const endOfWeek = new Date(today);
+
+  startOfWeek.setDate(today.getDate() - today.getDay());
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+  const openWOs = allWorkOrders.filter(w => w.status !== "Completed");
+
+  const overdueWOs = openWOs.filter(w =>
+    w.duedate && new Date(w.duedate) < today
+  );
+
+  const dueThisWeek = openWOs.filter(w => {
+    if (!w.duedate) return false;
+    const d = new Date(w.duedate);
+    return d >= startOfWeek && d <= endOfWeek;
+  });
+
+  document.getElementById("dash-wo-open").textContent = openWOs.length;
+  document.getElementById("dash-wo-overdue").textContent = overdueWOs.length;
+  document.getElementById("dash-wo-week").textContent = dueThisWeek.length;
+}
+
+async function loadDashboardInventory() {
+  try {
+    const res = await fetch(`${API_BASE}/api/parts?search=*`);
+    if (!res.ok) return;
+
+    const parts = await res.json();
+
+    let lowStock = 0;
+    let outStock = 0;
+
+    parts.forEach(p => {
+      const qty = Number(p.total_qty ?? 0);
+      const reorder = Number(p.reorderlevel ?? 0);
+
+      if (qty === 0) outStock++;
+      else if (reorder > 0 && qty <= reorder) lowStock++;
+    });
+
+    document.getElementById("dash-low-stock").textContent = lowStock;
+    document.getElementById("dash-out-stock").textContent = outStock;
+
+  } catch (err) {
+    console.error("Dashboard inventory error:", err);
+  }
+}
 
 /* ================= Parts Search ================= */
 
