@@ -72,24 +72,15 @@ function renderDashboard() {
 
 async function loadDashboardInventory() {
   try {
-    const res = await fetch(`${API_BASE}/api/parts?search=*`);
+    const res = await fetch(`${API_BASE}/api/parts?summary=inventory`);
     if (!res.ok) return;
 
-    const parts = await res.json();
+    const data = await res.json();
 
-    let lowStock = 0;
-    let outStock = 0;
-
-    parts.forEach(p => {
-      const qty = Number(p.total_qty ?? 0);
-      const reorder = Number(p.reorderlevel ?? 0);
-
-      if (qty === 0) outStock++;
-      else if (reorder > 0 && qty <= reorder) lowStock++;
-    });
-
-    document.getElementById("dash-low-stock").textContent = lowStock;
-    document.getElementById("dash-out-stock").textContent = outStock;
+    document.getElementById("dash-low-stock").textContent =
+      data.low_stock ?? 0;
+    document.getElementById("dash-out-stock").textContent =
+      data.out_stock ?? 0;
 
   } catch (err) {
     console.error("Dashboard inventory error:", err);
