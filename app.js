@@ -600,3 +600,48 @@ async function submitWorkOrder() {
     console.error("Create WO failed:", err);
   }
 }
+
+window.openCloseWOModal = function (woid) {
+  document.getElementById("close-wo-id").value = woid;
+  document.getElementById("workperformed").value = "";
+
+  bootstrap.Modal
+    .getOrCreateInstance(document.getElementById("closeWOModal"))
+    .show();
+};
+
+async function submitCloseWO() {
+  const woid = document.getElementById("close-wo-id").value;
+  const workperformed =
+    document.getElementById("workperformed").value.trim();
+
+  if (!workperformed) {
+    alert("Work performed is required.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/workorders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "close",
+        woid,
+        workperformed
+      })
+    });
+
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error || "Close failed");
+
+    bootstrap.Modal
+      .getInstance(document.getElementById("closeWOModal"))
+      .hide();
+
+    loadWorkOrders();
+
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
