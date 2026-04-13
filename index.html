@@ -175,6 +175,20 @@
     Create Work Order
   </button>
 
+  <div class="d-flex align-items-center mb-3">
+  <label class="me-2 mb-0"><strong>Status:</strong></label>
+  <select
+    id="wo-status-filter"
+    class="form-select form-select-sm"
+    style="width: 180px"
+    onchange="applyWOFilters()"
+  >
+    <option value="open" selected>Open</option>
+    <option value="completed">Completed</option>
+    <option value="all">All</option>
+  </select>
+</div>
+
   <table class="table table-sm table-hover" id="wo-table">
     <thead>
       <tr>
