@@ -120,6 +120,9 @@ async function runPartSearch() {
 
   if (query.length < 2) {
     allParts = [];
+
+    lastPartSearch - query;
+    
     renderPartsTable([]);
     document.getElementById("parts-placeholder").style.display = "block";
     return;
@@ -151,6 +154,15 @@ async function runPartSearch() {
     alert("Error searching parts");
   }
 }
+
+
+function refreshPartsTable() {
+  if (lastPartSearch.length >= 2) {
+    document.getElementById("part-search").value = lastPartSearch;
+    runPartSearch();
+  }
+}
+
 
 function renderPartsTable(parts) {
   const tbody = document.querySelector("#parts-table tbody");
