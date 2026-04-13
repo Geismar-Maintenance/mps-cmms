@@ -292,6 +292,7 @@ async function submitIssue() {
     bootstrap.Modal
       .getInstance(document.getElementById("issueModal"))
       .hide();
+    runPartSearch();
 
   } catch (err) {
     alert("Issue failed");
