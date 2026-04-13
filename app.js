@@ -456,6 +456,12 @@ async function loadWorkOrders() {
     if (!res.ok) throw new Error("Failed to load work orders");
 
     const rows = await res.json();
+   
+    rows.sort((a, b) => {
+  if (a.status === "Completed" && b.status !== "Completed") return 1;
+  if (a.status !== "Completed" && b.status === "Completed") return -1;
+  return 0;
+});
 
     rows.forEach(w => {
       const tr = document.createElement("tr");
