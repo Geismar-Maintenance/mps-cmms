@@ -57,12 +57,6 @@
       Dashboard
     </button>
 
-    <!-- Parts Management -->
-    <button class="nav-link btn btn-link text-start"
-            onclick="switchModule('parts', this)">
-      Parts
-    </button>
-
     <!-- History Section -->
     <h6 class="text-muted mt-3 mb-2">History</h6>
 
@@ -76,15 +70,22 @@
       Work Order History
     </button>
 
-    <!-- Work Orders -->
+    <!-- Operations Section -->
     <h6 class="text-muted mt-3 mb-2">Operations</h6>
 
+    <button class="nav-link btn btn-link text-start"
+            onclick="switchModule('parts', this)">
+      Parts
+    </button>
+    
     <button class="nav-link btn btn-link text-start"
             onclick="switchModule('workorders', this)">
       Work Orders
     </button>
 
     <!-- Administration -->
+    <h6 class="text-muted mt-3 mb-2">Administration</h6>
+    
     <button class="nav-link btn btn-link text-start"
             onclick="switchModule('admin', this)">
       Administration
