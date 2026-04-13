@@ -41,7 +41,7 @@ window.switchModule = function (moduleName, el) {
 
 /* ================= DASHBOARD ================= */
 async function loadDashboard() {
-  await loadWorkOrders();      // ensures allWorkOrders is populated
+  await loadWorkOrdersData();
   await loadDashboardInventory();
   renderDashboard();
 }
@@ -95,6 +95,13 @@ async function loadDashboardInventory() {
     console.error("Dashboard inventory error:", err);
   }
 }
+
+async function loadWorkOrdersData() {
+  const res = await fetch(`${API_BASE}/api/workorders`);
+  if (!res.ok) throw new Error("Failed to load work orders");
+  allWorkOrders = await res.json();
+}
+
 
 /* ================= Parts Search ================= */
 
@@ -511,17 +518,8 @@ async function loadWOHistory() {
 /* ================= Work Orders Module ================= */
 async function loadWorkOrders() {
   try {
-    const res = await fetch(`${API_BASE}/api/workorders`);
-    if (!res.ok) throw new Error("Failed to load work orders");
-
-    const rows = await res.json();
-
-    // ✅ Save full dataset
-    allWorkOrders = rows;
-
-    // ✅ Apply current filters and render
-    applyWOFilters();
-
+    await loadWorkOrdersData();
+    applyWOFilters(); // render table only
   } catch (err) {
     alert("Unable to load work orders");
     console.error(err);
