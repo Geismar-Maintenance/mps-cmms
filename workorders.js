@@ -119,34 +119,41 @@ async function submitWorkOrder() {
 }
 
 /* ---------- COMPLETE ---------- */
+
 function openCloseWOModal(woid) {
   document.getElementById("close-wo-id").value = woid;
   document.getElementById("workperformed").value = "";
+  loadTechniciansForWO();
 
   bootstrap.Modal
     .getOrCreateInstance(document.getElementById("closeWOModal"))
     .show();
 }
 
+
 async function submitCloseWO() {
   const woid = document.getElementById("close-wo-id").value;
-  const workperformed =
-    document.getElementById("workperformed").value.trim();
-
+  const workperformed = document.getElementById("workperformed").value.trim();
   if (!workperformed) {
     alert("Work performed is required.");
     return;
   }
+const workedBy = document.getElementById("wo-worked-by").value;
+if (!workedBy) {
+  alert("Please select who worked on this job.");
+  return;
+}
 
-  const res = await fetch(`${API_BASE}/api/workorders`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      action: "close",
-      woid,
-      workperformed
-    })
-  });
+const res = await fetch(`${API_BASE}/api/workorders`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    action: "close",
+    woid,
+    workperformed,
+    workedBy
+  })
+});
 
   const result = await res.json();
   if (!res.ok) throw new Error(result.error || "Close failed");
@@ -233,3 +240,25 @@ async function loadWOPriorities() {
     sel.appendChild(opt);
   });
 }
+async function loadTechniciansForWO(defaultTechId = null) {
+  const sel = document.getElementById("wo-worked-by");
+  sel.replaceChildren();
+
+  const res = await fetch(`${API_BASE}/api/technicians`);
+  if (!res.ok) throw new Error("Failed to load technicians");
+
+  const techs = await res.json();
+
+  techs.forEach(t => {
+    const opt = document.createElement("option");
+    opt.value = t.id;
+    opt.textContent = t.name; // adjust field name if needed
+
+    if (defaultTechId && Number(defaultTechId) === Number(t.id)) {
+      opt.selected = true;
+    }
+
+    sel.appendChild(opt);
+  });
+}
+
