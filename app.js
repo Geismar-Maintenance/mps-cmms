@@ -345,7 +345,7 @@ async function loadWOHistory() {
   tbody.innerHTML = "";
 
   try {
-    const res = await fetch(`${API_BASE}/api/workorders`);
+    const res = await fetch(`${API_BASE}/api/workorders?history=true`);
     if (!res.ok) throw new Error("Failed to load work order history");
 
     const rows = await res.json();
