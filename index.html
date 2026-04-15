@@ -461,68 +461,71 @@
 
 
   <!-- ================= ADD NEW PART MODAL ================= -->
-  <div id="addPartModal" class="modal">
-  <div class="modal-content">
-    <h3>Add New Master Part & Initial Stock</h3>
-    <form id="addPartForm">
-      <div class="form-group">
-        <label>Part Number (Unique)</label>
-        <input type="text" id="adminPartNumber" required placeholder="e.g., BRG-100-22">
+  <div id="addPartModal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Master Part & Initial Stock</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal('addPartModal')"></button>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Manufacturer</label>
-          <input type="text" id="adminManufacturer">
-        </div>
-        <div class="form-group">
-          <label>Model/Brand</label>
-          <input type="text" id="adminModel">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Description</label>
-        <input type="text" id="adminDescription" required>
-      </div>
+      <form id="addPartForm" onsubmit="submitAddPart(event)">
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Part Number (Unique)</label>
+              <input type="text" id="adminPartNumber" class="form-control" required placeholder="e.g., BRG-100-22">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Manufacturer</label>
+              <input type="text" id="adminManufacturer" class="form-control">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Model/Brand</label>
+              <input type="text" id="adminModel" class="form-control">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Description</label>
+              <input type="text" id="adminDescription" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Unit Cost ($)</label>
+              <input type="number" id="adminCost" class="form-control" step="0.01" value="0.00">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Reorder Level</label>
+              <input type="number" id="adminReorder" class="form-control" value="0">
+            </div>
+          </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label>Unit Cost ($)</label>
-          <input type="number" id="adminCost" step="0.01" value="0.00">
-        </div>
-        <div class="form-group">
-          <label>Reorder Level</label>
-          <input type="number" id="adminReorder" value="0">
-        </div>
-      </div>
+          <hr class="my-4">
+          <h6 class="text-mps-blue">Initial Location & Stock</h6>
+          <p class="text-muted small">Establish the home bin and initial count.</p>
 
-      <hr>
-      <h4>Initial Location & Stock</h4>
-      <p><small>Establish the home bin and initial count.</small></p>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Cabinet</label>
-          <input type="text" id="adminCabinet" required placeholder="e.g., A">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Cabinet</label>
+              <input type="text" id="adminCabinet" class="form-control" required placeholder="e.g., A">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Section</label>
+              <input type="text" id="adminSection" class="form-control" required placeholder="e.g., 1">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Bin</label>
+              <input type="text" id="adminBin" class="form-control" required placeholder="e.g., 05">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Initial Quantity to Receive</label>
+              <input type="number" id="adminInitialQty" class="form-control" required min="0" value="0">
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label>Section</label>
-          <input type="text" id="adminSection" required placeholder="e.g., 1">
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addPartModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitNewPart">Create & Onboard</button>
         </div>
-        <div class="form-group">
-          <label>Bin</label>
-          <input type="text" id="adminBin" required placeholder="e.g., 05">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Initial Quantity to Receive</label>
-        <input type="number" id="adminInitialQty" required min="0" value="0">
-      </div>
-
-      <div class="modal-actions">
-        <button type="button" class="btn-secondary" onclick="closeModal('addPartModal')">Cancel</button>
-        <button type="submit" class="btn-primary" id="btnSubmitNewPart">Create & Onboard</button>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 </div>
  
