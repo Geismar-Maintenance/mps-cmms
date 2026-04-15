@@ -340,6 +340,38 @@ async function loadPartsHistory() {
   });
 }
 
+async function loadWOHistory() {
+  const tbody = document.querySelector("#wo-history-table tbody");
+  tbody.innerHTML = "";
+
+  try {
+    const res = await fetch(`${API_BASE}/api/history/workorders`);
+    if (!res.ok) throw new Error("Failed to load work order history");
+
+    const rows = await res.json();
+
+    rows.forEach(w => {
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${w.woid}</td>
+        <td>${w.assetname ?? "—"}</td>
+        <td>${w.description}</td>
+        <td>${w.type}</td>
+        <td>${w.priority}</td>
+        <td>${new Date(w.opendate).toLocaleDateString()}</td>
+        <td>${w.closedate ? new Date(w.closedate).toLocaleDateString() : "—"}</td>
+      `;
+
+      tbody.appendChild(tr);
+    });
+
+  } catch (err) {
+    alert("Unable to load work order history");
+    console.error(err);
+  }
+}
+
 /* ======================================================
    APP INIT
    ====================================================== */
