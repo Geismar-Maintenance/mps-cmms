@@ -234,15 +234,38 @@
 </section>
 <!-- ================= Admin module ================= -->
       <!-- Admin -->
-      <section id="module-admin" class="module">
-        <h4>Administration</h4>
-        <p class="text-muted">Admin tools coming later.</p>
-      </section>
+      <div id="adminModule" class="content-section" style="display:none;">
+    <div class="section-header">
+        <h2>System Administration</h2>
+        <p>Manage master data, users, and system configurations.</p>
+    </div>
 
-    </main>
-  </div>
+    <div class="admin-grid">
+        <div class="admin-card" onclick="openModal('addPartModal')">
+            <div class="card-icon"><i class="fas fa-plus-square"></i></div>
+            <div class="card-info">
+                <h3>Onboard New Part</h3>
+                <p>Create a master record and initialize its home bin and stock.</p>
+            </div>
+        </div>
+
+        <div class="admin-card" onclick="showUserManagement()">
+            <div class="card-icon"><i class="fas fa-users-cog"></i></div>
+            <div class="card-info">
+                <h3>User Permissions</h3>
+                <p>Configure roles for Managers, Techs, and Operators.</p>
+            </div>
+        </div>
+
+        <div class="admin-card" onclick="showLocationManager()">
+            <div class="card-icon"><i class="fas fa-map-marked-alt"></i></div>
+            <div class="card-info">
+                <h3>Location Manager</h3>
+                <p>Edit cabinet/bin names or toggle location activity.</p>
+            </div>
+        </div>
+    </div>
 </div>
-
 <!-- ================= ISSUE MODAL ================= -->
 <div class="modal fade" id="issueModal" tabindex="-1">
   <div class="modal-dialog">
@@ -423,6 +446,73 @@
         </button>
       </div>
     </div>
+  </div>
+</div>
+
+
+  <!-- ================= ADD NEW PART MODAL ================= -->
+  <div id="addPartModal" class="modal">
+  <div class="modal-content">
+    <h3>Add New Master Part & Initial Stock</h3>
+    <form id="addPartForm">
+      <div class="form-group">
+        <label>Part Number (Unique)</label>
+        <input type="text" id="adminPartNumber" required placeholder="e.g., BRG-100-22">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Manufacturer</label>
+          <input type="text" id="adminManufacturer">
+        </div>
+        <div class="form-group">
+          <label>Model/Brand</label>
+          <input type="text" id="adminModel">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" id="adminDescription" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Unit Cost ($)</label>
+          <input type="number" id="adminCost" step="0.01" value="0.00">
+        </div>
+        <div class="form-group">
+          <label>Reorder Level</label>
+          <input type="number" id="adminReorder" value="0">
+        </div>
+      </div>
+
+      <hr>
+      <h4>Initial Location & Stock</h4>
+      <p><small>Establish the home bin and initial count.</small></p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Cabinet</label>
+          <input type="text" id="adminCabinet" required placeholder="e.g., A">
+        </div>
+        <div class="form-group">
+          <label>Section</label>
+          <input type="text" id="adminSection" required placeholder="e.g., 1">
+        </div>
+        <div class="form-group">
+          <label>Bin</label>
+          <input type="text" id="adminBin" required placeholder="e.g., 05">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Initial Quantity to Receive</label>
+        <input type="number" id="adminInitialQty" required min="0" value="0">
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" onclick="closeModal('addPartModal')">Cancel</button>
+        <button type="submit" class="btn-primary" id="btnSubmitNewPart">Create & Onboard</button>
+      </div>
+    </form>
   </div>
 </div>
  
