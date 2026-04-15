@@ -7,36 +7,42 @@ let allWorkOrders = [];
 /* ================= Navigation ================= */
 
 window.switchModule = function (moduleName, el) {
-  document.querySelectorAll(".module").forEach(m =>
-    m.classList.remove("active")
-  );
+  console.log("Switching to module:", moduleName);
 
+  // 1. Hide all modules and remove their active class
+  document.querySelectorAll(".module").forEach(m => {
+    m.classList.remove("active");
+    // Manually ensure the hidden state is applied
+    m.style.display = "none"; 
+  });
+
+  // 2. Identify the target (e.g., module-admin, module-dashboard)
   const target = document.getElementById(`module-${moduleName}`);
+  
   if (target) {
+    // 3. Add the active class which triggers your new CSS
     target.classList.add("active");
+    
+    // 4. Force display to block to override the inline "style=display:none"
+    target.style.setProperty("display", "block", "important");
+    
+    console.log(`Successfully activated: module-${moduleName}`);
+  } else {
+    console.error(`Missing HTML element: module-${moduleName}`);
   }
 
-  document.querySelectorAll("#module-nav .nav-link").forEach(l =>
-    l.classList.remove("active")
-  );
+  // 5. Update the Sidebar Navigation UI
+  document.querySelectorAll("#module-nav .nav-link, aside .nav-link").forEach(l => {
+    l.classList.remove("active");
+  });
 
+  // Highlight the button that was clicked
   if (el) el.classList.add("active");
 
-  if (moduleName === "dashboard") {
-  loadDashboard();
-}
-  
-  if (moduleName === "parts-history") {
-    loadPartsHistory();
-  }
-
-  if (moduleName === "wo-history") {
-    loadWOHistory();
-  }
- 
-  if (moduleName === "workorders") {
-  loadWorkOrders();
-}
+  // 6. Trigger specific data loading based on module
+  if (moduleName === "dashboard") loadDashboard();
+  if (moduleName === "parts-history") loadPartsHistory();
+  if (moduleName === "workorders") loadWorkOrders();
 };
 
 /* ================= DASHBOARD ================= */
