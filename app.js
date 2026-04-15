@@ -234,7 +234,52 @@ async function loadWOPriorities() {
     sel.appendChild(opt);
   });
 }
+/* ======================================================
+   WORK ORDER CREATE / SUBMIT
+   ====================================================== */
+async function submitWorkOrder() {
+  const assetid = document.getElementById("wo-asset").value;
+  const description = document.getElementById("wo-description").value.trim();
+  const wotype = document.getElementById("wo-type").value;
+  const priority = document.getElementById("wo-priority").value;
+  const duedate = document.getElementById("wo-due").value || null;
 
+  // ✅ Frontend validation
+  if (!assetid || !description || !wotype || !priority) {
+    alert("Asset, description, type, and priority are required.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/workorders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        assetid: parseInt(assetid, 10),
+        description,
+        wotype: parseInt(wotype, 10),
+        priority: parseInt(priority, 10),
+        duedate
+      })
+    });
+
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error || "Create failed");
+
+    // Close modal
+    bootstrap.Modal
+      .getInstance(document.getElementById("createWOModal"))
+      .hide();
+
+    // Refresh active work orders
+    loadWorkOrders();
+
+  } catch (err) {
+    alert(err.message);
+    console.error("Create WO failed:", err);
+  }
+}
+``
 /* ======================================================
    WORK ORDER CLOSE (TECHNICIAN COMPLETE)
    ====================================================== */
