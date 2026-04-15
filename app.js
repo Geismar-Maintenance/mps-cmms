@@ -259,16 +259,66 @@ async function submitAddPart(event) {
     const result = await res.json();
     if (!res.ok) throw new Error(result.error);
 
-    alert(`Part ${result.partnumber} created. Use Receive to add inventory.`);
+    // Close Add Part modal
     bootstrap.Modal.getInstance(
       document.getElementById("addPartModal")
     ).hide();
+
+    const newPartId = result.partid;
+
+    // Prompt to receive inventory
+    setTimeout(() => {
+      if (confirm("Part created. Would you like to receive inventory now?")) {
+        openReceiveFromAdmin(newPartId);
+      }
+    }, 300);
 
   } catch (err) {
     alert(err.message);
   } finally {
     btn.disabled = false;
   }
+}
+
+/* ======================================================
+   ADMIN‑GUIDED INVENTORY HELPERS
+   ====================================================== */
+
+function openReceiveFromAdmin(partid) {
+  // Create minimal selectedPart context
+  selectedPart = {
+    partid,
+    partnumber: document.getElementById("adminPartNumber").value,
+    model: ""
+  };
+
+  document.getElementById("receive-partname").innerText =
+    selectedPart.partnumber;
+
+  document.getElementById("receive-qty").value = "";
+
+  const receiveModal =
+    bootstrap.Modal.getOrCreateInstance(
+      document.getElementById("receiveModal")
+    );
+
+  receiveModal.show();
+
+  // Wrap submitReceive temporarily
+  const originalSubmitReceive = submitReceive;
+
+  submitReceive = async function () {
+    await originalSubmitReceive();
+
+    setTimeout(() => {
+      if (confirm("Inventory received. Would you like to move it to a storage location now?")) {
+        openMoveModal(partid);
+      }
+    }, 300);
+
+    // Restore original behavior
+    submitReceive = originalSubmitReceive;
+  };
 }
 
 /* ======================================================
