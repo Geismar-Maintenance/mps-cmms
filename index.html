@@ -460,71 +460,77 @@
 </div>
 
 
-  <!-- ================= ADD NEW PART MODAL ================= -->
-  <div id="addPartModal" class="modal fade" tabindex="-1" aria-hidden="true">
+<!-- ================= ADD NEW PART MODAL ================= -->
+<div id="addPartModal" class="modal fade" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
+
       <div class="modal-header">
-        <h5 class="modal-title">Add New Master Part & Initial Stock</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal('addPartModal')"></button>
+        <h5 class="modal-title">Add New Master Part</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
+
       <form id="addPartForm" onsubmit="submitAddPart(event)">
         <div class="modal-body">
+
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Part Number (Unique)</label>
-              <input type="text" id="adminPartNumber" class="form-control" required placeholder="e.g., BRG-100-22">
+              <input type="text" id="adminPartNumber"
+                     class="form-control" required>
             </div>
+
             <div class="col-md-3">
               <label class="form-label">Manufacturer</label>
-              <input type="text" id="adminManufacturer" class="form-control">
+              <input type="text" id="adminManufacturer"
+                     class="form-control">
             </div>
+
             <div class="col-md-3">
-              <label class="form-label">Model/Brand</label>
-              <input type="text" id="adminModel" class="form-control">
+              <label class="form-label">Model / Brand</label>
+              <input type="text" id="adminModel"
+                     class="form-control">
             </div>
+
             <div class="col-12">
               <label class="form-label">Description</label>
-              <input type="text" id="adminDescription" class="form-control" required>
+              <input type="text" id="adminDescription"
+                     class="form-control" required>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Unit Cost ($)</label>
-              <input type="number" id="adminCost" class="form-control" step="0.01" value="0.00">
+              <input type="number" id="adminCost"
+                     class="form-control" step="0.01" value="0.00">
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Reorder Level</label>
-              <input type="number" id="adminReorder" class="form-control" value="0">
+              <input type="number" id="adminReorder"
+                     class="form-control" value="0">
             </div>
           </div>
 
-          <hr class="my-4">
-          <h6 class="text-mps-blue">Initial Location & Stock</h6>
-          <p class="text-muted small">Establish the home bin and initial count.</p>
-
-          <div class="row g-3">
-            <div class="col-md-4">
-              <label class="form-label">Cabinet</label>
-              <input type="text" id="adminCabinet" class="form-control" required placeholder="e.g., A">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Section</label>
-              <input type="text" id="adminSection" class="form-control" required placeholder="e.g., 1">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Bin</label>
-              <input type="text" id="adminBin" class="form-control" required placeholder="e.g., 05">
-            </div>
-            <div class="col-12">
-              <label class="form-label">Initial Quantity to Receive</label>
-              <input type="number" id="adminInitialQty" class="form-control" required min="0" value="0">
-            </div>
+          <div class="alert alert-info mt-3">
+            Inventory is added separately using <strong>Receive</strong>.
           </div>
+
         </div>
+
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeModal('addPartModal')">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="btnSubmitNewPart">Create & Onboard</button>
+          <button type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal">
+            Cancel
+          </button>
+          <button type="submit"
+                  class="btn btn-primary"
+                  id="btnSubmitNewPart">
+            Create Part
+          </button>
         </div>
       </form>
+
     </div>
   </div>
 </div>
