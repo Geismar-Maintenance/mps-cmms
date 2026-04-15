@@ -845,5 +845,14 @@ async function submitCloseWO() {
 
 document.addEventListener("DOMContentLoaded", () => {
   loadDashboard();
+
+  // Attach Admin Submit
+  const addPartForm = document.getElementById("addPartForm");
+  if(addPartForm) {
+    addPartForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      submitAddPart();
+    });
+  }
 });
 
