@@ -500,8 +500,6 @@ function openReceiveFromAdmin(partid) {
    HISTORY (READ‑ONLY)
    ====================================================== */
 async function loadPartsHistory() {
-  console.log("loadWOHistory called");
-
    const tbody = document.querySelector("#parts-history-table tbody");
   tbody.innerHTML = "";
 
