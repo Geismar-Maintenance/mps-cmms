@@ -35,6 +35,7 @@ window.switchModule = function (moduleName, el) {
   // Module-specific loading
   if (moduleName === "dashboard") loadDashboard();
   if (moduleName === "parts-history") loadPartsHistory();
+  if (moduleName === "parts-history") loadWOHistory();
   if (moduleName === "workorders") loadWorkOrders();
 };
 
