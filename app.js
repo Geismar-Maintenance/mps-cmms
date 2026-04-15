@@ -147,7 +147,94 @@ function renderWOTable(rows) {
     tbody.appendChild(tr);
   });
 }
+/* ======================================================
+   WORK ORDER CREATE
+   ====================================================== */
+async function openCreateWOModal() {
+  try {
+    await loadWOAssets();
+    await loadWOTypes();
+    await loadWOPriorities();
 
+    bootstrap.Modal
+      .getOrCreateInstance(document.getElementById("createWOModal"))
+      .show();
+
+  } catch (err) {
+    alert("Unable to load data for work order creation");
+    console.error(err);
+  }
+}
+
+/* ---------- Load Assets ---------- */
+async function loadWOAssets() {
+  const sel = document.getElementById("wo-asset");
+  sel.replaceChildren();
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Select Asset";
+  sel.appendChild(placeholder);
+
+  const res = await fetch(`${API_BASE}/api/assets`);
+  if (!res.ok) throw new Error("Failed to load assets");
+
+  const assets = await res.json();
+
+  assets.forEach(a => {
+    const opt = document.createElement("option");
+    opt.value = a.assetid;
+    opt.textContent = `${a.assetnumber} – ${a.assetname}`;
+    sel.appendChild(opt);
+  });
+}
+
+/* ---------- Load WO Types ---------- */
+async function loadWOTypes() {
+  const sel = document.getElementById("wo-type");
+  sel.replaceChildren();
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Select Type";
+  sel.appendChild(placeholder);
+
+  const res = await fetch(`${API_BASE}/api/lookups?type=wotypes`);
+  if (!res.ok) throw new Error("Failed to load WO types");
+
+  const types = await res.json();
+
+  types.forEach(t => {
+    const opt = document.createElement("option");
+    opt.value = t.id;
+    opt.textContent = t.type;
+    sel.appendChild(opt);
+  });
+}
+
+/* ---------- Load Priorities ---------- */
+async function loadWOPriorities() {
+  const sel = document.getElementById("wo-priority");
+  sel.replaceChildren();
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Select Priority";
+  sel.appendChild(placeholder);
+
+  const res = await fetch(`${API_BASE}/api/lookups?type=wopriorities`);
+  if (!res.ok) throw new Error("Failed to load priorities");
+
+  const prios = await res.json();
+
+  prios.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = p.id;
+    opt.textContent = p.priority;
+    sel.appendChild(opt);
+  });
+}
+``
 /* ======================================================
    WORK ORDER CLOSE (TECHNICIAN COMPLETE)
    ====================================================== */
