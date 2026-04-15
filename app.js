@@ -208,6 +208,86 @@ function renderPartsTable(parts) {
     tbody.appendChild(tr);
   });
 }
+
+/* ================= ADMIN: Add/Onboard New Part ================= */
+window.openAddPartModal = function() {
+  document.getElementById("addPartForm").reset();
+  bootstrap.Modal.getOrCreateInstance(document.getElementById("addPartModal")).show();
+};
+
+async function submitAddPart() {
+  const btn = document.getElementById("btnSubmitNewPart");
+  const formData = {
+    partnumber: document.getElementById("adminPartNumber").value.trim(),
+    manufacturer: document.getElementById("adminManufacturer").value.trim(),
+    model: document.getElementById("adminModel").value.trim(),
+    description: document.getElementById("adminDescription").value.trim(),
+    cost: parseFloat(document.getElementById("adminCost").value) || 0,
+    reorderlevel: parseInt(document.getElementById("adminReorder").value) || 0,
+    qty: parseInt(document.getElementById("adminInitialQty").value) || 0,
+    cabinet: document.getElementById("adminCabinet").value.trim(),
+    section: document.getElementById("adminSection").value.trim(),
+    bin: document.getElementById("adminBin").value.trim()
+  };
+
+  if(!formData.partnumber || !formData.description) return alert("Missing required fields");
+
+  btn.disabled = true;
+  try {
+    const res = await fetch(`${API_BASE}/api/parts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData)
+    });
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error);
+
+    alert("Part Onboarded Successfully");
+    bootstrap.Modal.getInstance(document.getElementById("addPartModal")).hide();
+    if(lastPartSearch) runPartSearch(); 
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ================= SMART MOVE: Exclusive Locations ================= */
+
+window.openMoveModal = async function (partid) {
+  selectedPart = allParts.find(p => Number(p.partid) === Number(partid));
+  if (!selectedPart) return;
+
+  document.getElementById("move-partname").innerText = `${selectedPart.partnumber}`;
+  
+  // From Locations
+  const fromSelect = document.getElementById("move-from-location");
+  fromSelect.replaceChildren();
+  selectedPart.locations.forEach(loc => {
+    const opt = Object.assign(document.createElement("option"), { value: loc.locationid, textContent: `${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.qty})` });
+    fromSelect.appendChild(opt);
+  });
+
+  // To Locations (Smart Fetch)
+  const toSelect = document.getElementById("move-to-location");
+  toSelect.innerHTML = "<option>Loading smart locations...</option>";
+  
+  try {
+    const res = await fetch(`${API_BASE}/api/parts?preferredForPart=${partid}`);
+    const locations = await res.json();
+    toSelect.replaceChildren();
+    locations.forEach(loc => {
+      const opt = document.createElement("option");
+      opt.value = loc.locationid;
+      opt.textContent = `${loc.cabinet}.${loc.section}.${loc.bin} ${loc.bin_status === 'Home Bin' ? '⭐' : '(Empty)'}`;
+      if(loc.bin_status === 'Home Bin') opt.style.fontWeight = 'bold';
+      toSelect.appendChild(opt);
+    });
+  } catch (e) { console.error(e); }
+
+  bootstrap.Modal.getOrCreateInstance(document.getElementById("moveModal")).show();
+};
+
 /* ================= Issue Modal ================= */
 
 function openIssueModal(partid) {
