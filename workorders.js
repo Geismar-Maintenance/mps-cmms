@@ -133,13 +133,14 @@ function openCloseWOModal(woid) {
 
 async function submitCloseWO() {
   const woid = document.getElementById("close-wo-id").value;
-  const workperformed =
-    document.getElementById("workperformed").value.trim();
 
-  // ✅ THIS WAS MISSING
-  const workedBy =
-    document.getElementById("wo-worked-by")?.value;
+  const workperformedEl = document.getElementById("workperformed");
+  const workedByEl = document.getElementById("wo-worked-by");
 
+  const workperformed = workperformedEl ? workperformedEl.value.trim() : "";
+  const workedBy = workedByEl ? workedByEl.value : null;
+
+  // ✅ Validation
   if (!workperformed) {
     alert("Work performed is required.");
     return;
@@ -161,6 +162,22 @@ async function submitCloseWO() {
         workedBy
       })
     });
+
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error || "Close failed");
+
+    bootstrap.Modal
+      .getInstance(document.getElementById("closeWOModal"))
+      .hide();
+
+    loadWorkOrders();
+
+  } catch (err) {
+    console.error("Close WO failed:", err);
+    alert(err.message);
+  }
+}
+
 
     const result = await res.json();
     if (!res.ok) throw new Error(result.error || "Close failed");
