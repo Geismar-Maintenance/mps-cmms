@@ -216,48 +216,71 @@ function renderPartsTable(parts) {
 }
 
 /* ================= ADMIN: Add/Onboard New Part ================= */
+/* ================= ADMIN: Add/Onboard New Part ================= */
 window.openAddPartModal = function() {
-  document.getElementById("addPartForm").reset();
-  bootstrap.Modal.getOrCreateInstance(document.getElementById("addPartModal")).show();
+    const modalEl = document.getElementById("addPartModal");
+    const form = document.getElementById("addPartForm");
+    
+    if (form) form.reset();
+
+    // Safer instance management
+    let modalInstance = bootstrap.Modal.getInstance(modalEl);
+    if (!modalInstance) {
+        modalInstance = new bootstrap.Modal(modalEl);
+    }
+    modalInstance.show();
 };
 
-async function submitAddPart() {
-  const btn = document.getElementById("btnSubmitNewPart");
-  const formData = {
-    partnumber: document.getElementById("adminPartNumber").value.trim(),
-    manufacturer: document.getElementById("adminManufacturer").value.trim(),
-    model: document.getElementById("adminModel").value.trim(),
-    description: document.getElementById("adminDescription").value.trim(),
-    cost: parseFloat(document.getElementById("adminCost").value) || 0,
-    reorderlevel: parseInt(document.getElementById("adminReorder").value) || 0,
-    qty: parseInt(document.getElementById("adminInitialQty").value) || 0,
-    cabinet: document.getElementById("adminCabinet").value.trim(),
-    section: document.getElementById("adminSection").value.trim(),
-    bin: document.getElementById("adminBin").value.trim()
-  };
+async function submitAddPart(event) {
+    // 1. CRITICAL: Stop the page from refreshing
+    if (event) event.preventDefault();
 
-  if(!formData.partnumber || !formData.description) return alert("Missing required fields");
+    const btn = document.getElementById("btnSubmitNewPart");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Onboarding...';
 
-  btn.disabled = true;
-  try {
-    const res = await fetch(`${API_BASE}/api/parts`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData)
-    });
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.error);
+    const formData = {
+        partnumber: document.getElementById("adminPartNumber").value.trim(),
+        manufacturer: document.getElementById("adminManufacturer").value.trim(),
+        description: document.getElementById("adminDescription").value.trim(),
+        qty: parseInt(document.getElementById("adminInitialQty").value) || 0,
+        cabinet: document.getElementById("adminCabinet").value.trim(),
+        section: document.getElementById("adminSection").value.trim(),
+        bin: document.getElementById("adminBin").value.trim()
+        // Ensure these match your actual HTML IDs exactly
+    };
 
-    alert("Part Onboarded Successfully");
-    bootstrap.Modal.getInstance(document.getElementById("addPartModal")).hide();
-    if(lastPartSearch) runPartSearch(); 
-  } catch (err) {
-    alert(err.message);
-  } finally {
-    btn.disabled = false;
-  }
+    try {
+        // 2. The POST request (Fixing the 405 error)
+        const response = await fetch(`${API_BASE}/api/parts`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Failed to onboard part");
+        }
+
+        const result = await response.json();
+        alert("Success: " + result.message);
+
+        // Close modal
+        const modalEl = document.getElementById("addPartModal");
+        bootstrap.Modal.getInstance(modalEl).hide();
+        
+        // Refresh dashboard if needed
+        if (window.loadDashboard) loadDashboard();
+
+    } catch (err) {
+        console.error("Onboarding Error:", err);
+        alert("Error: " + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Complete Onboarding";
+    }
 }
-
 /* ================= SMART MOVE: Exclusive Locations ================= */
 
 window.openMoveModal = async function (partid) {
