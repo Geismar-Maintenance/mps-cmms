@@ -234,7 +234,7 @@ async function loadWOPriorities() {
     sel.appendChild(opt);
   });
 }
-``
+
 /* ======================================================
    WORK ORDER CLOSE (TECHNICIAN COMPLETE)
    ====================================================== */
