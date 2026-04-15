@@ -235,33 +235,43 @@
 <!-- ================= Admin module ================= -->
       <!-- Admin -->
       <div id="module-admin" class="module" style="display:none;">
-    <div class="section-header">
-        <h2>System Administration</h2>
-        <p>Manage master data, users, and system configurations.</p>
-    </div>
-
-    <div class="admin-grid">
-        <div class="admin-card" onclick="openModal('addPartModal')">
-            <div class="card-icon"><i class="fas fa-plus-square"></i></div>
-            <div class="card-info">
-                <h3>Onboard New Part</h3>
-                <p>Create a master record and initialize its home bin and stock.</p>
+    <div class="container-fluid py-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="border-bottom pb-2">System Administration</h2>
+                <p class="text-muted">Manage master data and system configurations.</p>
             </div>
         </div>
 
-        <div class="admin-card" onclick="showUserManagement()">
-            <div class="card-icon"><i class="fas fa-users-cog"></i></div>
-            <div class="card-info">
-                <h3>User Permissions</h3>
-                <p>Configure roles for Managers, Techs, and Operators.</p>
+        <div class="row g-4">
+            <div class="col-xl-4 col-md-6">
+                <div class="card h-100 shadow-sm border-0 bg-light" onclick="openAddPartModal()" style="cursor: pointer;">
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-plus-square fa-3x text-primary mb-3"></i>
+                        <h4 class="card-title">Onboard New Part</h4>
+                        <p class="card-text text-muted">Create master records and initialize stock.</p>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="admin-card" onclick="showLocationManager()">
-            <div class="card-icon"><i class="fas fa-map-marked-alt"></i></div>
-            <div class="card-info">
-                <h3>Location Manager</h3>
-                <p>Edit cabinet/bin names or toggle location activity.</p>
+            <div class="col-xl-4 col-md-6">
+                <div class="card h-100 shadow-sm border-0 bg-light" style="cursor: pointer;">
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-users-cog fa-3x text-secondary mb-3"></i>
+                        <h4 class="card-title">User Permissions</h4>
+                        <p class="card-text text-muted">Configure roles and access control.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6">
+                <div class="card h-100 shadow-sm border-0 bg-light" style="cursor: pointer;">
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-map-marked-alt fa-3x text-info mb-3"></i>
+                        <h4 class="card-title">Location Manager</h4>
+                        <p class="card-text text-muted">Manage bin naming and activity status.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
