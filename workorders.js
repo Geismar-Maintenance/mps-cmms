@@ -133,37 +133,51 @@ function openCloseWOModal(woid) {
 
 async function submitCloseWO() {
   const woid = document.getElementById("close-wo-id").value;
-  const workperformed = document.getElementById("workperformed").value.trim();
+  const workperformed =
+    document.getElementById("workperformed").value.trim();
+
+  // ✅ THIS WAS MISSING
+  const workedBy =
+    document.getElementById("wo-worked-by")?.value;
+
   if (!workperformed) {
     alert("Work performed is required.");
     return;
   }
-const workedBy = document.getElementById("wo-worked-by").value;
-if (!workedBy) {
-  alert("Please select who worked on this job.");
-  return;
+
+  if (!workedBy) {
+    alert("Please select who worked on this job.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/workorders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "close",
+        woid,
+        workperformed,
+        workedBy
+      })
+    });
+
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error || "Close failed");
+
+    bootstrap.Modal
+      .getInstance(document.getElementById("closeWOModal"))
+      .hide();
+
+    // ✅ Refresh active work orders
+    loadWorkOrders();
+
+  } catch (err) {
+    alert(err.message);
+    console.error("Close WO failed:", err);
+  }
 }
 
-const res = await fetch(`${API_BASE}/api/workorders`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    action: "close",
-    woid,
-    workperformed,
-    workedBy
-  })
-});
-
-  const result = await res.json();
-  if (!res.ok) throw new Error(result.error || "Close failed");
-
-  bootstrap.Modal
-    .getInstance(document.getElementById("closeWOModal"))
-    .hide();
-
-  loadWorkOrders();
-}
 
 /* ---------- HISTORY ---------- */
 async function loadWOHistory() {
