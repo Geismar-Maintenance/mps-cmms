@@ -124,3 +124,10 @@ aside {
 .module.active {
   display: block;
 }
+
+#adminModule {
+    display: none; /* Controlled by JS */
+    min-height: 100vh; 
+    padding: 20px;
+    background-color: #f7fafc; /* Light gray to see the boundaries */
+}
