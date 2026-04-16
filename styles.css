@@ -208,10 +208,3 @@ aside {
     background-color: var(--mps-gray-light);
     text-decoration: underline;
 }
-
-/* Ensure the danger color stays consistent with MPS palette if needed, 
-   or keep the standard Bootstrap danger red for visibility */
-.text-danger {
-    color: #dc3545 !important;
-    font-weight: 600;
-}
