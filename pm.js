@@ -4,7 +4,7 @@ export async function loadPMView() {
   const container = document.getElementById("main");
   container.innerHTML = "<h2>Preventive Maintenance</h2>";
 
-  const res = await fetch("/api/pm/status");
+  const res = await fetch(`${API_BASE}/api/pm?action=status`);
   const pms = await res.json();
 
   renderPMList(pms, container);
