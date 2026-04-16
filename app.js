@@ -37,6 +37,7 @@ window.switchModule = function (moduleName, el) {
   if (moduleName === "parts-history") loadPartsHistory();
   if (moduleName === "wo-history") loadWOHistory();
   if (moduleName === "workorders") loadWorkOrders();
+   if (moduleName === "pm") loadPMView();
 };
 
 /* ======================================================
@@ -281,4 +282,3 @@ async function loadPartsHistory() {
 document.addEventListener("DOMContentLoaded", () => {
   loadDashboard();
 });
-``
