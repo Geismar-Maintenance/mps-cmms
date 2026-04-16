@@ -82,6 +82,43 @@ async function loadDashboardInventory() {
     data.out_stock ?? 0;
 }
 
+window.showFilteredParts = async function(type) {
+    // 1. Visually update the sidebar navigation
+    const partsNavLink = document.querySelector('[onclick*="parts"]');
+    
+    // 2. Switch to the parts module
+    switchModule('parts', partsNavLink);
+
+    // 3. Clear existing search input and show a "loading" state
+    const searchInput = document.getElementById("part-search");
+    if (searchInput) searchInput.value = ""; 
+    
+    document.getElementById("parts-placeholder").textContent = 
+        `Filtering for ${type === 'low' ? 'Low Stock' : 'Out of Stock'}...`;
+
+    // 4. Fetch the filtered data from your Vercel backend
+    const res = await fetch(`${API_BASE}/api/parts?filter=${type}`);
+    if (!res.ok) return;
+
+    const data = await res.json();
+    allParts = data.map(p => ({
+        ...p,
+        total_qty: Number(p.total_qty ?? 0),
+        locations: Array.isArray(p.locations) ? p.locations : []
+    }));
+
+    // 5. Update UI to reflect the filter
+    document.getElementById("parts-placeholder").style.display = "none";
+    
+    // 6. Update the header to show the filter is active
+    const title = document.querySelector("#module-parts h4");
+    if (title) {
+        title.innerHTML = `Parts Management <span class="badge ${type === 'out' ? 'bg-danger' : 'bg-warning text-dark'}" style="margin-left:10px;">${type.toUpperCase()}</span>`;
+    }
+
+    renderPartsTable(allParts);
+};
+
 
 
 /* ======================================================
