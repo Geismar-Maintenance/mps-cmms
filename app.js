@@ -254,7 +254,7 @@ async function loadPartsHistory() {
    const tbody = document.querySelector("#parts-history-table tbody");
   tbody.innerHTML = "";
 
-  const res = await fetch(`${API_BASE}/api/history/parts`);
+  const res = await fetch(`${API_BASE}/api/parts?history=true`);
   if (!res.ok) return;
 
   const rows = await res.json();
