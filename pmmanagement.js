@@ -121,3 +121,38 @@ function renderPMTemplateWorkspace(template) {
 
   renderTemplateInfo();
 }
+function renderTemplateInfo() {
+  const editor = document.getElementById('pm-template-editor');
+  editor.innerHTML = `
+    <div class="text-muted">
+      Template Info panel coming next.
+    </div>
+  `;
+}
+
+function renderTriggerBlocks() {
+  const editor = document.getElementById('pm-template-editor');
+  editor.innerHTML = `
+    <div class="text-muted">
+      Trigger Blocks editor coming next.
+    </div>
+  `;
+}
+
+function renderTaskTiers() {
+  const editor = document.getElementById('pm-template-editor');
+  editor.innerHTML = `
+    <div class="text-muted">
+      Task Tiers view coming next.
+    </div>
+  `;
+}
+
+function renderTasks() {
+  const editor = document.getElementById('pm-template-editor');
+  editor.innerHTML = `
+    <div class="text-muted">
+      Tasks editor coming next.
+    </div>
+  `;
+}
