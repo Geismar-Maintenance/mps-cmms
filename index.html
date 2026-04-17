@@ -102,6 +102,8 @@
 </aside>
     <!-- Main Content -->
     <main class="col-md-10 p-4">
+
+            /+++++++++MODULES++++++++++++++/
       
 <!-- ================= DASHBOARD ================= -->
 <div id="module-dashboard" class="module active">
@@ -311,6 +313,48 @@
       <div id="module-pm" class="module" style="display:none;">
   <h2>Preventive Maintenance</h2>
   <div id="pm-content"></div>
+</div>
+
+<!-- ================= PM module ================= -->
+      <div id="module-pm-management" class="module">
+  <div class="container-fluid py-4">
+
+    <div class="row mb-3">
+      <div class="col-12">
+        <h2 class="border-bottom pb-2">PM Management</h2>
+        <p class="text-muted">
+          Configure PM templates, trigger blocks, task tiers, tasks, and requirements.
+        </p>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- LEFT PANEL: PM Templates -->
+      <div class="col-md-4">
+        <div class="card shadow-sm">
+          <div class="card-header">
+            <strong>PM Templates</strong>
+          </div>
+          <div class="list-group list-group-flush" id="pm-template-list">
+            <!-- dynamically loaded -->
+            <div class="list-group-item text-muted">
+              Loading templates…
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL: WORKSPACE -->
+      <div class="col-md-8">
+        <div class="card shadow-sm">
+          <div class="card-body text-muted text-center py-5" id="pm-management-workspace">
+            Select a PM template to begin managing blocks, tasks, and requirements.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
  
