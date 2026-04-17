@@ -37,7 +37,9 @@ window.switchModule = function (moduleName, el) {
   if (moduleName === "parts-history") loadPartsHistory();
   if (moduleName === "wo-history") loadWOHistory();
   if (moduleName === "workorders") loadWorkOrders();
-   if (moduleName === "pm") loadPMView();
+   if (moduleName === "pm") loadPMView();  
+  if (moduleName === 'pm-management') loadPMManagement();
+
 };
 
 /* ======================================================
