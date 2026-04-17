@@ -5,6 +5,7 @@
 let pmTemplates = [];
 let selectedPMTemplateId = null;
 
+
 /* ======================================================
    ENTRY POINT
    ====================================================== */
@@ -28,7 +29,7 @@ async function loadPMTemplates() {
   `;
 
   try {
-    const res = await fetch('/api/pm?action=adminLoad');
+    const res = await fetch('${API_BASE}/api/pm?action=adminLoad`);
     const data = await res.json();
 
     pmTemplates = data.templates || [];
