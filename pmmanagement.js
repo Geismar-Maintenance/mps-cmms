@@ -4,6 +4,7 @@
 
 let pmTemplates = [];
 let selectedPMTemplateId = null;
+let currentTaskId = null;
 
 
 /* ======================================================
@@ -420,9 +421,7 @@ async function loadTaskTiers() {
   const container = document.getElementById("pm-tier-list");
 
   try {
-    const res = await fetch(
-      `${API_BASE}/api/pm?action=getTaskTiers&templateId=${selectedPMTemplateId}`
-    );
+    const res = await fetch(`${API_BASE}/api/pm?action=getTaskTiers&templateId=${selectedPMTemplateId}`);
     const data = await res.json();
 
     if (data.tiers.length === 0) {
@@ -464,6 +463,29 @@ async function loadTaskTiers() {
       `<div class="text-danger">Failed to load task tiers.</div>`;
   }
 }
+async function loadTaskTierOptions() {
+  const select = document.getElementById("task-tier");
+  if (!select) return;
+
+  select.innerHTML = `<option value="">Select Tier</option>`;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/pm?action=getTaskTiers`);
+    const data = await res.json();
+
+    data.tiers.forEach(tier => {
+      const opt = document.createElement("option");
+      opt.value = tier.pm_task_tier_id;
+      opt.textContent = tier.tier_name;
+      select.appendChild(opt);
+    });
+
+  } catch (err) {
+    console.error("Failed to load task tiers:", err);
+    select.innerHTML =
+      `<option value="">Error loading tiers</option>`;
+  }
+}
 
 async function addTaskTier() {
   const name = document.getElementById("new-tier-name").value.trim();
@@ -492,14 +514,14 @@ async function removeTaskTier(tierId) {
   );
   if (!confirmDelete) return;
 
-  const res = await fetch(`${API_BASE}/api/pm`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      action: "removeTaskTier",
-      pm_task_tier_id: tierId
-    })
-  });
+await fetch(`${API_BASE}/api/pm?action=removeTaskTier`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    pm_task_tier_id: tierId
+  })
+});
+
 
   if (!res.ok) {
     alert("Tier cannot be removed because tasks exist.");
@@ -508,16 +530,6 @@ async function removeTaskTier(tierId) {
 
   renderTaskTiers();
 }
-
-
-async function renderTasks() {
-  const editor = document.getElementById("pm-template-editor");
-
-  editor.innerHTML = `
-    <h5 class="mb-3">Tasks</h5>
-
-    <div id="pm-task-list">Loading tasks…</div>
-
     <hr />
 
     <h6>Add New Task</h6>
@@ -546,6 +558,14 @@ async function renderTasks() {
       </div>
     </div>
   `;
+
+async function renderTasks() {
+  const editor = document.getElementById("pm-template-editor");
+
+  editor.innerHTML = `
+    <h5 class="mb-3">Tasks</h5>
+
+    <div id="pm-task-list">Loading tasks…</div>
 
   await loadTaskTierOptions();
   await loadTasks();
@@ -649,6 +669,46 @@ async function addRequirement(taskId) {
     alert("Name and sequence are required.");
     return;
   }
+   editor.innerHTML = `
+  <h5 class="mb-3">Tasks</h5>
+
+  <div id="pm-task-list">Loading tasks…</div>
+
+  <hr />
+
+  <h6>Add New Task</h6>
+  ... existing add-task form ...
+
+  <hr />
+
+  <h6>Task Requirements</h6>
+  <div id="task-requirements" class="list-group mb-3"></div>
+
+  <div class="row g-2">
+    <div class="col-md-6">
+      <input id="req-name" class="form-control"
+        placeholder="Requirement description" />
+    </div>
+
+    <div class="col-md-2">
+      <input id="req-order" type="number"
+        class="form-control" placeholder="Seq" />
+    </div>
+
+    <div class="col-md-2 form-check mt-2">
+      <input id="req-reading"
+        type="checkbox" class="form-check-input" />
+      <label class="form-check-label">Requires Reading</label>
+    </div>
+
+    <div class="col-md-2">
+      <button class="btn btn-primary w-100"
+        onclick="addRequirement(currentTaskId)">
+        Add Requirement
+      </button>
+    </div>
+  </div>
+`;
 
   await fetch(`${API_BASE}/api/pm?action=addTaskRequirement`, {
     method: "POST",
