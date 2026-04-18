@@ -9,44 +9,12 @@ let selectedPart = null;
 let lastPartSearch = "";
 let postReceiveAction = null;
 
-window.goToWorkOrders = function (filter) {
-  switch (filter) {
-    case 'open':
-      loadModule('workorders', { status: 'open' });
-      break;
+window.loadModule = function (moduleName, filters = {}) {
+  // Switch visible module
+  switchModule(moduleName);
 
-    case 'overdue':
-      loadModule('workorders', {
-        status: 'open',
-        due: 'overdue'
-      });
-      break;
-
-    case 'week':
-      loadModule('workorders', {
-        status: 'open',
-        due: 'this_week'
-      });
-      break;
-
-    default:
-      loadModule('workorders');
-  }
-};
-
-window.goToInventory = function (filter) {
-  switch (filter) {
-    case 'low':
-      loadModule('inventory', { stock: 'low' });
-      break;
-
-    case 'out':
-      loadModule('inventory', { stock: 'out' });
-      break;
-
-    default:
-      loadModule('inventory');
-  }
+  // Store filters globally so target module can read them
+  window.currentModuleFilters = filters;
 };
 
 /* ======================================================
@@ -65,47 +33,7 @@ window.switchModule = function (moduleName, el) {
     target.classList.add("active");
     target.style.display = "block";
   }
-   //Dashboard Nav
-   function goToWorkOrders(filter) {
-  switch (filter) {
-    case 'open':
-      loadModule('workorders', { status: 'open' });
-      break;
-
-    case 'overdue':
-      loadModule('workorders', {
-        status: 'open',
-        due: 'overdue'
-      });
-      break;
-
-    case 'week':
-      loadModule('workorders', {
-        status: 'open',
-        due: 'this_week'
-      });
-      break;
-
-    default:
-      loadModule('workorders');
-  }
-}
-
-function goToInventory(filter) {
-  switch (filter) {
-    case 'low':
-      loadModule('inventory', { stock: 'low' });
-      break;
-
-    case 'out':
-      loadModule('inventory', { stock: 'out' });
-      break;
-
-    default:
-      loadModule('inventory');
-  }
-}
-
+  
   // Update nav UI
   document.querySelectorAll("#module-nav .nav-link").forEach(l =>
     l.classList.remove("active")
