@@ -530,9 +530,6 @@ await fetch(`${API_BASE}/api/pm?action=removeTaskTier`, {
   renderTaskTiers();
 }
 
-
-let currentTaskId = null;
-
 async function renderTasks() {
   const editor = document.getElementById("pm-template-editor");
 
