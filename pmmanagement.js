@@ -122,12 +122,149 @@ function renderPMTemplateWorkspace(template) {
   renderTemplateInfo();
 }
 function renderTemplateInfo() {
-  const editor = document.getElementById('pm-template-editor');
+  const editor = document.getElementById("pm-template-editor");
+
+  if (!selectedPMTemplateId) {
+    editor.innerHTML = `<div class="text-muted">No template selected.</div>`;
+    return;
+  }
+
+  const template = pmTemplates.find(
+    t => t.pm_template_id === selectedPMTemplateId
+  );
+
+  if (!template) {
+    editor.innerHTML = `<div class="text-danger">Template not found.</div>`;
+    return;
+  }
+
   editor.innerHTML = `
-    <div class="text-muted">
-      Template Info panel coming next.
+    <div class="mb-3">
+      <h5>PM Template – ${template.assetname}</h5>
     </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label class="form-label fw-bold">Asset</label>
+        <div>${template.assetname}</div>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label fw-bold">Engine Type</label>
+        <div class="text-capitalize">${template.pm_engine_type}</div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label class="form-label fw-bold">Status</label>
+        <div>
+          <span class="badge ${
+            template.active ? "bg-success" : "bg-secondary"
+          }">
+            ${template.active ? "Active" : "Inactive"}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label fw-bold">Description</label>
+      <textarea
+        class="form-control"
+        id="pm-template-description"
+        rows="3"
+      >${template.description || ""}</textarea>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+      <button
+        class="btn btn-primary"
+        onclick="saveTemplateInfo()"
+      >
+        Save Changes
+      </button>
+
+      <button
+        class="btn btn-outline-secondary"
+        onclick="toggleTemplateActive(${template.pm_template_id})"
+      >
+        ${template.active ? "Deactivate" : "Activate"}
+      </button>
+    </div>
+
+    <hr />
+
+    <h6 class="fw-bold">Definition Health</h6>
+    <ul id="pm-template-warnings" class="text-muted">
+      <li>Checking definitions…</li>
+    </ul>
   `;
+
+  renderTemplateWarnings(template.pm_template_id);
+}
+async function saveTemplateInfo() {
+  const description = document
+    .getElementById("pm-template-description")
+    .value;
+
+  await fetch(`${API_BASE}/api/pm`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "saveTemplate",
+      pm_template_id: selectedPMTemplateId,
+      description
+    })
+  });
+
+  const template = pmTemplates.find(
+    t => t.pm_template_id === selectedPMTemplateId
+  );
+  if (template) template.description = description;
+}
+
+async function toggleTemplateActive(templateId) {
+  await fetch(`${API_BASE}/api/pm`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "toggleTemplate",
+      pm_template_id: templateId
+    })
+  });
+
+  const t = pmTemplates.find(p => p.pm_template_id === templateId);
+  if (t) t.active = !t.active;
+
+  renderTemplateInfo();
+}
+
+async function renderTemplateWarnings(templateId) {
+  const list = document.getElementById("pm-template-warnings");
+
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/pm?action=templateHealth&templateId=${templateId}`
+    );
+    const data = await res.json();
+
+    list.innerHTML = "";
+
+    if (!data.warnings || data.warnings.length === 0) {
+      list.innerHTML = `<li class="text-success">No issues detected.</li>`;
+      return;
+    }
+
+    data.warnings.forEach(w => {
+      const li = document.createElement("li");
+      li.textContent = w;
+      li.classList.add("text-warning");
+      list.appendChild(li);
+    });
+
+  } catch {
+    list.innerHTML = `<li class="text-danger">Failed to load warnings.</li>`;
+  }
 }
 
 function renderTriggerBlocks() {
