@@ -510,11 +510,104 @@ async function removeTaskTier(tierId) {
 }
 
 
-function renderTasks() {
-  const editor = document.getElementById('pm-template-editor');
+async function renderTasks() {
+  const editor = document.getElementById("pm-template-editor");
+
   editor.innerHTML = `
-    <div class="text-muted">
-      Tasks editor coming next.
+    <h5 class="mb-3">Tasks</h5>
+
+    <div id="pm-task-list">Loading tasks…</div>
+
+    <hr />
+
+    <h6>Add New Task</h6>
+    <div class="row g-2 mb-3">
+      <div class="col-md-4">
+        <input id="task-desc" class="form-control"
+               placeholder="Task description" />
+      </div>
+      <div class="col-md-3">
+        <select id="task-tier" class="form-select"></select>
+      </div>
+      <div class="col-md-3">
+        <select id="task-discipline" class="form-select">
+          <option value="mechanical">Mechanical</option>
+          <option value="electrical">Electrical</option>
+        </select>
+      </div>
+      <div class="col-md-1">
+        <input id="task-order" class="form-control" type="number"
+               placeholder="Ord" />
+      </div>
+      <div class="col-md-1">
+        <button class="btn btn-primary w-100" onclick="addTask()">
+          Add
+        </button>
+      </div>
     </div>
   `;
+
+  await loadTaskTierOptions();
+  await loadTasks();
 }
+
+async function loadTasks() {
+  const res = await fetch(
+    `${API_BASE}/api/pm?action=getTasks&templateId=${selectedPMTemplateId}`
+  );
+  const { tasks } = await res.json();
+
+  const container = document.getElementById("pm-task-list");
+  if (tasks.length === 0) {
+    container.innerHTML = `<div class="text-muted">No tasks defined.</div>`;
+    return;
+  }
+
+  const grouped = {};
+  tasks.forEach(t => {
+    grouped[t.tier_name] ??= [];
+    grouped[t.tier_name].push(t);
+  });
+
+  container.innerHTML = Object.keys(grouped).map(tier => `
+    <h6 class="mt-3">${tier}</h6>
+    <ul class="list-group mb-2">
+      ${grouped[tier].map(t => `
+        <li class="list-group-item d-flex justify-content-between">
+          ${t.task_description} (${t.discipline})
+          <button class="btn btn-sm btn-outline-danger"
+                  onclick="removeTask(${t.pm_task_template_id})">
+            Remove
+          </button>
+        </li>
+      `).join("")}
+    </ul>
+  `).join("");
+}
+async function addTask() {
+  const desc = document.getElementById("task-desc").value.trim();
+  const tierId = document.getElementById("task-tier").value;
+  const disc = document.getElementById("task-discipline").value;
+  const order = Number(document.getElementById("task-order").value);
+
+  if (!desc || !tierId || !order) {
+    alert("All fields required.");
+    return;
+  }
+
+  await fetch(`${API_BASE}/api/pm?action=addTask`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      pm_template_id: selectedPMTemplateId,
+      pm_task_tier_id: tierId,
+      task_description: desc,
+      discipline: disc,
+      sequence_order: order
+    })
+  });
+
+  renderTasks();
+}
+
+
