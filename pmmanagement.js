@@ -522,7 +522,6 @@ await fetch(`${API_BASE}/api/pm?action=removeTaskTier`, {
   })
 });
 
-
   if (!res.ok) {
     alert("Tier cannot be removed because tasks exist.");
     return;
@@ -530,42 +529,102 @@ await fetch(`${API_BASE}/api/pm?action=removeTaskTier`, {
 
   renderTaskTiers();
 }
+
+
+let currentTaskId = null;
+
+async function renderTasks() {
+  const editor = document.getElementById("pm-template-editor");
+
+  editor.innerHTML = `
+    <!-- TASKS HEADER -->
+    <h5 class="mb-3">Tasks</h5>
+
+    <!-- TASK LIST -->
+    <div id="pm-task-list">Loading tasks…</div>
+
     <hr />
 
+    <!-- ADD NEW TASK -->
     <h6>Add New Task</h6>
     <div class="row g-2 mb-3">
       <div class="col-md-4">
         <input id="task-desc" class="form-control"
                placeholder="Task description" />
       </div>
+
       <div class="col-md-3">
         <select id="task-tier" class="form-select"></select>
       </div>
+
       <div class="col-md-3">
         <select id="task-discipline" class="form-select">
           <option value="mechanical">Mechanical</option>
           <option value="electrical">Electrical</option>
         </select>
       </div>
+
       <div class="col-md-1">
         <input id="task-order" class="form-control" type="number"
                placeholder="Ord" />
       </div>
+
       <div class="col-md-1">
-        <button class="btn btn-primary w-100" onclick="addTask()">
+        <button class="btn btn-primary w-100"
+                onclick="addTask()">
           Add
         </button>
       </div>
     </div>
+
+    <!-- ============================= -->
+    <!-- TASK REQUIREMENTS SECTION     -->
+    <!-- ============================= -->
+
+    <hr />
+
+    <h6>Task Requirements</h6>
+
+    <!-- REQUIREMENTS LIST (renders here) -->
+    <div id="task-requirements"
+         class="list-group mb-3">
+      <div class="text-muted">
+        Select a task to manage its requirements.
+      </div>
+    </div>
+
+    <!-- ADD REQUIREMENT FORM -->
+    <div class="row g-2 align-items-center">
+      <div class="col-md-6">
+        <input id="req-name"
+               class="form-control"
+               placeholder="Requirement description" />
+      </div>
+
+      <div class="col-md-2">
+        <input id="req-order"
+               type="number"
+               class="form-control"
+               placeholder="Seq" />
+      </div>
+
+      <div class="col-md-2 form-check mt-2">
+        <input id="req-reading"
+               type="checkbox"
+               class="form-check-input" />
+        <label class="form-check-label">
+          Requires Reading
+        </label>
+      </div>
+
+      <div class="col-md-2">
+        <button class="btn btn-primary w-100"
+                onclick="addRequirement(currentTaskId)">
+          Add Requirement
+        </button>
+      </div>
+    </div>
   `;
-
-async function renderTasks() {
-  const editor = document.getElementById("pm-template-editor");
-
-  editor.innerHTML = `
-    <h5 class="mb-3">Tasks</h5>
-
-    <div id="pm-task-list">Loading tasks…</div>
 
   await loadTaskTierOptions();
   await loadTasks();
@@ -629,6 +688,7 @@ async function addTask() {
 
   renderTasks();
 }
+
 
 async function renderRequirements(taskId) {
   const res = await fetch(
