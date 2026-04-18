@@ -474,16 +474,14 @@ async function addTaskTier() {
     return;
   }
 
-  await fetch(`${API_BASE}/api/pm`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      action: "addTaskTier",
-      pm_template_id: selectedPMTemplateId,
-      tier_name: name,
-      tier_order: order
-    })
-  });
+ await fetch(`${API_BASE}/api/pm?action=addTaskTier`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    tier_name: name,
+    tier_order: order
+  })
+});
 
   renderTaskTiers();
 }
