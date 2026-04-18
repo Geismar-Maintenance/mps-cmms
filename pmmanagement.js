@@ -610,4 +610,70 @@ async function addTask() {
   renderTasks();
 }
 
+async function renderRequirements(taskId) {
+  const res = await fetch(
+    `${API_BASE}/api/pm?action=getTaskRequirements&taskId=${taskId}`
+  );
+  const { requirements } = await res.json();
+
+  const container = document.getElementById("task-requirements");
+
+  if (requirements.length === 0) {
+    container.innerHTML =
+      `<div class="text-muted">No requirements defined.</div>`;
+    return;
+  }
+
+  container.innerHTML = requirements.map(r => `
+    <div class="list-group-item d-flex justify-content-between">
+      <div>
+        ${r.sequence_order}. ${r.requirement_name}
+        <span class="text-muted">
+          (${r.requires_reading ? "Reading" : "Check"})
+        </span>
+      </div>
+      <button class="btn btn-sm btn-outline-danger"
+        onclick="removeRequirement(${r.pm_task_requirement_id}, ${taskId})">
+        Remove
+      </button>
+    </div>
+  `).join("");
+}
+async function addRequirement(taskId) {
+  const name = document.getElementById("req-name").value.trim();
+  const order = Number(document.getElementById("req-order").value);
+  const requiresReading =
+    document.getElementById("req-reading").checked;
+
+  if (!name || !order) {
+    alert("Name and sequence are required.");
+    return;
+  }
+
+  await fetch(`${API_BASE}/api/pm?action=addTaskRequirement`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      pm_task_template_id: taskId,
+      requirement_name: name,
+      sequence_order: order,
+      requires_reading: requiresReading
+    })
+  });
+
+  renderRequirements(taskId);
+}
+async function removeRequirement(reqId, taskId) {
+  if (!confirm("Remove this requirement?")) return;
+
+  await fetch(`${API_BASE}/api/pm?action=removeTaskRequirement`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      pm_task_requirement_id: reqId
+    })
+  });
+
+  renderRequirements(taskId);
+}
 
