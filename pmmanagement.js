@@ -375,14 +375,142 @@ async function removeTriggerBlock(blockId) {
   renderTriggerBlocks();
 }
 
-function renderTaskTiers() {
-  const editor = document.getElementById('pm-template-editor');
+async function renderTaskTiers() {
+  const editor = document.getElementById("pm-template-editor");
+
+  if (!selectedPMTemplateId) return;
+
   editor.innerHTML = `
-    <div class="text-muted">
-      Task Tiers view coming next.
+    <h5 class="mb-3">Task Tiers</h5>
+
+    <div id="pm-tier-list">Loading tiers…</div>
+
+    <hr />
+
+    <h6>Add New Tier</h6>
+    <div class="row g-2 mb-3">
+      <div class="col-md-5">
+        <input
+          type="text"
+          id="new-tier-name"
+          class="form-control"
+          placeholder="Tier name (e.g. 2000-Hour)"
+        />
+      </div>
+      <div class="col-md-3">
+        <input
+          type="number"
+          id="new-tier-order"
+          class="form-control"
+          placeholder="Order"
+        />
+      </div>
+      <div class="col-md-4">
+        <button class="btn btn-primary w-100" onclick="addTaskTier()">
+          Add Tier
+        </button>
+      </div>
     </div>
   `;
+
+  loadTaskTiers();
 }
+
+async function loadTaskTiers() {
+  const container = document.getElementById("pm-tier-list");
+
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/pm?action=getTaskTiers&templateId=${selectedPMTemplateId}`
+    );
+    const data = await res.json();
+
+    if (data.tiers.length === 0) {
+      container.innerHTML =
+        `<div class="text-muted">No task tiers defined.</div>`;
+      return;
+    }
+
+    container.innerHTML = `
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Tier Name</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.tiers.map(t => `
+            <tr>
+              <td>${t.tier_order}</td>
+              <td>${t.tier_name}</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  onclick="removeTaskTier(${t.pm_task_tier_id})"
+                >
+                  Remove
+                </button>
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    `;
+
+  } catch {
+    container.innerHTML =
+      `<div class="text-danger">Failed to load task tiers.</div>`;
+  }
+}
+
+async function addTaskTier() {
+  const name = document.getElementById("new-tier-name").value.trim();
+  const order = Number(document.getElementById("new-tier-order").value);
+
+  if (!name || !order) {
+    alert("Tier name and order are required.");
+    return;
+  }
+
+  await fetch(`${API_BASE}/api/pm`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "addTaskTier",
+      pm_template_id: selectedPMTemplateId,
+      tier_name: name,
+      tier_order: order
+    })
+  });
+
+  renderTaskTiers();
+}
+
+async function removeTaskTier(tierId) {
+  const confirmDelete = confirm(
+    "Remove this task tier? Tasks assigned to it will block removal."
+  );
+  if (!confirmDelete) return;
+
+  const res = await fetch(`${API_BASE}/api/pm`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "removeTaskTier",
+      pm_task_tier_id: tierId
+    })
+  });
+
+  if (!res.ok) {
+    alert("Tier cannot be removed because tasks exist.");
+    return;
+  }
+
+  renderTaskTiers();
+}
+
 
 function renderTasks() {
   const editor = document.getElementById('pm-template-editor');
