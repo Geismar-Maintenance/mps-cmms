@@ -25,6 +25,46 @@ window.switchModule = function (moduleName, el) {
     target.classList.add("active");
     target.style.display = "block";
   }
+   //Dashboard Nav
+   function goToWorkOrders(filter) {
+  switch (filter) {
+    case 'open':
+      loadModule('workorders', { status: 'open' });
+      break;
+
+    case 'overdue':
+      loadModule('workorders', {
+        status: 'open',
+        due: 'overdue'
+      });
+      break;
+
+    case 'week':
+      loadModule('workorders', {
+        status: 'open',
+        due: 'this_week'
+      });
+      break;
+
+    default:
+      loadModule('workorders');
+  }
+}
+
+function goToInventory(filter) {
+  switch (filter) {
+    case 'low':
+      loadModule('inventory', { stock: 'low' });
+      break;
+
+    case 'out':
+      loadModule('inventory', { stock: 'out' });
+      break;
+
+    default:
+      loadModule('inventory');
+  }
+}
 
   // Update nav UI
   document.querySelectorAll("#module-nav .nav-link").forEach(l =>
@@ -45,6 +85,25 @@ window.switchModule = function (moduleName, el) {
 /* ======================================================
    DASHBOARD
    ====================================================== */
+function updateDashboardStat(id, value, onClickFn) {
+  const el = document.getElementById(id);
+  el.textContent = value;
+
+  const row = el.closest('.clickable-stat');
+  if (!row) return;
+
+  if (value === 0) {
+    row.style.pointerEvents = 'none';
+    row.style.opacity = '0.45';
+    row.title = 'No items to display';
+    row.onclick = null;
+  } else {
+    row.style.pointerEvents = 'auto';
+    row.style.opacity = '1';
+    row.title = 'Click to view details';
+    row.onclick = onClickFn;
+  }
+}
 async function loadDashboard() {
   try { await loadWorkOrdersData(); } catch {}
   try { await loadDashboardInventory(); } catch {}
@@ -69,9 +128,23 @@ function renderDashboard() {
     return d >= startOfWeek && d <= endOfWeek;
   });
 
-  document.getElementById("dash-wo-open").textContent = openWOs.length;
-  document.getElementById("dash-wo-overdue").textContent = overdueWOs.length;
-  document.getElementById("dash-wo-week").textContent = dueThisWeek.length;
+updateDashboardStat(
+  "dash-wo-open",
+  openWOs.length,
+  () => goToWorkOrders('open')
+);
+
+updateDashboardStat(
+  "dash-wo-overdue",
+  overdueWOs.length,
+  () => goToWorkOrders('overdue')
+);
+
+updateDashboardStat(
+  "dash-wo-week",
+  dueThisWeek.length,
+  () => goToWorkOrders('week')
+);
 }
 
 async function loadDashboardInventory() {
@@ -79,10 +152,17 @@ async function loadDashboardInventory() {
   if (!res.ok) return;
   const data = await res.json();
 
-  document.getElementById("dash-low-stock").textContent =
-    data.low_stock ?? 0;
-  document.getElementById("dash-out-stock").textContent =
-    data.out_stock ?? 0;
+updateDashboardStat(
+  "dash-low-stock",
+  data.low_stock ?? 0,
+  () => goToInventory('low')
+);
+
+updateDashboardStat(
+  "dash-out-stock",
+  data.out_stock ?? 0,
+  () => goToInventory('out')
+);
 }
 
 /* ======================================================
