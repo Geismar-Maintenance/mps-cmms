@@ -267,13 +267,112 @@ async function renderTemplateWarnings(templateId) {
   }
 }
 
-function renderTriggerBlocks() {
-  const editor = document.getElementById('pm-template-editor');
+async function renderTriggerBlocks() {
+  const editor = document.getElementById("pm-template-editor");
+
+  if (!selectedPMTemplateId) return;
+
   editor.innerHTML = `
-    <div class="text-muted">
-      Trigger Blocks editor coming next.
+    <h5 class="mb-3">Trigger Blocks</h5>
+    <div id="pm-block-list">Loading blocks…</div>
+
+    <hr />
+
+    <h6>Add New Block</h6>
+    <div class="row g-2 mb-3">
+      <div class="col-md-6">
+        <input
+          type="number"
+          id="new-block-hours"
+          class="form-control"
+          placeholder="Block hours (e.g. 2000)"
+        />
+      </div>
+      <div class="col-md-4">
+        <input
+          type="number"
+          id="new-block-seq"
+          class="form-control"
+          placeholder="Sequence order"
+        />
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-primary w-100" onclick="addTriggerBlock()">
+          Add
+        </button>
+      </div>
     </div>
   `;
+
+  loadTriggerBlocks();
+}
+
+async function loadTriggerBlocks() {
+  const container = document.getElementById("pm-block-list");
+
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/pm?action=getBlocks&templateId=${selectedPMTemplateId}`
+    );
+    const data = await res.json();
+
+    if (data.blocks.length === 0) {
+      container.innerHTML =
+        `<div class="text-muted">No trigger blocks defined.</div>`;
+      return;
+    }
+
+    container.innerHTML = `
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Block Hours</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.blocks.map(b => `
+            <tr>
+              <td>${b.sequence_order}</td>
+              <td>${b.block_hours}</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  onclick="removeTriggerBlock(${b.pm_block_id})"
+                >
+                  Remove
+                </button>
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    `;
+
+  } catch (err) {
+    container.innerHTML =
+      `<div class="text-danger">Failed to load blocks.</div>`;
+  }
+}
+
+async function removeTriggerBlock(blockId) {
+  const confirmDelete = confirm(
+    "Remove this trigger block? Existing PMs may prevent removal."
+  );
+
+  if (!confirmDelete) return;
+
+  await fetch(`${API_BASE}/api/pm`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "removeBlock",
+      pm_block_id: blockId
+    })
+  });
+
+  renderTriggerBlocks();
 }
 
 function renderTaskTiers() {
