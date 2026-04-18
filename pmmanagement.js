@@ -649,8 +649,8 @@ async function loadTasks() {
     <h6 class="mt-3">${tier}</h6>
     <ul class="list-group mb-2">
       ${grouped[tier].map(t => `
-        <li class="list-group-item d-flex justify-content-between">
-          ${t.task_description} (${t.discipline})
+<li class="list-group-item d-flex justify-content-between"
+    onclick="selectTask(${t.pm_task_template_id})">
           <button class="btn btn-sm btn-outline-danger"
                   onclick="removeTask(${t.pm_task_template_id})">
             Remove
