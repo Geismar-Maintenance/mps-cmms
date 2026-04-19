@@ -36,13 +36,13 @@ window.goToWorkOrders = function (filter) {
 window.goToInventory = function (filter) {
   switch (filter) {
     case 'low':
-      loadModule('inventory', { stock: 'low' });
+      loadModule('parts', { stock: 'low' });
       break;
     case 'out':
-      loadModule('inventory', { stock: 'out' });
+      loadModule('parts', { stock: 'out' });
       break;
     default:
-      loadModule('inventory');
+      loadModule('parts');
   }
 };
 
