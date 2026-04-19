@@ -10,11 +10,10 @@ let lastPartSearch = "";
 let postReceiveAction = null;
 
 window.loadModule = function (moduleName, filters = {}) {
-  // Switch visible module
-  switchModule(moduleName);
-
-  // Store filters globally so target module can read them
+    // Store filters globally so target module can read them
   window.currentModuleFilters = filters;
+   // Switch visible module
+  switchModule(moduleName);
 };
 
 window.goToWorkOrders = function (filter) {
