@@ -17,6 +17,35 @@ window.loadModule = function (moduleName, filters = {}) {
   window.currentModuleFilters = filters;
 };
 
+window.goToWorkOrders = function (filter) {
+  switch (filter) {
+    case 'open':
+      loadModule('workorders', { status: 'open' });
+      break;
+    case 'overdue':
+      loadModule('workorders', { status: 'open', due: 'overdue' });
+      break;
+    case 'week':
+      loadModule('workorders', { status: 'open', due: 'this_week' });
+      break;
+    default:
+      loadModule('workorders');
+  }
+};
+
+window.goToInventory = function (filter) {
+  switch (filter) {
+    case 'low':
+      loadModule('inventory', { stock: 'low' });
+      break;
+    case 'out':
+      loadModule('inventory', { stock: 'out' });
+      break;
+    default:
+      loadModule('inventory');
+  }
+};
+
 /* ======================================================
    NAVIGATION
    ====================================================== */
