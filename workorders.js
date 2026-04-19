@@ -18,8 +18,11 @@ function applyWOFilters() {
   const statusFilter =
     document.getElementById("wo-status-filter")?.value || "open";
 
+  const dashboardFilters = window.currentModuleFilters || {};
+
   let filtered = [...allWorkOrders];
 
+  // ✅ Status filtering (existing behavior)
   if (statusFilter === "open") {
     filtered = filtered.filter(w => w.status !== "Completed");
   }
@@ -36,7 +39,33 @@ function applyWOFilters() {
     });
   }
 
+  // ✅ Dashboard due-date filters
+  if (dashboardFilters.due === "overdue") {
+    const today = new Date();
+    filtered = filtered.filter(
+      w => w.duedate && new Date(w.duedate) < today
+    );
+  }
+
+  if (dashboardFilters.due === "this_week") {
+    const today = new Date();
+    const start = new Date(today);
+    const end = new Date(today);
+
+    start.setDate(today.getDate() - today.getDay());
+    end.setDate(start.getDate() + 6);
+
+    filtered = filtered.filter(w => {
+      if (!w.duedate) return false;
+      const d = new Date(w.duedate);
+      return d >= start && d <= end;
+    });
+  }
+
   renderWOTable(filtered);
+
+  // ✅ Clear dashboard filters after first use
+  window.currentModuleFilters = null;
 }
 
 function renderWOTable(rows) {
