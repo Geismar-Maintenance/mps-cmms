@@ -194,16 +194,7 @@ async function loadParts() {
   renderPartsTable([]);
   document.getElementById("parts-placeholder").style.display = "block";
 }
-  // 🔎 NORMAL SEARCH-FIRST MODE (unchanged behavior)
-  allParts = [];
-  renderPartsTable([]);
-  document.getElementById("parts-placeholder").style.display = "block";
 
-
-  // Default inventory view (show all parts)
-  renderPartsTable(allParts);
-  document.getElementById("parts-placeholder").style.display = "none";
-}
 async function runPartSearch() {
   const input = document.getElementById("part-search");
   const query = input.value.trim();
