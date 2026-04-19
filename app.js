@@ -183,20 +183,17 @@ async function loadParts() {
     locations: Array.isArray(p.locations) ? p.locations : []
   }));
 
-  // ✅ Hide placeholder since we now show data by default
-  const placeholder = document.getElementById("parts-placeholder");
-  if (placeholder) placeholder.style.display = "none";
+  document.getElementById("parts-placeholder").style.display = "none";
 
-  // ✅ Apply dashboard filters if present
   if (window.currentModuleFilters?.stock) {
     applyInventoryDashboardFilters();
     window.currentModuleFilters = null;
     return;
   }
 
-  // ✅ Default inventory view
   renderPartsTable(allParts);
 }
+
 async function runPartSearch() {
   const input = document.getElementById("part-search");
   const query = input.value.trim();
