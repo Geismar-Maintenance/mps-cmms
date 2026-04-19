@@ -178,11 +178,12 @@ async function loadParts() {
       return;
     }
 
-    allParts = (await res.json()).map(p => ({
-      ...p,
-      total_qty: Number(p.total_qty ?? 0),
-      locations: Array.isArray(p.locations) ? p.locations : []
-    }));
+allParts = (await res.json()).map(p => ({
+  ...p,
+  total_qty: Number(p.total_qty ?? 0),
+  reorderlevel: Number(p.reorderlevel ?? 0),   // ✅ THIS FIXES IT
+  locations: Array.isArray(p.locations) ? p.locations : []
+}));
 
     document.getElementById("parts-placeholder").style.display = "none";
     applyInventoryDashboardFilters();
