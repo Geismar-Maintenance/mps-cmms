@@ -203,7 +203,7 @@ renderPartsTable(allParts || []);
 //  }
 
 //  renderPartsTable(allParts);
-//}
+}
 
 async function runPartSearch() {
   const input = document.getElementById("part-search");
