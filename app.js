@@ -170,27 +170,31 @@ document.getElementById("part-search")?.addEventListener("keydown", e => {
   if (e.key === "Enter") runPartSearch();
 });
 async function loadParts() {
-  // Always load parts when navigating here
-  const res = await fetch(`${API_BASE}/api/parts`);
-  if (!res.ok) {
-    console.error("Failed to load parts");
-    return;
-  }
-
-  const data = await res.json();
-
-  // Normalize shape exactly like search does
-  allParts = data.map(p => ({
-    ...p,
-    total_qty: Number(p.total_qty ?? 0),
-    locations: Array.isArray(p.locations) ? p.locations : []
-  }));
-
-  // If dashboard passed an inventory filter, apply it
+  // 🧠 DASHBOARD ENTRY MODE
   if (window.currentModuleFilters?.stock) {
+    const res = await fetch(`${API_BASE}/api/parts`);
+    if (!res.ok) {
+      console.error("Failed to load parts");
+      return;
+    }
+
+    allParts = (await res.json()).map(p => ({
+      ...p,
+      total_qty: Number(p.total_qty ?? 0),
+      locations: Array.isArray(p.locations) ? p.locations : []
+    }));
+
+    document.getElementById("parts-placeholder").style.display = "none";
     applyInventoryDashboardFilters();
     return;
   }
+
+  // 🔎 NORMAL SEARCH-FIRST MODE (unchanged behavior)
+  allParts = [];
+  renderPartsTable([]);
+  document.getElementById("parts-placeholder").style.display = "block";
+}
+
 
   // Default inventory view (show all parts)
   renderPartsTable(allParts);
