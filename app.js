@@ -27,6 +27,13 @@ window.switchModule = function (moduleName, el) {
     m.style.display = "none";
   });
 
+   
+window.loadModule = function (moduleName, filters = {}) {
+  switchModule(moduleName);
+  window.currentModuleFilters = filters;
+};
+
+
   // Show target module
   const target = document.getElementById(`module-${moduleName}`);
   if (target) {
@@ -99,19 +106,19 @@ function renderDashboard() {
 updateDashboardStat(
   "dash-wo-open",
   openWOs.length,
-  () => goToWorkOrders('open')
+  () => window.goToWorkOrders('open')
 );
 
 updateDashboardStat(
   "dash-wo-overdue",
   overdueWOs.length,
-  () => goToWorkOrders('overdue')
+  () => window.goToWorkOrders('overdue')
 );
 
 updateDashboardStat(
   "dash-wo-week",
   dueThisWeek.length,
-  () => goToWorkOrders('week')
+  () => window.goToWorkOrders('week')
 );
 }
 
@@ -123,13 +130,13 @@ async function loadDashboardInventory() {
 updateDashboardStat(
   "dash-low-stock",
   data.low_stock ?? 0,
-  () => goToInventory('low')
+  () => window.goToInventory('low')
 );
 
 updateDashboardStat(
   "dash-out-stock",
   data.out_stock ?? 0,
-  () => goToInventory('out')
+  () => window.goToInventory('out')
 );
 }
 
