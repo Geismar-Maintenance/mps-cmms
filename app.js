@@ -83,6 +83,7 @@ window.loadModule = function (moduleName, filters = {}) {
   if (moduleName === "workorders") loadWorkOrders();
    if (moduleName === "pm") loadPMView();  
   if (moduleName === 'pm-management') loadPMManagement();
+   if (moduleName === "parts") loadParts();
 
 };
 
@@ -175,7 +176,18 @@ updateDashboardStat(
 document.getElementById("part-search")?.addEventListener("keydown", e => {
   if (e.key === "Enter") runPartSearch();
 });
+async function loadParts() {
+  // If dashboard passed a filter, apply it
+  if (window.currentModuleFilters?.stock) {
+    applyInventoryDashboardFilters();
+    return;
+  }
 
+  // Otherwise show placeholder default state
+  allParts = [];
+  renderPartsTable([]);
+  document.getElementById("parts-placeholder").style.display = "block";
+}
 async function runPartSearch() {
   const input = document.getElementById("part-search");
   const query = input.value.trim();
