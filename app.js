@@ -76,7 +76,11 @@ window.switchModule = function (moduleName, el) {
   if (moduleName === "workorders") loadWorkOrders();
    if (moduleName === "pm") loadPMView();  
   if (moduleName === 'pm-management') loadPMManagement();
-   if (moduleName === "parts") loadParts();
+
+function onModuleActivated(moduleName) {
+  if (moduleName === "parts") {
+    loadParts();
+  }
 
 };
 
