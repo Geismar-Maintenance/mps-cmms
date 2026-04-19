@@ -171,28 +171,39 @@ document.getElementById("part-search")?.addEventListener("keydown", e => {
 async function loadParts() {
    console.log("✅ loadParts fired");
   const res = await fetch(`${API_BASE}/api/parts`);
-  if (!res.ok) {
-    console.error("Failed to load parts");
-    return;
-  }
+   
+const raw = await res.json();
+console.log("RAW /api/parts response:", raw);
 
-  allParts = (await res.json()).map(p => ({
-    ...p,
-    total_qty: Number(p.total_qty ?? 0),
-    reorderlevel: Number(p.reorderlevel ?? 0),
-    locations: Array.isArray(p.locations) ? p.locations : []
-  }));
+// TEMPORARY: bypass mapping
+allParts = Array.isArray(raw) ? raw : raw.parts;
 
-  document.getElementById("parts-placeholder").style.display = "none";
+console.log("allParts length:", allParts?.length);
 
-  if (window.currentModuleFilters?.stock) {
-    applyInventoryDashboardFilters();
-    window.currentModuleFilters = null;
-    return;
-  }
+renderPartsTable(allParts || []);
 
-  renderPartsTable(allParts);
-}
+//  if (!res.ok) {
+//    console.error("Failed to load parts");
+//    return;
+//  }
+
+//  allParts = (await res.json()).map(p => ({
+//    ...p,
+//    total_qty: Number(p.total_qty ?? 0),
+//    reorderlevel: Number(p.reorderlevel ?? 0),
+//    locations: Array.isArray(p.locations) ? p.locations : []
+//  }));
+
+//  document.getElementById("parts-placeholder").style.display = "none";
+
+//  if (window.currentModuleFilters?.stock) {
+//    applyInventoryDashboardFilters();
+//    window.currentModuleFilters = null;
+//    return;
+//  }
+
+//  renderPartsTable(allParts);
+//}
 
 async function runPartSearch() {
   const input = document.getElementById("part-search");
