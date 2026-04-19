@@ -170,42 +170,41 @@ document.getElementById("part-search")?.addEventListener("keydown", e => {
   if (e.key === "Enter") runPartSearch();
 });
 async function loadParts() {
-  // ✅ DASHBOARD ENTRY MODE (Low / Out of Stock)
-  if (window.currentModuleFilters?.stock) {
-    const res = await fetch(`${API_BASE}/api/parts`);
-    if (!res.ok) {
-      console.error("Failed to load parts");
-      return;
-    }
-
-allParts = (await res.json()).map(p => ({
-  ...p,
-  total_qty: Number(p.total_qty ?? 0),
-  reorderlevel: Number(p.reorderlevel ?? 0),   // ✅ THIS FIXES IT
-  locations: Array.isArray(p.locations) ? p.locations : []
-}));
-
-    document.getElementById("parts-placeholder").style.display = "none";
-    applyInventoryDashboardFilters();
+  const res = await fetch(`${API_BASE}/api/parts`);
+  if (!res.ok) {
+    console.error("Failed to load parts");
     return;
   }
 
-  // ✅ NORMAL SEARCH-FIRST MODE (sidebar → Parts)
-  allParts = [];
-  renderPartsTable([]);
-  document.getElementById("parts-placeholder").style.display = "block";
-}
+  allParts = (await res.json()).map(p => ({
+    ...p,
+    total_qty: Number(p.total_qty ?? 0),
+    reorderlevel: Number(p.reorderlevel ?? 0),
+    locations: Array.isArray(p.locations) ? p.locations : []
+  }));
 
+  // ✅ Hide placeholder since we now show data by default
+  const placeholder = document.getElementById("parts-placeholder");
+  if (placeholder) placeholder.style.display = "none";
+
+  // ✅ Apply dashboard filters if present
+  if (window.currentModuleFilters?.stock) {
+    applyInventoryDashboardFilters();
+    window.currentModuleFilters = null;
+    return;
+  }
+
+  // ✅ Default inventory view
+  renderPartsTable(allParts);
+}
 async function runPartSearch() {
   const input = document.getElementById("part-search");
   const query = input.value.trim();
 
-  if (query.length < 2) {
-    allParts = [];
-    renderPartsTable([]);
-    document.getElementById("parts-placeholder").style.display = "block";
-    return;
-  }
+if (query.length < 2) {
+  renderPartsTable(allParts);
+  return;
+}
 
   lastPartSearch = query;
 
