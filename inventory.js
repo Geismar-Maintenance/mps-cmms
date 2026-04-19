@@ -1,6 +1,26 @@
 /* ======================================================
    INVENTORY OPERATIONS (ISSUE / RECEIVE / MOVE)
    ====================================================== */
+window.applyInventoryDashboardFilters = function () {
+  const filters = window.currentModuleFilters || {};
+  if (!filters.stock) return;
+
+  let filtered = [...allParts];
+
+  if (filters.stock === 'out') {
+    filtered = filtered.filter(p => Number(p.total_qty ?? 0) === 0);
+  }
+
+  if (filters.stock === 'low') {
+    filtered = filtered.filter(p =>
+      Number(p.total_qty ?? 0) > 0 &&
+      Number(p.total_qty) <= Number(p.reorderlevel ?? 0)
+    );
+  }
+
+  renderPartsTable(filtered);
+};
+
 /* ---------- ISSUE ---------- */
 function openIssueModal(partid) {
   selectedPart = allParts.find(p => Number(p.partid) === Number(partid));
