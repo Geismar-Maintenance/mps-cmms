@@ -193,7 +193,6 @@ async function loadParts() {
   allParts = [];
   renderPartsTable([]);
   document.getElementById("parts-placeholder").style.display = "block";
-}
 
 
   // Default inventory view (show all parts)
