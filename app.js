@@ -64,19 +64,6 @@ window.switchModule = function (moduleName, el) {
   }
   
   // Update nav UI
-  function onModuleActivated(moduleName) {
-  if (moduleName === "parts") {
-    loadParts();
-  }
-
-  if (moduleName === "workorders") {
-    loadWorkOrders();
-  }
-
-  if (moduleName === "dashboard") {
-    loadDashboard();
-  }
-}
    document.querySelectorAll("#module-nav .nav-link").forEach(l =>
     l.classList.remove("active")
   );
@@ -89,6 +76,7 @@ window.switchModule = function (moduleName, el) {
   if (moduleName === "workorders") loadWorkOrders();
    if (moduleName === "pm") loadPMView();  
   if (moduleName === 'pm-management') loadPMManagement();
+   if (moduleName === "parts") loadParts();
 };
 
 /* ======================================================
@@ -181,6 +169,7 @@ document.getElementById("part-search")?.addEventListener("keydown", e => {
   if (e.key === "Enter") runPartSearch();
 });
 async function loadParts() {
+   console.log("✅ loadParts fired");
   const res = await fetch(`${API_BASE}/api/parts`);
   if (!res.ok) {
     console.error("Failed to load parts");
