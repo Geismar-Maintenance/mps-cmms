@@ -56,12 +56,6 @@ window.switchModule = function (moduleName, el) {
   });
 
    
-window.loadModule = function (moduleName, filters = {}) {
-  switchModule(moduleName);
-  window.currentModuleFilters = filters;
-};
-
-
   // Show target module
   const target = document.getElementById(`module-${moduleName}`);
   if (target) {
