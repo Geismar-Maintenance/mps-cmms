@@ -80,8 +80,7 @@ window.switchModule = function (moduleName, el) {
 function onModuleActivated(moduleName) {
   if (moduleName === "parts") {
     loadParts();
-  }
-
+     }}
 };
 
 /* ======================================================
