@@ -170,7 +170,7 @@ document.getElementById("part-search")?.addEventListener("keydown", e => {
   if (e.key === "Enter") runPartSearch();
 });
 async function loadParts() {
-  // 🧠 DASHBOARD ENTRY MODE
+  // ✅ DASHBOARD ENTRY MODE (Low / Out of Stock)
   if (window.currentModuleFilters?.stock) {
     const res = await fetch(`${API_BASE}/api/parts`);
     if (!res.ok) {
@@ -189,6 +189,11 @@ async function loadParts() {
     return;
   }
 
+  // ✅ NORMAL SEARCH-FIRST MODE (sidebar → Parts)
+  allParts = [];
+  renderPartsTable([]);
+  document.getElementById("parts-placeholder").style.display = "block";
+}
   // 🔎 NORMAL SEARCH-FIRST MODE (unchanged behavior)
   allParts = [];
   renderPartsTable([]);
