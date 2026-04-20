@@ -79,3 +79,17 @@ function renderPartsTable(parts) {
       <td>${p.model ?? "—"}</td>
       <td>${p.total_qty}</td>
       <td>${locationDisplay}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-primary"
+                ${p.total_qty === 0 ? "disabled" : ""}
+                onclick="openIssueModal(${p.partid})">Issue</button>
+        <button class="btn btn-sm btn-outline-success"
+                onclick="openReceiveModal(${p.partid})">Receive</button>
+        <button class="btn btn-sm btn-outline-secondary"
+                onclick="openMoveModal(${p.partid})">Move</button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
