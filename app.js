@@ -193,6 +193,25 @@ function goToInventoryFromDashboard(stockType) {
 /* ======================================================
    PARTS SEARCH (OPS)
    ====================================================== */
+function showPartsContextBanner(stockType, count) {
+  const banner = document.getElementById("parts-context-banner");
+  if (!banner) return;
+
+  if (stockType === "low") {
+    banner.textContent = `Showing ${count} LOW STOCK parts from dashboard`;
+  }
+
+  if (stockType === "out") {
+    banner.textContent = `Showing ${count} OUT OF STOCK parts from dashboard`;
+  }
+
+  banner.style.display = "block";
+}
+
+const banner = document.getElementById("parts-context-banner");
+if (banner) banner.style.display = "none";
+
+
 document.getElementById("part-search")?.addEventListener("keydown", e => {
   if (e.key === "Enter") runPartSearch();
 });
