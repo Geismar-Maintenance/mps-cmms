@@ -33,19 +33,6 @@ window.goToWorkOrders = function (filter) {
   }
 };
 
-window.goToInventory = function (filter) {
-  switch (filter) {
-    case 'low':
-      loadModule('parts', { stock: 'low' });
-      break;
-    case 'out':
-      loadModule('parts', { stock: 'out' });
-      break;
-    default:
-      loadModule('parts');
-  }
-};
-
 /* ======================================================
    NAVIGATION
    ====================================================== */
