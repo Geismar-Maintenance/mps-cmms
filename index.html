@@ -104,6 +104,7 @@
     <main class="col-md-10 p-4">
 
             <!--   +++++++++MODULES++++++++++++++   -->
+      
   <!-- ================= DASHBOARD ================= -->
 <section id="module-dashboard" class="module active">
 
@@ -111,7 +112,7 @@
 
   <div class="row g-3">
 
-    <!-- Work Orders -->
+    <!-- ✅ WORK ORDERS CARD -->
     <div class="col-md-4">
       <div class="card">
         <div class="card-body">
@@ -135,6 +136,37 @@
       </div>
     </div>
 
+    <!-- INVENTORY CARD -->
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">Inventory</h6>
+
+          <p class="mb-1">
+            Low Stock:
+            <strong id="dash-low-stock">0</strong>
+          </p>
+
+          <p class="mb-0">
+            Out of Stock:
+            <strong id="dash-out-stock" class="text-danger">0</strong>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLACEHOLDER / FUTURE -->
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body text-muted">
+          <h6 class="card-title">Coming Soon</h6>
+          PM Status, KPIs, Alerts
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
     <!-- Inventory -->
     <div class="col-md-4">
       <div class="card">
