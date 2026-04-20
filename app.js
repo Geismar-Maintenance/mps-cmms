@@ -210,10 +210,16 @@ if (banner) banner.style.display = "none";
 document.getElementById("part-search")?.addEventListener("keydown", e => {
   if (e.key === "Enter") runPartSearch();
 });
+
 async function loadParts() {
-   console.log("✅ loadParts fired");
-  const res = await fetch(`${API_BASE}/api/parts`);
-   
+  console.log("✅ loadParts fired", partsEntryMode);
+
+  // ✅ Skip sidebar auto-load when coming from dashboard
+  if (partsEntryMode === "dashboard") {
+    partsEntryMode = "sidebar"; // reset for next time
+    return;
+  }
+
 const raw = await res.json();
 console.log("RAW /api/parts response:", raw);
 
