@@ -83,25 +83,6 @@ window.switchModule = function (moduleName, el) {
 /* ======================================================
    DASHBOARD
    ====================================================== */
-function updateDashboardStat(id, value, onClickFn) {
-  const el = document.getElementById(id);
-  el.textContent = value;
-
-  const row = el.closest('.clickable-stat');
-  if (!row) return;
-
-  if (value === 0) {
-    row.style.pointerEvents = 'none';
-    row.style.opacity = '0.45';
-    row.title = 'No items to display';
-    row.onclick = null;
-  } else {
-    row.style.pointerEvents = 'auto';
-    row.style.opacity = '1';
-    row.title = 'Click to view details';
-    row.onclick = onClickFn;
-  }
-}
 async function loadDashboard() {
   try { await loadWorkOrdersData(); } catch {}
   try { await loadDashboardInventory(); } catch {}
@@ -162,51 +143,10 @@ updateDashboardStat(
   () => window.goToInventory('out')
 );
 }
-function goToInventoryFromDashboard(stockType) {
-   partsEntryMode= "dashboard";
-  switchModule("parts");
-   
-  // 2️⃣ Clear any existing search input (important)
-  const searchInput = document.getElementById("part-search");
-  if (searchInput) searchInput.value = "";
-
-  // 3️⃣ Fetch filtered inventory from backend
-
-  fetch(`${API_BASE}/api/parts?context=dashboard&stock=${stockType}`)
-    .then(res => res.json())
-    .then(parts => {
-      renderPartsTable(parts);
-      showPartsContextBanner(stockType, parts.length);
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Unable to load inventory from dashboard");
-    });
-}
-
 
 /* ======================================================
    PARTS SEARCH (OPS)
    ====================================================== */
-function showPartsContextBanner(stockType, count) {
-  const banner = document.getElementById("parts-context-banner");
-  if (!banner) return;
-
-  if (stockType === "low") {
-    banner.textContent = `Showing ${count} LOW STOCK parts from dashboard`;
-  }
-
-  if (stockType === "out") {
-    banner.textContent = `Showing ${count} OUT OF STOCK parts from dashboard`;
-  }
-
-  banner.style.display = "block";
-}
-
-const banner = document.getElementById("parts-context-banner");
-if (banner) banner.style.display = "none";
-
-
 document.getElementById("part-search")?.addEventListener("keydown", e => {
   if (e.key === "Enter") runPartSearch();
 });
