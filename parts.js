@@ -102,3 +102,30 @@ function renderPartsTable(parts) {
   });
 }
 
+async function openPartDetails(partId) {
+  // placeholder: show modal or panel
+  await loadPartDetails(partId);
+}
+function renderPartDetails(data) {
+  const panel = document.getElementById("part-detail-panel");
+
+  panel.innerHTML = `
+    <h5>${data.part.partnumber}</h5>
+    <div>${data.part.description}</div>
+
+    <hr>
+
+    <h6>Locations</h6>
+    ${data.locations.map(l => `
+      <div>${l.cabinet}.${l.section}.${l.bin} — ${l.qty}</div>
+    `).join("")}
+
+    <hr>
+
+    <h6>History</h6>
+    ${data.history.map(h => `
+      <div>${h.date} — ${h.type} ${h.qty}</div>
+    `).join("")}
+  `;
+}
+
