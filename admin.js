@@ -52,3 +52,35 @@ window.submitAddPart = async function (event) {
     if (btn) btn.disabled = false;
   }
 };
+
+/* ======================================================
+   ADMIN‑GUIDED INVENTORY HELPERS
+   ====================================================== */
+
+function openReceiveFromAdmin(partid) {
+  // Set selectedPart context
+  selectedPart = {
+    partid,
+    partnumber: document.getElementById("adminPartNumber").value,
+    model: ""
+  };
+
+  document.getElementById("receive-partname").innerText =
+    selectedPart.partnumber;
+
+  document.getElementById("receive-qty").value = "";
+
+  // ✅ Define one‑time post‑receive behavior
+  postReceiveAction = () => {
+    setTimeout(() => {
+      if (confirm("Inventory received. Would you like to move it to a storage location now?")) {
+        openMoveModal(partid);
+      }
+    }, 300);
+  };
+
+  bootstrap.Modal
+    .getOrCreateInstance(document.getElementById("receiveModal"))
+    .show();
+}
+
