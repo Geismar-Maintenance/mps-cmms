@@ -729,10 +729,18 @@ async function renderRequirements(taskId) {
   `).join("");
 }
 async function addRequirement(taskId) {
-  const name = document.getElementById("req-name").value.trim();
-  const order = Number(document.getElementById("req-order").value);
-  const requiresReading =
-    document.getElementById("req-reading").checked;
+  if (!taskId) {
+    alert("Please select a task first.");
+    return;
+  }
+
+  const nameInput = document.getElementById("req-name");
+  const orderInput = document.getElementById("req-order");
+  const readingInput = document.getElementById("req-reading");
+
+  const name = nameInput.value.trim();
+  const order = Number(orderInput.value);
+  const requiresReading = readingInput.checked;
 
   if (!name || !order) {
     alert("Name and sequence are required.");
@@ -750,8 +758,6 @@ async function addRequirement(taskId) {
     })
   });
 
-  renderRequirements(taskId);
-}
 async function removeRequirement(reqId, taskId) {
   if (!confirm("Remove this requirement?")) return;
 
