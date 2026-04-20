@@ -8,6 +8,7 @@ let allWorkOrders = [];
 let selectedPart = null;
 let lastPartSearch = "";
 let postReceiveAction = null;
+let partsEntryMode = "sidebar"; // 'sidebar' | 'dashboard
 
 window.loadModule = function (moduleName, filters = {}) {
     // Store filters globally so target module can read them
@@ -162,26 +163,19 @@ updateDashboardStat(
 );
 }
 function goToInventoryFromDashboard(stockType) {
-  // 1️⃣ Switch to Parts module
+   partsEntryMode= "dashboard';
   switchModule("parts");
-
+   
   // 2️⃣ Clear any existing search input (important)
   const searchInput = document.getElementById("part-search");
   if (searchInput) searchInput.value = "";
 
   // 3️⃣ Fetch filtered inventory from backend
-  fetch(`${API_BASE}/api/parts?context=dashboard&stock=${stockType}`)
-    .then(res => {
-      if (!res.ok) {
-        throw new Error("Failed to load inventory");
-      }
-      return res.json();
-    })
-    .then(parts => {
-      // 4️⃣ Render results into Parts table
-      renderPartsTable(parts);
 
-      // 5️⃣ Optional: visual context cue
+  fetch(`${API_BASE}/api/parts?context=dashboard&stock=${stockType}`)
+    .then(res => res.json())
+    .then(parts => {
+      renderPartsTable(parts);
       showPartsContextBanner(stockType, parts.length);
     })
     .catch(err => {
@@ -189,6 +183,7 @@ function goToInventoryFromDashboard(stockType) {
       alert("Unable to load inventory from dashboard");
     });
 }
+
 
 /* ======================================================
    PARTS SEARCH (OPS)
