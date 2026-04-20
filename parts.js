@@ -108,7 +108,8 @@ window.loadPartDetails = async function (partId) {
   }
 
   const data = await res.json();
-  renderPartDetails(data);
+  console.log("PART DETAILS RESPONSE:", data);
+   renderPartDetails(data);
 };
 
 function renderPartDetails(data) {
