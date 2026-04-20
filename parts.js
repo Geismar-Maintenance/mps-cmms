@@ -100,10 +100,17 @@ function renderPartsTable(parts) {
   });
 }
 
-async function openPartDetails(partId) {
-  // placeholder: show modal or panel
-  await loadPartDetails(partId);
+async function loadPartDetails(partId) {
+  const res = await fetch(`${API_BASE}/api/parts?partId=${partId}`);
+  if (!res.ok) {
+    alert("Failed to load part details");
+    return;
+  }
+
+  const data = await res.json();
+  renderPartDetails(data);
 }
+
 function renderPartDetails(data) {
   const panel = document.getElementById("part-detail-panel");
 
