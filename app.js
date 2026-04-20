@@ -4,8 +4,6 @@ const API_BASE = "https://mps-geismar-backend-hkxb.vercel.app";
    GLOBAL STATE
    ====================================================== */
 let allWorkOrders = [];
-let selectedPart = null;
-let lastPartSearch = "";
 let postReceiveAction = null;
 let partsEntryMode = "sidebar"; // 'sidebar' | 'dashboard
 
