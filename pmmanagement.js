@@ -760,6 +760,14 @@ async function addRequirement(taskId) {
     })
   });
 
+  // optional but recommended
+  nameInput.value = "";
+  orderInput.value = "";
+  readingInput.checked = false;
+
+  renderRequirements(taskId);
+}
+
 async function removeRequirement(reqId, taskId) {
   if (!confirm("Remove this requirement?")) return;
 
@@ -773,4 +781,4 @@ async function removeRequirement(reqId, taskId) {
 
   renderRequirements(taskId);
 }
-
+``
