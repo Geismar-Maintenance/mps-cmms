@@ -112,4 +112,57 @@ window.loadPartDetails = async function (partId) {
    renderPartDetails(data);
 };
 
-console.log("PART DETAILS RESPONSE:", data);
+function renderPartDetails(data) {
+  const panel = document.getElementById("part-detail-panel");
+  if (!panel) return;
+
+  panel.style.display = "block";
+
+  panel.innerHTML = `
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5>${data.part.partnumber}</h5>
+      <button class="btn btn-sm btn-outline-secondary"
+              onclick="closePartDetails()">Back to Parts</button>
+    </div>
+
+    <div class="mb-2">${data.part.description}</div>
+
+    <div class="text-muted mb-3">
+      ${data.part.manufacturer ?? "—"} | ${data.part.model ?? "—"}
+    </div>
+
+    <hr>
+
+    <h6>Locations</h6>
+    ${
+      data.locations.length === 0
+        ? `<div class="text-muted">No inventory on hand.</div>`
+        : data.locations.map(l => `
+            <div>
+              ${l.cabinet}.${l.section}.${l.bin} — ${l.qty}
+            </div>
+          `).join("")
+    }
+
+    <hr>
+
+    <h6>History</h6>
+    ${
+      data.history.length === 0
+        ? `<div class="text-muted">No transactions.</div>`
+        : data.history.map(h => `
+            <div>
+              ${new Date(h.transactiondate).toLocaleString()}
+              — ${h.transactiontype} ${h.qty}
+            </div>
+          `).join("")
+    }
+  `;
+}
+
+function closePartDetails() {
+  const panel = document.getElementById("part-detail-panel");
+  if (panel) panel.style.display = "none";
+}
+
+
