@@ -163,7 +163,7 @@ updateDashboardStat(
 );
 }
 function goToInventoryFromDashboard(stockType) {
-   partsEntryMode= "dashboard';
+   partsEntryMode= "dashboard";
   switchModule("parts");
    
   // 2️⃣ Clear any existing search input (important)
