@@ -88,6 +88,27 @@ async function loadDashboard() {
   try { await loadDashboardInventory(); } catch {}
   renderDashboard();
 }
+function updateDashboardStat(id, value, onClickFn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.textContent = value;
+
+  const row = el.closest('.clickable-stat');
+  if (!row) return;
+
+  if (value === 0) {
+    row.style.pointerEvents = 'none';
+    row.style.opacity = '0.45';
+    row.title = 'No items to display';
+    row.onclick = null;
+  } else {
+    row.style.pointerEvents = 'auto';
+    row.style.opacity = '1';
+    row.title = 'Click to view details';
+    row.onclick = onClickFn;
+  }
+}
 
 function renderDashboard() {
   const today = new Date();
