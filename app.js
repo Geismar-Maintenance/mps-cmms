@@ -65,34 +65,6 @@ window.switchModule = function (moduleName, el) {
 };
 
 /* ======================================================
-   HISTORY (READ‑ONLY)
-   ====================================================== */
-async function loadPartsHistory() {
-   const tbody = document.querySelector("#parts-history-table tbody");
-  tbody.innerHTML = "";
-
-  const res = await fetch(`${API_BASE}/api/parts?history=true`);
-  if (!res.ok) return;
-
-  const rows = await res.json();
-  rows.forEach(h => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${new Date(h.transactiondate).toLocaleString()}</td>
-      <td>${h.transactiontype}</td>
-      <td>${h.partnumber}</td>
-      <td>${h.description}</td>
-      <td>${h.from_cabinet ? `${h.from_cabinet}.${h.from_section}.${h.from_bin}` : "—"}</td>
-      <td>${h.to_cabinet ? `${h.to_cabinet}.${h.to_section}.${h.to_bin}` : "—"}</td>
-      <td>${h.qty}</td>
-      <td>${h.performed_by}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-
-/* ======================================================
    APP INIT
    ====================================================== */
 document.addEventListener("DOMContentLoaded", () => {
