@@ -161,6 +161,34 @@ updateDashboardStat(
   () => window.goToInventory('out')
 );
 }
+function goToInventoryFromDashboard(stockType) {
+  // 1️⃣ Switch to Parts module
+  switchModule("parts");
+
+  // 2️⃣ Clear any existing search input (important)
+  const searchInput = document.getElementById("part-search");
+  if (searchInput) searchInput.value = "";
+
+  // 3️⃣ Fetch filtered inventory from backend
+  fetch(`${API_BASE}/api/parts?context=dashboard&stock=${stockType}`)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to load inventory");
+      }
+      return res.json();
+    })
+    .then(parts => {
+      // 4️⃣ Render results into Parts table
+      renderPartsTable(parts);
+
+      // 5️⃣ Optional: visual context cue
+      showPartsContextBanner(stockType, parts.length);
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Unable to load inventory from dashboard");
+    });
+}
 
 /* ======================================================
    PARTS SEARCH (OPS)
