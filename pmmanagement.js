@@ -649,13 +649,19 @@ async function loadTasks() {
     <h6 class="mt-3">${tier}</h6>
     <ul class="list-group mb-2">
       ${grouped[tier].map(t => `
-<li class="list-group-item d-flex justify-content-between"
+<li class="list-group-item d-flex justify-content-between align-items-center"
     onclick="selectTask(${t.pm_task_template_id})">
-          <button class="btn btn-sm btn-outline-danger"
-                  onclick="removeTask(${t.pm_task_template_id})">
-            Remove
-          </button>
-        </li>
+
+  <span>
+    ${t.task_description}
+    <span class="text-muted">(${t.discipline})</span>
+  </span>
+
+  <button class="btn btn-sm btn-outline-danger"
+          onclick="event.stopPropagation(); removeTask(${t.pm_task_template_id})">
+    Remove
+  </button>
+</li>
       `).join("")}
     </ul>
   `).join("");
