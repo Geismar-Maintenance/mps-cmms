@@ -147,17 +147,19 @@
     <div class="card-body">
       <h6 class="card-title">Inventory</h6>
 
-     <p class="mb-1 clickable-stat"
-   onclick="goToInventory('low')">
+
+<p class="mb-1 clickable-stat"
+   onclick="goToInventoryFromDashboard('low')">
   Low Stock:
-  <strong id="dash-low-stock" class="text-mps-orange">0</strong>
+  <strong id="dash-low-stock">0</strong>
 </p>
 
-<p class="mb-0 clickable-stat"
-   onclick="goToInventory('out')">
+<p class="mb-1 clickable-stat"
+   onclick="goToInventoryFromDashboard('out')">
   Out of Stock:
   <strong id="dash-out-stock" class="text-danger">0</strong>
 </p>
+
 
     </div>
   </div>
@@ -169,7 +171,7 @@
       <!-- Parts -->
       <section id="module-parts" class="module">
         <h4 class="mb-3">Parts Management</h4>
-
+<div id="parts-context-banner" class="alert alert-info" style="display:none;"></div>
 <input
   id="part-search"
   class="form-control form-control-sm mb-3"
