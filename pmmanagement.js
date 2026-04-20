@@ -692,6 +692,12 @@ async function addTask() {
   renderTasks();
 }
 
+window.selectTask = function (taskId) {
+  currentTaskId = taskId;
+  renderRequirements(taskId);
+};
+
+
 async function renderRequirements(taskId) {
   const res = await fetch(
     `${API_BASE}/api/pm?action=getTaskRequirements&taskId=${taskId}`
