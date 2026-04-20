@@ -737,46 +737,6 @@ async function addRequirement(taskId) {
     alert("Name and sequence are required.");
     return;
   }
-   editor.innerHTML = `
-  <h5 class="mb-3">Tasks</h5>
-
-  <div id="pm-task-list">Loading tasks…</div>
-
-  <hr />
-
-  <h6>Add New Task</h6>
-  ... existing add-task form ...
-
-  <hr />
-
-  <h6>Task Requirements</h6>
-  <div id="task-requirements" class="list-group mb-3"></div>
-
-  <div class="row g-2">
-    <div class="col-md-6">
-      <input id="req-name" class="form-control"
-        placeholder="Requirement description" />
-    </div>
-
-    <div class="col-md-2">
-      <input id="req-order" type="number"
-        class="form-control" placeholder="Seq" />
-    </div>
-
-    <div class="col-md-2 form-check mt-2">
-      <input id="req-reading"
-        type="checkbox" class="form-check-input" />
-      <label class="form-check-label">Requires Reading</label>
-    </div>
-
-    <div class="col-md-2">
-      <button class="btn btn-primary w-100"
-        onclick="addRequirement(currentTaskId)">
-        Add Requirement
-      </button>
-    </div>
-  </div>
-`;
 
   await fetch(`${API_BASE}/api/pm?action=addTaskRequirement`, {
     method: "POST",
