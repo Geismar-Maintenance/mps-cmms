@@ -614,11 +614,12 @@ async function renderTasks() {
         </label>
       </div>
 
-      <div class="col-md-2">
-        <button class="btn btn-primary w-100"
-                onclick="addRequirement(currentTaskId)">
-          Add Requirement
-        </button>
+<button type="button"
+        class="btn btn-primary w-100"
+        onclick="addRequirement(currentTaskId)">
+  Add Requirement
+</button>
+
       </div>
     </div>
   `;
