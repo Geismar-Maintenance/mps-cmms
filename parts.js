@@ -74,14 +74,12 @@ function renderPartsTable(parts) {
         : "—";
 
     tr.innerHTML = `
-      <td>${p.partnumber}</td>
-      
+
 <td class="text-primary"
     style="cursor:pointer"
     onclick="openPartDetails(${p.partid})">
   ${p.partnumber}
 </td>
-
       <td>${p.description}</td>
       <td>${p.manufacturer ?? "—"}</td>
       <td>${p.model ?? "—"}</td>
@@ -96,7 +94,7 @@ function renderPartsTable(parts) {
         <button class="btn btn-sm btn-outline-secondary"
                 onclick="openMoveModal(${p.partid})">Move</button>
       </td>
-';
+ `;
 
     tbody.appendChild(tr);
   });
