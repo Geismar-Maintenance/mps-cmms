@@ -77,7 +77,7 @@ function renderPartsTable(parts) {
 
 <td class="text-primary"
     style="cursor:pointer"
-    onclick="openPartDetails(${p.partid})">
+    onclick="loadPartDetails(${p.partid})">
   ${p.partnumber}
 </td>
       <td>${p.description}</td>
@@ -100,7 +100,7 @@ function renderPartsTable(parts) {
   });
 }
 
-async function loadPartDetails(partId) {
+window.loadPartDetails = async function (partId) {
   const res = await fetch(`${API_BASE}/api/parts?partId=${partId}`);
   if (!res.ok) {
     alert("Failed to load part details");
@@ -109,7 +109,7 @@ async function loadPartDetails(partId) {
 
   const data = await res.json();
   renderPartDetails(data);
-}
+};
 
 function renderPartDetails(data) {
   const panel = document.getElementById("part-detail-panel");
