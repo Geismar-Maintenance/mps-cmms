@@ -1,0 +1,81 @@
+/* ======================================================
+   PARTS MODULE (FRONTEND)
+   Baseline behavior:
+   - Do nothing on entry
+   - Wait for search + Enter
+   ====================================================== */
+
+let allParts = [];
+let lastPartSearch = "";
+
+/* ---------- Entry ---------- */
+function loadParts() {
+  // Baseline behavior: show nothing until search
+  renderPartsTable([]);
+}
+
+/* ---------- Search ---------- */
+document.getElementById("part-search")?.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    runPartSearch();
+  }
+});
+
+async function runPartSearch() {
+  const input = document.getElementById("part-search");
+  const query = input.value.trim();
+
+  if (query.length < 2) {
+    renderPartsTable([]);
+    return;
+  }
+
+  lastPartSearch = query;
+
+  const res = await fetch(
+    `${API_BASE}/api/parts?search=${encodeURIComponent(query)}`
+  );
+
+  if (!res.ok) {
+    console.error("Failed to search parts");
+    return;
+  }
+
+  const data = await res.json();
+
+  allParts = data.map(p => ({
+    ...p,
+    total_qty: Number(p.total_qty ?? 0),
+    locations: Array.isArray(p.locations) ? p.locations : []
+  }));
+
+  document.getElementById("parts-placeholder")?.style.setProperty("display", "none");
+  renderPartsTable(allParts);
+}
+
+/* ---------- Rendering ---------- */
+function renderPartsTable(parts) {
+  const tbody = document.querySelector("#parts-table tbody");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  parts.forEach(p => {
+    const tr = document.createElement("tr");
+
+    const locationDisplay =
+      p.locations.length > 0
+        ? p.locations
+            .map(loc =>
+              `${loc.cabinet}.${loc.section}.${loc.bin} (${loc.qty})`
+            )
+            .join("<br>")
+        : "—";
+
+    tr.innerHTML = `
+      <td>${p.partnumber}</td>
+      <td>${p.description}</td>
+      <td>${p.manufacturer ?? "—"}</td>
+      <td>${p.model ?? "—"}</td>
+      <td>${p.total_qty}</td>
+      <td>${locationDisplay}</td>
