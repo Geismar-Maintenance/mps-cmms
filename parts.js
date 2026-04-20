@@ -6,6 +6,7 @@
    ====================================================== */
 
 let allParts = [];
+let selectedPart = null;
 let lastPartSearch = "";
 
 /* ---------- Entry ---------- */
