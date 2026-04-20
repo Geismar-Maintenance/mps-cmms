@@ -3,7 +3,6 @@ const API_BASE = "https://mps-geismar-backend-hkxb.vercel.app";
 /* ======================================================
    GLOBAL STATE
    ====================================================== */
-let allParts = [];
 let allWorkOrders = [];
 let selectedPart = null;
 let lastPartSearch = "";
