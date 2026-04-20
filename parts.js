@@ -113,7 +113,9 @@ window.loadPartDetails = async function (partId) {
 };
 
 function renderPartDetails(data) {
-  console.log("DETAIL PANEL:", document.getElementById("part-detail-panel"));
+  const panel = document.getElementById("part-detail-panel");
+  console.log("DETAIL PANEL:", panel);
+
   if (!panel) return;
 
   panel.style.display = "block";
@@ -159,7 +161,6 @@ function renderPartDetails(data) {
     }
   `;
 }
-
 function closePartDetails() {
   const panel = document.getElementById("part-detail-panel");
   if (panel) panel.style.display = "none";
