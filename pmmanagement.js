@@ -707,22 +707,28 @@ async function renderRequirements(taskId) {
 
   const container = document.getElementById("task-requirements");
 
-  container.innerHTML = requirements.length === 0
-    ? `<div class="text-muted">No requirements defined.</div>`
-    : requirements.map(r => `
-        <div class="list-group-item d-flex justify-content-between">
-          <div>
-            ${r.sequence_order}. ${r.requirement_name}
-            <span class="text-muted">
-              (${r.requires_reading ? "Reading" : "Check"})
-            </span>
-          </div>
-          <button class="btn btn-sm btn-outline-danger"
-            onclick="removeRequirement(${r.pm_task_requirement_id}, ${taskId})">
-            Remove
-          </button>
+  let html = "";
+
+  if (requirements.length === 0) {
+    html = `<div class="text-muted">No requirements defined.</div>`;
+  } else {
+    html = requirements.map(r => `
+      <div class="list-group-item d-flex justify-content-between">
+        <div>
+          ${r.sequence_order}. ${r.requirement_name}
+          <span class="text-muted">
+            (${r.requires_reading ? "Reading" : "Check"})
+          </span>
         </div>
-      `).join("");
+        <button class="btn btn-sm btn-outline-danger"
+          onclick="removeRequirement(${r.pm_task_requirement_id}, ${taskId})">
+          Remove
+        </button>
+      </div>
+    `).join("");
+  }
+
+  container.innerHTML = html;
 }
 async function addRequirement(taskId) {
   if (!taskId) {
