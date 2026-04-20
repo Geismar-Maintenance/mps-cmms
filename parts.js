@@ -89,8 +89,16 @@ function renderPartsTable(parts) {
         <button class="btn btn-sm btn-outline-secondary"
                 onclick="openMoveModal(${p.partid})">Move</button>
       </td>
+      
+<td class="text-primary"
+    style="cursor:pointer"
+    onclick="openPartDetails(${p.partid})">
+  ${p.partnumber}
+</td>
+
     `;
 
     tbody.appendChild(tr);
   });
 }
+
