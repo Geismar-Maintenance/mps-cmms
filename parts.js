@@ -113,7 +113,7 @@ window.loadPartDetails = async function (partId) {
 };
 
 function renderPartDetails(data) {
-  const panel = document.getElementById("part-detail-panel");
+  console.log("DETAIL PANEL:", document.getElementById("part-detail-panel"));
   if (!panel) return;
 
   panel.style.display = "block";
