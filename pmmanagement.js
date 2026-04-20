@@ -685,6 +685,41 @@ async function addTask() {
 
   renderTasks();
 }
+function renderTasks(tasks) {
+  const container = document.getElementById("pm-task-list");
+
+  if (!tasks || tasks.length === 0) {
+    container.innerHTML =
+      `<div class="text-muted">No tasks defined.</div>`;
+    return;
+  }
+
+  // Group tasks by tier
+  const grouped = {};
+  tasks.forEach(t => {
+    grouped[t.tier_name] ??= [];
+    grouped[t.tier_name].push(t);
+  });
+
+  container.innerHTML = Object.keys(grouped).map(tier => `
+    <h6 class="mt-3">${tier}</h6>
+    <ul class="list-group mb-2">
+      ${grouped[tier].map(t => `
+        <li class="list-group-item d-flex justify-content-between align-items-center"
+            onclick="selectTask(${t.pm_task_template_id})">
+          <span>
+            ${t.sequence_order}. ${t.task_description}
+            <span class="text-muted">(${t.discipline})</span>
+          </span>
+          <button class="btn btn-sm btn-outline-danger"
+                  onclick="event.stopPropagation(); removeTask(${t.pm_task_template_id})">
+            Remove
+          </button>
+        </li>
+      `).join("")}
+    </ul>
+  `).join("");
+}
 
 
 async function renderRequirements(taskId) {
