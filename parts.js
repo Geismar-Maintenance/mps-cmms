@@ -11,7 +11,7 @@ let lastPartSearch = "";
 
 /* ---------- Entry ---------- */
 
-function loadParts() {
+window.loadParts = function () {
   const filter = window.currentModuleFilters?.inventoryFilter;
   console.log("loadParts called, inventoryFilter =", filter);
 
