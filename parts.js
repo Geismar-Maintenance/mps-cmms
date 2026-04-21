@@ -10,18 +10,19 @@ let selectedPart = null;
 let lastPartSearch = "";
 
 /* ---------- Entry ---------- */
+
 function loadParts() {
   const filter = window.currentModuleFilters?.inventoryFilter;
+  console.log("loadParts called, inventoryFilter =", filter);
 
   if (!filter) {
-    // Normal search-driven mode
     renderPartsTable([]);
     return;
   }
 
-  // Dashboard-driven mode
   loadInventoryFilteredParts(filter);
 }
+
 
 /* ---------- Filtered Inventory ---------- */
 
