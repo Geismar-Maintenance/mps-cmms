@@ -36,7 +36,10 @@ window.goToWorkOrders = function (filter) {
 /* ======================================================
    LOGIN
    ====================================================== */
-async function submitLogin() {
+
+window.submitLogin = async function (e) {
+  e.preventDefault();
+
   const username = document.getElementById("login-username").value.trim();
   const pin = document.getElementById("login-pin").value.trim();
   const err = document.getElementById("login-error");
