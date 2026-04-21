@@ -23,6 +23,23 @@ function loadParts() {
   loadInventoryFilteredParts(filter);
 }
 
+/* ---------- Filtered Inventory ---------- */
+
+async function loadInventoryFilteredParts(type) {
+  const res = await fetch(`${API_BASE}/api/parts?inventory=${type}`);
+  if (!res.ok) {
+    console.error("Failed to load inventory filter:", type);
+    return;
+  }
+
+  const data = await res.json();
+
+  allParts = data.map(p => ({
+    ...p,
+    total_qty: Number(p.total_qty ?? 0),
+    locations: Array.isArray(p.locations) ? p.locations : []
+  }));
+
 
 /* ---------- Search ---------- */
 document.getElementById("part-search")?.addEventListener("keydown", e => {
