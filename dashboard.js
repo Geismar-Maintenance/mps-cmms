@@ -99,12 +99,12 @@ async function loadDashboardInventory() {
   updateDashboardStat(
     "dash-low-stock",
     data.low_stock ?? 0,
-    null // dashboard only shows count for now
+    () => goToInventory('low');
   );
 
   updateDashboardStat(
     "dash-out-stock",
     data.out_stock ?? 0,
-    null
+    () => goToInventory('out');
   );
 }
