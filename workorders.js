@@ -125,17 +125,20 @@ async function submitWorkOrder() {
     return;
   }
 
-  const res = await fetch(`${API_BASE}/api/workorders`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      assetid: parseInt(assetid, 10),
-      description,
-      wotype: parseInt(wotype, 10),
-      priority: parseInt(priority, 10),
-      duedate
-    })
-  });
+  
+const res = await fetch(`${API_BASE}/api/workorders`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    assetid: parseInt(assetid, 10),
+    description,
+    wotype: parseInt(wotype, 10),
+    priority: parseInt(priority, 10),
+    duedate,
+    created_by_userid: currentUser.userid   // ✅ ADD THIS
+  })
+});
+
 
   const result = await res.json();
   if (!res.ok) throw new Error(result.error || "Create failed");
@@ -183,12 +186,15 @@ async function submitCloseWO() {
     const res = await fetch(`${API_BASE}/api/workorders`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "close",
-        woid,
-        workperformed,
-        workedBy
-      })
+     
+body: JSON.stringify({
+  action: "close",
+  woid,
+  workperformed,
+  workedBy,
+  completed_by_userid: currentUser.userid   // ✅ ADD THIS
+})
+
     });
 
     const result = await res.json();
