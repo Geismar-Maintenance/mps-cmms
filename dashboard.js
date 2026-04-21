@@ -108,3 +108,8 @@ async function loadDashboardInventory() {
     () => goToInventory('out')
   );
 }
+
+window.goToInventory = function (type) {
+  loadModule("parts", { inventoryFilter: type });
+};
+
