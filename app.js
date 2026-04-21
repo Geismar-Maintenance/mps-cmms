@@ -69,9 +69,6 @@ window.switchModule = function (moduleName, el) {
 /* ======================================================
    APP INIT
    ====================================================== */
-document.addEventListener("DOMContentLoaded", () => {
-  loadDashboard();
-
    window.goToWorkOrders = function (filter) {
   switch (filter) {
     case 'open':
@@ -86,9 +83,6 @@ document.addEventListener("DOMContentLoaded", () => {
     default:
       loadModule('workorders');
   }
-};
-
-window.currentUser = null;
 
 async function submitLogin() {
   const username = document.getElementById("login-username").value.trim();
@@ -120,6 +114,7 @@ async function submitLogin() {
 
     document.getElementById("login-screen").style.display = "none";
     document.getElementById("app-shell").style.display = "block";
+     loadDashboard();
 
     // optional: show user name somewhere
     console.log("Logged in as", data.display_name);
