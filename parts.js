@@ -40,6 +40,9 @@ async function loadInventoryFilteredParts(type) {
     locations: Array.isArray(p.locations) ? p.locations : []
   }));
 
+  renderPartsTable(allParts);
+}
+
 
 /* ---------- Search ---------- */
 document.getElementById("part-search")?.addEventListener("keydown", e => {
