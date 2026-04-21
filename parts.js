@@ -11,9 +11,18 @@ let lastPartSearch = "";
 
 /* ---------- Entry ---------- */
 function loadParts() {
-  // Baseline behavior: show nothing until search
-  renderPartsTable([]);
+  const filter = window.currentModuleFilters?.inventoryFilter;
+
+  if (!filter) {
+    // Normal search-driven mode
+    renderPartsTable([]);
+    return;
+  }
+
+  // Dashboard-driven mode
+  loadInventoryFilteredParts(filter);
 }
+
 
 /* ---------- Search ---------- */
 document.getElementById("part-search")?.addEventListener("keydown", e => {
