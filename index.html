@@ -37,6 +37,32 @@
 
 <body>
 
+  <!-- ================= LOGIN ================= -->
+<section id="login-screen" class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+      <h4 class="mb-3 text-center">CMMS Login</h4>
+
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input id="login-username" class="form-control" autocomplete="username" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">PIN</label>
+        <input id="login-pin" class="form-control" type="password" inputmode="numeric" />
+      </div>
+
+      <div class="d-grid">
+        <button class="btn btn-primary" onclick="submitLogin()">Login</button>
+      </div>
+
+      <div id="login-error" class="text-danger mt-2" style="display:none;"></div>
+    </div>
+  </div>
+</section>
+
+
 <!-- Top Navbar -->
 <nav class="navbar navbar-dark bg-primary px-3">
   <span class="navbar-brand">Geismar Maintenance CMMS</span>
