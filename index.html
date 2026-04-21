@@ -37,31 +37,49 @@
 
 <body>
 
-  <!-- ================= LOGIN ================= -->
+ <!-- ================= LOGIN SCREEN ================= -->
 <section id="login-screen" class="container mt-5">
   <div class="row justify-content-center">
     <div class="col-md-4">
       <h4 class="mb-3 text-center">CMMS Login</h4>
 
-      <div class="mb-3">
-        <label class="form-label">Username</label>
-        <input id="login-username" class="form-control" autocomplete="username" />
-      </div>
+      <form onsubmit="submitLogin(event)">
+        <div class="mb-3">
+          <label class="form-label">>          <label class="form-label">Username</label>
 
-      <div class="mb-3">
-        <label class="form-label">PIN</label>
-        <input id="login-pin" class="form-control" type="password" inputmode="numeric" />
-      </div>
+        <div class="mb-3">
+          <label class="form-label">PIN</label>
+          <input
+            id="login-pin"
+            class="form-control"
+            type="password"
+            inputmode="numeric"
+            autocomplete="current-password"
+          />
+        </div>
 
-      <div class="d-grid">
-        <button class="btn btn-primary" onclick="submitLogin()">Login</button>
-      </div>
+        <div class="d-grid">
+          <button class="btn btn-primary" type="submit">
+            Login
+          </button>
+        </div>
 
-      <div id="login-error" class="text-danger mt-2" style="display:none;"></div>
+        <div
+          id="login-error"
+          class="text-danger mt-2"
+          style="display:none;"
+        ></div>
+      </form>
     </div>
   </div>
 </section>
+          <input
+            id="login-username"
+            class="form-control"
+            autocomplete="username"
+          />
 
+<div id="app-shell" style="display:none;">
 
 <!-- Top Navbar -->
 <nav class="navbar navbar-dark bg-primary px-3">
@@ -696,6 +714,6 @@
 <script src="history.js"></script>
 <script src="pm.js"></script>
 <script src="pmmanagement.js"></script>
-
+</div>
 </body>
 </html>
