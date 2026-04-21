@@ -37,7 +37,6 @@
 
 <body>
 
- <!-- ================= LOGIN SCREEN ================= -->
 <section id="login-screen" class="container mt-5">
   <div class="row justify-content-center">
     <div class="col-md-4">
@@ -45,7 +44,14 @@
 
       <form onsubmit="submitLogin(event)">
         <div class="mb-3">
-          <label class="form-label">>          <label class="form-label">Username</label>
+          <label class="form-label">Username</label>
+          <input
+            id="login-username"
+            class="form-control"
+            type="text"
+            autocomplete="username"
+          />
+        </div>
 
         <div class="mb-3">
           <label class="form-label">PIN</label>
@@ -64,20 +70,11 @@
           </button>
         </div>
 
-        <div
-          id="login-error"
-          class="text-danger mt-2"
-          style="display:none;"
-        ></div>
+        <div id="login-error" class="text-danger mt-2" style="display:none;"></div>
       </form>
     </div>
   </div>
 </section>
-          <input
-            id="login-username"
-            class="form-control"
-            autocomplete="username"
-          />
 
 <div id="app-shell" style="display:none;">
 
