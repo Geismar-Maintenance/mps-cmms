@@ -99,12 +99,12 @@ async function loadDashboardInventory() {
   updateDashboardStat(
     "dash-low-stock",
     data.low_stock ?? 0,
-    () => goToInventory('low');
+    () => goToInventory('low')
   );
 
   updateDashboardStat(
     "dash-out-stock",
     data.out_stock ?? 0,
-    () => goToInventory('out');
+    () => goToInventory('out')
   );
 }
