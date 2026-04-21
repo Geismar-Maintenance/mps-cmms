@@ -66,11 +66,15 @@ window.submitLogin = async function (e) {
     }
 
     window.currentUser = data;
+     
+document.getElementById("current-user-label").textContent =
+  `Logged in as ${data.display_name}`;
+
 
     document.getElementById("login-screen").style.display = "none";
     document.getElementById("app-shell").style.display = "block";
 
-    loadDashboard(); // ✅ START APP AFTER LOGIN
+    loadDashboard();
 
     console.log("Logged in as", data.display_name);
 
@@ -79,6 +83,24 @@ window.submitLogin = async function (e) {
     err.style.display = "block";
   }
 }
+/* ======================================================
+   LOGOUT
+   ====================================================== */
+window.logout = function () {
+  window.currentUser = null;
+
+  // Hide app, show login
+  document.getElementById("app-shell").style.display = "none";
+  document.getElementById("login-screen").style.display = "flex";
+
+  // Clear login fields
+  document.getElementById("login-username").value = "";
+  document.getElementById("login-pin").value = "";
+
+  // Clear user label
+  document.getElementById("current-user-label").textContent = "";
+};
+``
 
 /* ======================================================
    NAVIGATION
