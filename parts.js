@@ -27,7 +27,8 @@ window.loadParts = function () {
 /* ---------- Filtered Inventory ---------- */
 
 window.loadInventoryFilteredParts = async function (type) {
-   console.log("✅ loadInventoryFilteredParts called with:", type);
+  console.log("✅ loadInventoryFilteredParts called with:", type);
+
   const res = await fetch(`${API_BASE}/api/parts?inventory=${type}`);
   if (!res.ok) {
     console.error("Failed to load inventory filter:", type);
@@ -35,6 +36,7 @@ window.loadInventoryFilteredParts = async function (type) {
   }
 
   const data = await res.json();
+  console.log("📦 inventory filter response:", data);
 
   allParts = data.map(p => ({
     ...p,
@@ -42,8 +44,12 @@ window.loadInventoryFilteredParts = async function (type) {
     locations: Array.isArray(p.locations) ? p.locations : []
   }));
 
+  // ✅ THIS WAS MISSING
+  document.getElementById("parts-placeholder")
+    ?.style.setProperty("display", "none");
+
   renderPartsTable(allParts);
-}
+};
 
 
 /* ---------- Search ---------- */
