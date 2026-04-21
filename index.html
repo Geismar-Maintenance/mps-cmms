@@ -79,9 +79,17 @@
 <div id="app-shell" style="display:none;">
 
 <!-- Top Navbar -->
-<nav class="navbar navbar-dark bg-primary px-3">
+<nav class="navbar navbar-dark bg-primary px-3 d-flex justify-content-between">
   <span class="navbar-brand">Geismar Maintenance CMMS</span>
+
+  <div class="text-white d-flex align-items-center gap-3">
+    <span id="current-user-label"></span>
+    <button class="btn btn-sm btn-outline-light" onclick="logout()">
+      Logout
+    </button>
+  </div>
 </nav>
+
 
 <div class="container-fluid">
   <div class="row">
