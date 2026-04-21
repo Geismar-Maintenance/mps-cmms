@@ -208,3 +208,14 @@ aside {
     background-color: var(--mps-gray-light);
     text-decoration: underline;
 }
+
+/* ================= LOGIN OVERLAY ================= */
+#login-screen {
+  position: fixed;
+  inset: 0;
+  background-color: #f8f9fa;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
