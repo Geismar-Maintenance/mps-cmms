@@ -52,17 +52,20 @@ window.loadWOHistory = async function () {
 
     rows.forEach(w => {
       const tr = document.createElement("tr");
+
       tr.innerHTML = `
-        <td>${new Date(w.closedate).toLocaleDateString()}</td>
+        <td>${w.closeddate ? new Date(w.closeddate).toLocaleDateString() : "—"}</td>
         <td>WO-${w.woid}</td>
-        <td>${w.assetname}</td>
-        <td>${w.description}</td>
-        <td>${w.completed_by ?? "—"}</td>
+        <td>${w.assetname ?? "—"}</td>
+        <td>${w.description ?? "—"}</td>
+        <td>${w.completed_by_userid ?? "—"}</td>
       `;
+
       tbody.appendChild(tr);
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("WO History error:", err);
   }
 };
+
