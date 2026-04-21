@@ -27,6 +27,7 @@ window.loadParts = function () {
 /* ---------- Filtered Inventory ---------- */
 
 window.loadInventoryFilteredParts = async function (type) {
+   console.log("✅ loadInventoryFilteredParts called with:", type);
   const res = await fetch(`${API_BASE}/api/parts?inventory=${type}`);
   if (!res.ok) {
     console.error("Failed to load inventory filter:", type);
