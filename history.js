@@ -54,11 +54,13 @@ window.loadWOHistory = async function () {
       const tr = document.createElement("tr");
 
       tr.innerHTML = `
-        <td>${w.closeddate ? new Date(w.closeddate).toLocaleDateString() : "—"}</td>
         <td>WO-${w.woid}</td>
         <td>${w.assetname ?? "—"}</td>
         <td>${w.description ?? "—"}</td>
-        <td>${w.completed_by_userid ?? "—"}</td>
+        <td>${w.type ?? "—"}</td>
+        <td>${w.priority ?? "—"}</td>
+        <td>${w.opendate ? new Date(w.opendate).toLocaleDateString() : "—"}</td>
+        <td>${w.closeddate ? new Date(w.closeddate).toLocaleDateString() : "—"}</td>
       `;
 
       tbody.appendChild(tr);
