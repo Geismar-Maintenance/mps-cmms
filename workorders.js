@@ -135,7 +135,7 @@ const res = await fetch(`${API_BASE}/api/workorders`, {
     wotype: parseInt(wotype, 10),
     priority: parseInt(priority, 10),
     duedate,
-    created_by_userid: currentUser.userid;null
+    created_by_userid: currentUser ? currentUser.userid;null
   })
 });
 
@@ -192,7 +192,7 @@ body: JSON.stringify({
   woid,
   workperformed,
   workedBy,
-  completed_by_userid: currentUser.userid:null
+  completed_by_userid: currentUser ? currentUser.userid:null
 })
 
     });
