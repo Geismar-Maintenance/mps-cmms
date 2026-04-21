@@ -7,6 +7,8 @@ let allWorkOrders = [];
 let postReceiveAction = null;
 let partsEntryMode = "sidebar"; // 'sidebar' | 'dashboard
 
+window.currentUser = null;
+
 window.loadModule = function (moduleName, filters = {}) {
     // Store filters globally so target module can read them
   window.currentModuleFilters = filters;
