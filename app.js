@@ -32,6 +32,49 @@ window.goToWorkOrders = function (filter) {
   }
 };
 
+window.currentUser = null;
+
+async function submitLogin() {
+  const username = document.getElementById("login-username").value.trim();
+  const pin = document.getElementById("login-pin").value.trim();
+  const err = document.getElementById("login-error");
+
+  err.style.display = "none";
+
+  if (!username || !pin) {
+    err.textContent = "Username and PIN required";
+    err.style.display = "block";
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/lookups?action=login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, pin })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Login failed");
+    }
+
+    window.currentUser = data;
+
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app-shell").style.display = "block";
+
+    // optional: show user name somewhere
+    console.log("Logged in as", data.display_name);
+
+  } catch (e) {
+    err.textContent = e.message;
+    err.style.display = "block";
+  }
+}
+
+
 /* ======================================================
    NAVIGATION
    ====================================================== */
