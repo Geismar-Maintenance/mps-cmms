@@ -172,6 +172,41 @@ function renderPartDetails(data) {
 
     <hr>
 
+    window.loadPartDetails = async function (partId) {
+  const res = await fetch(`${API_BASE}/api/parts?partId=${partId}`);
+  if (!res.ok) {
+    alert("Failed to load part details");
+    return;
+  }
+
+  const data = await res.json();
+  console.log("PART DETAILS RESPONSE:", data);
+   renderPartDetails(data);
+};
+
+function renderPartDetails(data) {
+  const panel = document.getElementById("part-detail-panel");
+  console.log("DETAIL PANEL:", panel);
+
+  if (!panel) return;
+
+  panel.style.display = "block";
+
+  panel.innerHTML = `
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5>${data.part.partnumber}</h5>
+      <button class="btn btn-sm btn-outline-secondary"
+              onclick="closePartDetails()">Back to Parts</button>
+    </div>
+
+    <div class="mb-2">${data.part.description}</div>
+
+    <div class="text-muted mb-3">
+      ${data.part.manufacturer ?? "—"} | ${data.part.model ?? "—"}
+    </div>
+
+    <hr>
+
     <h6>Locations</h6>
     ${
       data.locations.length === 0
@@ -182,6 +217,36 @@ function renderPartDetails(data) {
             </div>
           `).join("")
     }
+
+    <hr>
+
+    <h6>History</h6>
+    ${
+      data.history.length === 0
+        ? `<div class="text-muted">No transactions.</div>`
+        : data.history.map(h => `
+            <div>
+              ${new Date(h.transactiondate).toLocaleString()}
+              — ${h.transactiontype} ${h.qty}
+            </div>
+          `).join("")
+    }
+  `;
+   
+<button
+  class="btn btn-sm btn-outline-secondary"
+  onclick="openCycleCount({
+    partid: PART_ID,
+    partnumber: 'PN-12345',
+    locationid: LOCATION_ID,
+    location_label: 'CAB-01 / A / 03',
+    qty: 7
+  })"
+>
+  Cycle Count
+</button>
+
+}
 
     <hr>
 
