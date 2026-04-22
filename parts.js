@@ -198,6 +198,62 @@ function renderPartDetails(data) {
     }
   `;
 }
+//=========CYCLE COUNT===========//
+let ccContext = {};
+
+function openCycleCount(part) {
+  ccContext = part;
+
+  document.getElementById("cc-partnumber").textContent = part.partnumber;
+  document.getElementById("cc-confirm-partnumber").textContent = part.partnumber;
+  document.getElementById("cc-location").textContent = part.location_label;
+  document.getElementById("cc-system-qty").textContent = part.qty;
+
+  document.getElementById("cc-confirm-part").checked = false;
+  document.getElementById("cc-actual-qty").value = "";
+  document.getElementById("cc-delta").textContent = "0";
+  document.getElementById("cc-actual-qty").disabled = true;
+  document.getElementById("cc-submit").disabled = true;
+
+  new bootstrap.Modal(document.getElementById("cycleCountModal")).show();
+}
+
+function toggleCycleCountInputs() {
+  const confirmed = document.getElementById("cc-confirm-part").checked;
+  document.getElementById("cc-actual-qty").disabled = !confirmed;
+}
+
+function updateCycleDelta() {
+  const actual = Number(document.getElementById("cc-actual-qty").value);
+  const system = Number(ccContext.qty);
+  const delta = actual - system;
+
+  document.getElementById("cc-delta").textContent =
+    delta > 0 ? `+${delta}` : delta;
+
+  document.getElementById("cc-submit").disabled = actual < 0;
+}
+
+async function submitCycleCount() {
+  const actual_qty = Number(document.getElementById("cc-actual-qty").value);
+
+  await fetch(`${API_BASE}/api/parts?action=cycleCount`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      partid: ccContext.partid,
+      locationid: ccContext.locationid,
+      actual_qty,
+      performed_by_userid: currentUser.userid
+    })
+  });
+
+  bootstrap.Modal.getInstance(
+    document.getElementById("cycleCountModal")
+  ).hide();
+
+  loadParts(); // refresh inventory
+}
 function closePartDetails() {
   const panel = document.getElementById("part-detail-panel");
   if (panel) panel.style.display = "none";
