@@ -246,9 +246,20 @@ function updateCycleDelta() {
 }
 
 async function submitCycleCount() {
+  console.log("🚀 submitCycleCount called");
+
+  console.log("📦 ccContext:", ccContext);
+
   const actual_qty = Number(document.getElementById("cc-actual-qty").value);
 
-  await fetch(`${API_BASE}/api/parts?action=cycleCount`, {
+  console.log("📤 Sending payload:", {
+    partid: ccContext.partid,
+    locationid: ccContext.locationid,
+    actual_qty,
+    performed_by_userid: currentUser?.userid
+  });
+
+  const res = await fetch(`${API_BASE}/api/parts?action=cycleCount`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -259,11 +270,21 @@ async function submitCycleCount() {
     })
   });
 
+  console.log("📥 Response status:", res.status);
+
+  const text = await res.text();
+  console.log("📥 Raw response:", text);
+
+  if (!res.ok) {
+    alert("Cycle count failed – see console");
+    return;
+  }
+
   bootstrap.Modal.getInstance(
     document.getElementById("cycleCountModal")
   ).hide();
 
-  loadParts(); // refresh inventory
+  loadPartDetails(ccContext.partid);
 }
 function closePartDetails() {
   const panel = document.getElementById("part-detail-panel");
