@@ -538,6 +538,69 @@
   </div>
 </div>
 
+     <!-- ================= CYCLE COUNT MODAL ================= -->   
+      <div class="modal fade" id="cycleCountModal" tabindex="-1">
+  <div class="modal-dialog <span id="cc-partnumber"></span>  <div class="modal-dialog">
+      </div>
+
+      <div class="mb-2">
+        <strong>Location:</strong>
+        <span id="cc-location"></span>
+      </div>
+
+      <div class="mb-2">
+        <strong>System Qty:</strong>
+        <span id="cc-system-qty"></span>
+      </div>
+
+      <div class="form-check mb-3">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="cc-confirm-part"
+          onchange="toggleCycleCountInputs()"
+        />
+        <label class="form-check-label">
+          I confirm this location contains part
+          <strong id="cc-confirm-partnumber"></strong>
+        </label>
+      </div>
+
+      <label class="form-label">Actual Count</label>
+      <input
+        type="number"
+        id="cc-actual-qty"
+        class="form-control mb-2"
+        min="0"
+        disabled
+        oninput="updateCycleDelta()"
+      />
+
+      <div class="mb-2">
+        <strong>Adjustment:</strong>
+        <span id="cc-delta">0</span>
+      </div>
+
+      <button
+        id="cc-submit"
+        class="btn btn-primary"
+        disabled
+        onclick="submitCycleCount()"
+      >
+        Confirm Cycle Count
+      </button>
+
+    </div>
+  </div>
+</div>
+    <div class="modal-content p-3">
+
+      <h5>Cycle Count</h5>
+
+      <div class="mb-2">
+        <strong>Part:</strong>
+
+
   <!-- ================= Create WO MODAL ================= -->
 <div class="modal fade" id="createWOModal" tabindex="-1">
   <div class="modal-dialog">
