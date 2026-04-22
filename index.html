@@ -539,8 +539,15 @@
 </div>
 
      <!-- ================= CYCLE COUNT MODAL ================= -->   
-      <div class="modal fade" id="cycleCountModal" tabindex="-1">
-  <div class="modal-dialog <span id="cc-partnumber"></span>  <div class="modal-dialog">
+<div class="modal fade" id="cycleCountModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content p-3">
+
+      <h5>Cycle Count</h5>
+
+      <div class="mb-2">
+        <strong>Part:</strong>
+        <span id="cc-partnumber"></span>
       </div>
 
       <div class="mb-2">
@@ -581,24 +588,26 @@
         <span id="cc-delta">0</span>
       </div>
 
-      <button
-        id="cc-submit"
-        class="btn btn-primary"
-        disabled
-        onclick="submitCycleCount()"
-      >
-        Confirm Cycle Count
-      </button>
+      <div class="d-flex justify-content-end gap-2">
+        <button
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Cancel
+        </button>
+        <button
+          id="cc-submit"
+          class="btn btn-primary"
+          disabled
+          onclick="submitCycleCount()"
+        >
+          Confirm Cycle Count
+        </button>
+      </div>
 
     </div>
   </div>
 </div>
-    <div class="modal-content p-3">
-
-      <h5>Cycle Count</h5>
-
-      <div class="mb-2">
-        <strong>Part:</strong>
 
 
   <!-- ================= Create WO MODAL ================= -->
