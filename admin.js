@@ -99,11 +99,13 @@ window.importInventoryCSV = async function () {
 
   log.textContent = `Parsed ${rows.length} rows. Sending to server…`;
 
-  const res = await fetch("/api/admin/import/inventory", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ rows })
-  });
+
+fetch(`${API_BASE}/api/parts?action=importInventory`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ rows })
+});
+
 
   const result = await res.json();
 
