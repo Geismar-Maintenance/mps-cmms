@@ -53,6 +53,68 @@ window.submitAddPart = async function (event) {
   }
 };
 
+async function importInventoryCSV() {
+  const fileInput = document.getElementById("inventory-csv");
+  const log = document.getElementById("import-log");
+
+  if (!fileInput.files.length) {
+    alert("Please select a CSV file.");
+    return;
+  }
+
+  const file = fileInput.files[0];
+  const text = await file.text();
+
+  const lines = text.trim().split("\n");
+  const headers = lines.shift().split(",").map(h => h.trim());
+
+  const requiredHeaders = [
+    "partnumber",
+    "description",
+    "manufacturer",
+    "model",
+    "reorderlevel",
+    "cost",
+    "cabinet",
+    "section",
+    "bin",
+    "qty"
+  ];
+
+  for (const h of requiredHeaders) {
+    if (!headers.includes(h)) {
+      alert(`Missing required column: ${h}`);
+      return;
+    }
+  }
+
+  const rows = lines.map(line => {
+    const values = line.split(",").map(v => v.trim());
+    const row = {};
+    headers.forEach((h, i) => {
+      row[h] = values[i] ?? "";
+    });
+    return row;
+  });
+
+  log.textContent = `Parsed ${rows.length} rows. Sending to server…`;
+
+  const res = await fetch("/api/admin/import/inventory", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ rows })
+  });
+
+  const result = await res.json();
+
+  if (!res.ok) {
+    log.textContent = "❌ Import failed:\n" + JSON.stringify(result, null, 2);
+    return;
+  }
+
+  log.textContent = "✅ Import succeeded:\n" + JSON.stringify(result, null, 2);
+}
+
 /* ======================================================
    ADMIN‑GUIDED INVENTORY HELPERS
    ====================================================== */
