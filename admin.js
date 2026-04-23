@@ -121,7 +121,7 @@ if (!res.ok) {
 
 console.log("✅ Import succeeded:", result);
 alert("Import succeeded!");
-
+};
 
 /* ======================================================
    ADMIN‑GUIDED INVENTORY HELPERS
