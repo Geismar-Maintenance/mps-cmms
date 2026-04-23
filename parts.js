@@ -198,54 +198,6 @@ function closePartDetails() {
   const panel = document.getElementById("part-detail-panel");
   if (panel) panel.style.display = "none";
 }
-window.openIssueModal = function (partid) {
-  const part = allParts.find(p => p.partid === Number(partid));
-  if (!part) {
-    alert("Part not found.");
-    return;
-  }
 
-  selectedPart = part;
-
-  document.getElementById("issue-partname").textContent =
-    `${part.partnumber} — ${part.description}`;
-
-  const modalEl = document.getElementById("issueModal");
-  const modal = new bootstrap.Modal(modalEl);
-
-  modal.show();
-};
-window.openReceiveModal = function (partid) {
-  const part = allParts.find(p => p.partid === Number(partid));
-  if (!part) {
-    alert("Part not found.");
-    return;
-  }
-
-  selectedPart = part;
-
-  document.getElementById("receive-partname").textContent =
-    `${part.partnumber} — ${part.description}`;
-
-  new bootstrap.Modal(
-    document.getElementById("receiveModal")
-  ).show();
-};
-window.openMoveModal = function (partid) {
-  const part = allParts.find(p => p.partid === Number(partid));
-  if (!part) {
-    alert("Part not found.");
-    return;
-  }
-
-  selectedPart = part;
-
-  document.getElementById("move-partname").textContent =
-    `${part.partnumber} — ${part.description}`;
-
-  new bootstrap.Modal(
-    document.getElementById("moveModal")
-  ).show();
-};
 
 
