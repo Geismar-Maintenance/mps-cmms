@@ -63,66 +63,70 @@ window.importInventoryCSV = async function () {
   }
 
   const file = fileInput.files[0];
-  const text = await file.text();
 
-  const lines = text.trim().split("\n");
-  const headers = lines.shift().split(",").map(h => h.trim());
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
 
-  const requiredHeaders = [
-    "partnumber",
-    "description",
-    "manufacturer",
-    "model",
-    "reorderlevel",
-    "cost",
-    "cabinet",
-    "section",
-    "bin",
-    "qty"
-  ];
+    complete: async function (results) {
+      const rows = results.data;
 
-  for (const h of requiredHeaders) {
-    if (!headers.includes(h)) {
-      alert(`Missing required column: ${h}`);
-      return;
+      // ✅ Header validation
+      const requiredHeaders = [
+        "partnumber",
+        "description",
+        "manufacturer",
+        "model",
+        "reorderlevel",
+        "cost",
+        "cabinet",
+        "section",
+        "bin",
+        "qty"
+      ];
+
+      for (const h of requiredHeaders) {
+        if (!results.meta.fields.includes(h)) {
+          alert(`Missing required column: ${h}`);
+          return;
+        }
+      }
+
+      // ✅ Structural guard (prevents silent corruption)
+      for (const row of rows) {
+        if (Object.values(row).some(v => v === undefined)) {
+          alert("CSV structure error: column mismatch (likely commas or quoting issues).");
+          return;
+        }
+      }
+
+      log.textContent = `Parsed ${rows.length} rows. Sending to server…`;
+
+      const res = await fetch(
+        `${API_BASE}/api/parts?action=importInventory`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ rows })
+        }
+      );
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        log.textContent = "❌ Import failed:\n" + JSON.stringify(result, null, 2);
+        return;
+      }
+
+      log.textContent = "✅ Import succeeded:\n" + JSON.stringify(result, null, 2);
+      alert("Import succeeded!");
+    },
+
+    error: function (err) {
+      log.textContent = "❌ CSV parse error: " + err.message;
     }
-  }
-
-  const rows = lines.map(line => {
-    const values = line.split(",").map(v => v.trim());
-    const row = {};
-    headers.forEach((h, i) => {
-      row[h] = values[i] ?? "";
-    });
-    return row;
   });
-
-  log.textContent = `Parsed ${rows.length} rows. Sending to server…`;
-
-
-const res = await fetch(`${API_BASE}/api/parts?action=importInventory`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ rows })
-});
-
-let result;
-try {
-  result = await res.json();
-} catch {
-  throw new Error("Server did not return JSON");
-}
-
-if (!res.ok) {
-  console.error("Import failed:", result);
-  alert("Import failed. See console for details.");
-  return;
-}
-
-console.log("✅ Import succeeded:", result);
-alert("Import succeeded!");
 };
-
 /* ======================================================
    ADMIN‑GUIDED INVENTORY HELPERS
    ====================================================== */
