@@ -100,22 +100,28 @@ window.importInventoryCSV = async function () {
   log.textContent = `Parsed ${rows.length} rows. Sending to server…`;
 
 
-fetch(`${API_BASE}/api/parts?action=importInventory`, {
+const res = await fetch(`${API_BASE}/api/parts?action=importInventory`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ rows })
 });
 
+let result;
+try {
+  result = await res.json();
+} catch {
+  throw new Error("Server did not return JSON");
+}
 
-  const result = await res.json();
+if (!res.ok) {
+  console.error("Import failed:", result);
+  alert("Import failed. See console for details.");
+  return;
+}
 
-  if (!res.ok) {
-    log.textContent = "❌ Import failed:\n" + JSON.stringify(result, null, 2);
-    return;
-  }
+console.log("✅ Import succeeded:", result);
+alert("Import succeeded!");
 
-  log.textContent = "✅ Import succeeded:\n" + JSON.stringify(result, null, 2);
-};
 
 /* ======================================================
    ADMIN‑GUIDED INVENTORY HELPERS
