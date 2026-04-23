@@ -80,7 +80,13 @@ function renderWOTable(rows) {
     }
 
     tr.innerHTML = `
-      <td>${w.woid}</td>
+      
+<td class="text-primary"
+    style="cursor:pointer"
+    onclick="openWorkOrderDetailModal(${w.woid})">
+  WO-${w.woid}
+</td>
+
       <td>${w.assetname ?? "—"}</td>
       <td>${w.description}</td>
       <td>${w.type}</td>
