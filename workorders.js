@@ -238,6 +238,65 @@ async function loadWOHistory() {
   });
 }
 
+window.openWorkOrderDetailModal = async function (woid) {
+  const res = await fetch(`${API_BASE}/api/workorders/${woid}`);
+  if (!res.ok) {
+    alert("Failed to load work order");
+    return;
+  }
+
+  const wo = await res.json();
+
+  document.getElementById("wo-detail-id").textContent = wo.woid;
+  document.getElementById("wo-detail-hidden-id").value = wo.woid;
+
+  document.getElementById("wo-detail-description").value = wo.description;
+  document.getElementById("wo-detail-due").value =
+    wo.duedate?.split("T")[0] ?? "";
+
+  document.getElementById("wo-detail-status").value = wo.status;
+
+  // populate selects (reuse existing loaders)
+  await populateAssetSelect("wo-detail-asset", wo.assetid);
+  await populatePrioritySelect("wo-detail-priority", wo.priority);
+  await populateTypeSelect("wo-detail-type", wo.type);
+
+  new bootstrap.Modal(
+    document.getElementById("workOrderDetailModal")
+  ).show();
+};
+
+window.saveWorkOrderDetails = async function () {
+  const woid = document.getElementById("wo-detail-hidden-id").value;
+
+  const payload = {
+    description: document.getElementById("wo-detail-description").value,
+    assetid: document.getElementById("wo-detail-asset").value,
+    priority: document.getElementById("wo-detail-priority").value,
+    type: document.getElementById("wo-detail-type").value,
+    status: document.getElementById("wo-detail-status").value,
+    duedate: document.getElementById("wo-detail-due").value
+  };
+
+  const res = await fetch(`${API_BASE}/api/workorders/${woid}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    alert("Failed to save work order");
+    return;
+  }
+
+  bootstrap.Modal.getInstance(
+    document.getElementById("workOrderDetailModal")
+  ).hide();
+
+  loadWorkOrders(); // refresh table
+};
+
+
 /* ---------- SUPPORT LOADERS ---------- */
 async function loadWOAssets() {
   const sel = document.getElementById("wo-asset");
