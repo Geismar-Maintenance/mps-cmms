@@ -53,7 +53,7 @@ window.submitAddPart = async function (event) {
   }
 };
 
-async function importInventoryCSV() {
+window.importInventoryCSV = async function () {
   const fileInput = document.getElementById("inventory-csv");
   const log = document.getElementById("import-log");
 
@@ -91,29 +91,6 @@ async function importInventoryCSV() {
   const rows = lines.map(line => {
     const values = line.split(",").map(v => v.trim());
     const row = {};
-    headers.forEach((h, i) => {
-      row[h] = values[i] ?? "";
-    });
-    return row;
-  });
-
-  log.textContent = `Parsed ${rows.length} rows. Sending to server…`;
-
-  const res = await fetch("/api/admin/import/inventory", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ rows })
-  });
-
-  const result = await res.json();
-
-  if (!res.ok) {
-    log.textContent = "❌ Import failed:\n" + JSON.stringify(result, null, 2);
-    return;
-  }
-
-  log.textContent = "✅ Import succeeded:\n" + JSON.stringify(result, null, 2);
-}
 
 /* ======================================================
    ADMIN‑GUIDED INVENTORY HELPERS
