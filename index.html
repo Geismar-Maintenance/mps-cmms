@@ -647,6 +647,73 @@
   </div>
 </div>
 
+  <!-- ================= WORK ORDER DETAILS MODAL ================= -->    
+<div class="modal fade" id="workOrderDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">
+          Work Order <span id="wo-detail-id"></span>
+        </h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <input type="hidden" id="wo-detail-hidden-id">
+
+        <div class="mb-2">
+          <label class="form-label">Description</label>
+          <input id="wo-detail-description" class="form-control">
+        </div>
+
+        <div class="row g-2">
+          <div class="col-md-6">
+            <label class="form-label">Asset</label>
+            <select id="wo-detail-asset" class="form-select"></select>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Priority</label>
+            <select id="wo-detail-priority" class="form-select"></select>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Status</label>
+            <select id="wo-detail-status" class="form-select">
+              <option value="open">Open</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row g-2 mt-2">
+          <div class="col-md-6">
+            <label class="form-label">Type</label>
+            <select id="wo-detail-type" class="form-select"></select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Due Date</label>
+            <input type="date" id="wo-detail-due" class="form-control">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button class="btn btn-primary" onclick="saveWorkOrderDetails()">
+          Save Changes
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 <!-- ================= ADD NEW PART MODAL ================= -->
 <div id="addPartModal" class="modal fade" tabindex="-1" aria-hidden="true">
