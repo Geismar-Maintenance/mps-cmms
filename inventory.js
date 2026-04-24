@@ -1,3 +1,19 @@
+
+/* ======================================================
+   INVENTORY MODULE (FRONTEND)
+   ------------------------------------------------------
+   Responsibilities:
+   - Issue inventory
+   - Receive inventory
+   - Move inventory
+   - Open inventory-related modals
+   - Call inventory backend endpoints
+
+   Depends on:
+   - allParts[] populated by parts.js
+   ====================================================== */
+
+
 /* ======================================================
    INVENTORY OPERATIONS (ISSUE / RECEIVE / MOVE)
    ====================================================== */
