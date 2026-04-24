@@ -389,4 +389,56 @@ async function loadTechniciansForWO(defaultTechId = null) {
     sel.appendChild(opt);
   });
 }
+async function loadWODetailAssets(selectedId = null) {
+  const sel = document.getElementById("wo-detail-asset");
+  sel.replaceChildren();
 
+  const res = await fetch(`${API_BASE}/api/assets`);
+  const assets = await res.json();
+
+  assets.forEach(a => {
+    const opt = document.createElement("option");
+    opt.value = a.assetid;
+    opt.textContent = `${a.assetnumber} – ${a.assetname}`;
+    if (Number(a.assetid) === Number(selectedId)) {
+      opt.selected = true;
+    }
+    sel.appendChild(opt);
+  });
+}
+
+async function loadWODetailTypes(selectedId = null) {
+  const sel = document.getElementById("wo-detail-type");
+  sel.replaceChildren();
+
+  const res = await fetch(`${API_BASE}/api/lookups?type=wotypes`);
+  const types = await res.json();
+
+  types.forEach(t => {
+    const opt = document.createElement("option");
+    opt.value = t.id;
+    opt.textContent = t.type;
+    if (Number(t.id) === Number(selectedId)) {
+      opt.selected = true;
+    }
+    sel.appendChild(opt);
+  });
+}
+
+async function loadWODetailPriorities(selectedId = null) {
+  const sel = document.getElementById("wo-detail-priority");
+  sel.replaceChildren();
+
+  const res = await fetch(`${API_BASE}/api/lookups?type=wopriorities`);
+  const prios = await res.json();
+
+  prios.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = p.id;
+    opt.textContent = p.priority;
+    if (Number(p.id) === Number(selectedId)) {
+      opt.selected = true;
+    }
+    sel.appendChild(opt);
+  });
+}
