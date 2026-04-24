@@ -1,9 +1,19 @@
+
 /* ======================================================
    PARTS MODULE (FRONTEND)
-   Baseline behavior:
-   - Do nothing on entry
-   - Wait for search + Enter
+   ------------------------------------------------------
+   Responsibilities:
+   - Search parts
+   - Render parts table
+   - Dispatch inventory actions (Issue / Receive / Move)
+
+   Does NOT:
+   - Perform inventory mutations
+   - Manage modals directly
+
+   Inventory actions are handled by inventory.js
    ====================================================== */
+
 
 let allParts = [];
 let selectedPart = null;
