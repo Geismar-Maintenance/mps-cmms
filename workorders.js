@@ -271,6 +271,9 @@ window.openWorkOrderDetailModal = async function (woid) {
   document.getElementById("wo-detail-due").value =
     wo.duedate?.split("T")[0] ?? "";
   document.getElementById("wo-detail-status").value = wo.status;
+  document.getElementById("wo-detail-created-by").textContent =
+  wo.created_by ?? "—";
+
 
   const modalEl = document.getElementById("workOrderDetailModal");
   const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
