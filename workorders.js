@@ -267,24 +267,18 @@ window.openWorkOrderDetailModal = async function (woid) {
 
   document.getElementById("wo-detail-id").textContent = wo.woid;
   document.getElementById("wo-detail-hidden-id").value = wo.woid;
-
   document.getElementById("wo-detail-description").value = wo.description;
   document.getElementById("wo-detail-due").value =
     wo.duedate?.split("T")[0] ?? "";
-
   document.getElementById("wo-detail-status").value = wo.status;
 
-  await loadWOAssets();
-await loadWOPriorities();
-await loadWOTypes();
+  const modalEl = document.getElementById("workOrderDetailModal");
+  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+  modal.show();
 
-document.getElementById("wo-detail-asset").value = wo.assetid;
-document.getElementById("wo-detail-priority").value = wo.priority;
-document.getElementById("wo-detail-type").value = wo.type;
-
-  new bootstrap.Modal(
-    document.getElementById("workOrderDetailModal")
-  ).show();
+  await loadWODetailAssets(wo.assetid);
+  await loadWODetailPriorities(wo.priority);
+  await loadWODetailTypes(wo.type);
 };
 
 window.saveWorkOrderDetails = async function () {
