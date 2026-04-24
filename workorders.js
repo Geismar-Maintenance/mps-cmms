@@ -274,10 +274,13 @@ window.openWorkOrderDetailModal = async function (woid) {
 
   document.getElementById("wo-detail-status").value = wo.status;
 
-  // populate selects (reuse existing loaders)
-  await populateAssetSelect("wo-detail-asset", wo.assetid);
-  await populatePrioritySelect("wo-detail-priority", wo.priority);
-  await populateTypeSelect("wo-detail-type", wo.type);
+  await loadWOAssets();
+await loadWOPriorities();
+await loadWOTypes();
+
+document.getElementById("wo-detail-asset").value = wo.assetid;
+document.getElementById("wo-detail-priority").value = wo.priority;
+document.getElementById("wo-detail-type").value = wo.type;
 
   new bootstrap.Modal(
     document.getElementById("workOrderDetailModal")
