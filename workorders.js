@@ -1,5 +1,17 @@
 /* ======================================================
-   WORK ORDERS (FRONTEND)
+   WORK ORDERS MODULE (FRONTEND)
+   ------------------------------------------------------
+   Responsibilities:
+   - Load and render work orders
+   - Apply dashboard and UI filters
+   - Open Work Order Detail modal
+   - Create, edit, and close work orders
+
+   Backend expectations:
+   - GET /api/workorders           → list
+   - GET /api/workorders?id=ID     → single WO
+   - POST /api/workorders          → create / close
+   - PUT /api/workorders?id=ID     → update
    ====================================================== */
 
 /* ---------- LOAD & RENDER ---------- */
