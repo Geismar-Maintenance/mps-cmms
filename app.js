@@ -100,7 +100,57 @@ window.logout = function () {
   // Clear user label
   document.getElementById("current-user-label").textContent = "";
 };
-``
+
+async function submitPinChange() {
+  const currentPin = document.getElementById('pin-current').value;
+  const newPin = document.getElementById('pin-new').value;
+  const confirmPin = document.getElementById('pin-confirm').value;
+  const errorEl = document.getElementById('pin-change-error');
+
+  // Basic Frontend Validation
+  if (newPin !== confirmPin) {
+    errorEl.textContent = "New PINs do not match.";
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  if (newPin.length < 4) {
+    errorEl.textContent = "PIN must be at least 4 digits.";
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/change-pin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        // In a real app, the server gets the UserID from the session/token
+        currentPin: currentPin,
+        newPin: newPin
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("PIN updated successfully.");
+      // Close the modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('changePinModal'));
+      modal.hide();
+      // Clear inputs
+      document.getElementById('pin-current').value = '';
+      document.getElementById('pin-new').value = '';
+      document.getElementById('pin-confirm').value = '';
+    } else {
+      errorEl.textContent = data.error || "Failed to update PIN.";
+      errorEl.style.display = 'block';
+    }
+  } catch (err) {
+    errorEl.textContent = "Server error. Please try again.";
+    errorEl.style.display = 'block';
+  }
+};
 
 /* ======================================================
    NAVIGATION
