@@ -78,15 +78,19 @@ window.loadWOHistory = async function () {
 };
 window.openWorkOrder = async function (woid) {
   try {
-    const res = await fetch(`${API_BASE}/api/workorders?${woid}`);
+    const res = await fetch(`${API_BASE}/api/workorders?id=${woid}`);
+
+    console.log("STATUS:", res.status);
+
     const data = await res.json();
+    console.log("DATA:", data);
 
     if (!res.ok) throw new Error(data.error);
 
     showWorkOrderModal(data);
 
   } catch (err) {
-    console.error(err);
+    console.error("ERROR:", err);
     alert("Failed to load work order");
   }
 };
