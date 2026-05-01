@@ -307,5 +307,5 @@ window.refreshPartsTable = async function () {
     console.error("Failed to refresh parts table", err);
   }
 };
-}
+
 
