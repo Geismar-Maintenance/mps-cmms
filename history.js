@@ -101,19 +101,12 @@ function showWorkOrderModal(wo) {
   document.getElementById("wo-asset").innerText = wo.assetname || "—";
   document.getElementById("wo-status").innerText = wo.status || "—";
 
-  const workList = document.getElementById("wo-work-list");
-  workList.innerHTML = "";
-
-  if (!wo.transactions || wo.transactions.length === 0 {
-    workList.innerHTML = "<li>No work recorded</li>";
-  } else {
-    wo.transactions.forEach(t => {
-      const li = document.createElement("li");
-      li.textContent =
-        `${t.transactiontype}: ${t.qty} × ${t.partnumber} - ${t.part_description} (by ${t.performed_by})`;
-      workList.appendChild(li);
-    });
-  }
+const workList = document.getElementById("wo-work-list");
+workList.innerHTML = `
+  <li>${wo.workperformed || "No work recorded"}</li>
+  <li><strong>Performed by:</strong> ${wo.workperformed_by || "—"}</li>
+`;
+ }
 
   bootstrap.Modal
     .getOrCreateInstance(document.getElementById("workOrderModal"))
