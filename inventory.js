@@ -294,7 +294,7 @@ async function loadAllLocationsForMove() {
     opt.textContent = `${loc.cabinet}.${loc.section}.${loc.bin}`;
     toSelect.appendChild(opt);
   });
-   
+}
 window.refreshPartsTable = async function () {
   try {
     const res = await fetch(`${API_BASE}/api/parts`);
