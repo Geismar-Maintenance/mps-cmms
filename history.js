@@ -54,7 +54,13 @@ window.loadWOHistory = async function () {
       const tr = document.createElement("tr");
 
       tr.innerHTML = `
-        <td>WO-${w.woid}</td>
+        
+<td>
+  <a href="#" onclick="openWorkOrder(${w.woid})">
+    WO-${w.woid}
+  </a>
+</td>
+
         <td>${w.assetname ?? "—"}</td>
         <td>${w.description ?? "—"}</td>
         <td>${w.type ?? "—"}</td>
@@ -70,4 +76,43 @@ window.loadWOHistory = async function () {
     console.error("WO History error:", err);
   }
 };
+window.openWorkOrder = async function (woid) {
+  try {
+    const res = await fetch(`${API_BASE}/api/workorders/${woid}`);
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error);
+
+    showWorkOrderModal(data);
+
+  } catch (err) {
+    console.error(err);
+    alert("Failed to load work order");
+  }
+};
+
+function showWorkOrderModal(wo) {
+  document.getElementById("wo-title").innerText = `WO-${wo.woid}`;
+  document.getElementById("wo-desc").innerText = wo.description || "—";
+  document.getElementById("wo-asset").innerText = wo.assetname || "—";
+  document.getElementById("wo-status").innerText = wo.status || "—";
+
+  const workList = document.getElementById("wo-work-list");
+  workList.innerHTML = "";
+
+  if (!wo.transactions.length) {
+    workList.innerHTML = "<li>No work recorded</li>";
+  } else {
+    wo.transactions.forEach(t => {
+      const li = document.createElement("li");
+      li.textContent =
+        `${t.transactiontype}: ${t.qty} × ${t.partnumber} - ${t.part_description} (by ${t.performed_by})`;
+      workList.appendChild(li);
+    });
+  }
+
+  bootstrap.Modal
+    .getOrCreateInstance(document.getElementById("workOrderModal"))
+    .show();
+}
 
