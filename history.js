@@ -98,19 +98,17 @@ catch (err) {
 };
 
 function showWorkOrderModal(wo) {
-  document.getElementById("wo-title").innerText = `WO-${wo.woid}`;
-  document.getElementById("wo-desc").innerText = wo.description || "—";
-  document.getElementById("wo-asset").innerText = wo.assetname || "—";
-  document.getElementById("wo-status").innerText = wo.status || "—";
+  document.getElementById("wo-detail-id").innerText = wo.woid;
+  document.getElementById("wo-detail-description").value = wo.description || "";
+  document.getElementById("wo-detail-workperformed").value = wo.workperformed || "";
+  document.getElementById("wo-detail-workperformed-by").value =
+    wo.workperformed_by || window.currentUser.display_name;
 
-const workList = document.getElementById("wo-work-list");
-workList.innerHTML = `
-  <li>${wo.workperformed || "No work recorded"}</li>
-  <li><strong>Performed by:</strong> ${wo.workperformed_by || "—"}</li>
-`;
+  document.getElementById("wo-detail-created-by").innerText =
+    wo.created_by || "—";
 
   bootstrap.Modal
-    .getOrCreateInstance(document.getElementById("workOrderModal"))
+    .getOrCreateInstance(document.getElementById("workOrderDetailModal"))
     .show();
 }
 
