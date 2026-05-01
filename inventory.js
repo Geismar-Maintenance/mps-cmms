@@ -81,8 +81,8 @@ async function submitIssue() {
 
   try {
     const res = await fetch(`${API_BASE}/api/transactions`, {
-method:"POST"
-headers:{"Content-Type:":"application/json
+method:"POST",
+headers:{"Content-Type:":"application/json},
 body: JSON.stringify({
   type: "issue",
   partid: selectedPart.partid,
@@ -142,8 +142,8 @@ async function submitReceive() {
 
   try {
     const res = await fetch(`${API_BASE}/api/transactions`, {
-method:"POST"
-headers:{"Content-Type:":"application/json
+method:"POST",
+headers:{"Content-Type:":"application/json},
 body: JSON.stringify({
   type: "receive",
   partid: Number(selectedPart.partid),
@@ -220,8 +220,8 @@ async function submitMove() {
 
   try {
     const res = await fetch(`${API_BASE}/api/transactions`, {
-method:"POST"
-headers:{"Content-Type:":"application/json
+method:"POST",
+headers:{"Content-Type:":"application/json},
 body: JSON.stringify({
   type: "move",
   partid: selectedPart.partid,
