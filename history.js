@@ -104,7 +104,7 @@ function showWorkOrderModal(wo) {
   const workList = document.getElementById("wo-work-list");
   workList.innerHTML = "";
 
-  if (!wo.transactions.length) {
+  if (!wo.transactions || wo.transactions.length === 0 {
     workList.innerHTML = "<li>No work recorded</li>";
   } else {
     wo.transactions.forEach(t => {
