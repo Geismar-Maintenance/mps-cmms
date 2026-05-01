@@ -80,16 +80,17 @@ async function submitIssue() {
   }
 
   try {
-    const res = await fetch(`${API_BASE}/api/parts/issue`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        partid: selectedPart.partid,
-        from_locationid: locationid,
-        qty,
-        assetid,
-        workorder,
-        performed_by: "tech"
+    const res = await fetch(`${API_BASE}/api/transactions`, {
+
+body: JSON.stringify({
+  type: "issue",
+  partid: selectedPart.partid,
+  from_locationid: locationid,
+  qty,
+  assetid,
+  workorder,
+
+        performed_by: window.currentUser.display_name
       })
     });
 
@@ -139,13 +140,14 @@ async function submitReceive() {
   }
 
   try {
-    const res = await fetch(`${API_BASE}/api/parts/receive`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        partid: Number(selectedPart.partid),
-        qty,
-        performed_by: "tech"
+    const res = await fetch(`${API_BASE}/api/transactions`, {
+
+body: JSON.stringify({
+  type: "receive",
+  partid: Number(selectedPart.partid),
+  qty,
+
+        performed_by: window.currentUser.display_name
       })
     });
 
@@ -215,15 +217,16 @@ async function submitMove() {
   }
 
   try {
-    const res = await fetch(`${API_BASE}/api/parts/move`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        partid: selectedPart.partid,
-        from_locationid,
-        to_locationid,
-        qty,
-        performed_by: "tech"
+    const res = await fetch(`${API_BASE}/api/transactions`, {
+
+body: JSON.stringify({
+  type: "move",
+  partid: selectedPart.partid,
+  from_locationid,
+  to_locationid,
+  qty,
+
+        performed_by: window.currentUser.display_name
       })
     });
 
