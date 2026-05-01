@@ -106,9 +106,9 @@ function showWorkOrderModal(wo) {
    clearWorkOrderModal();
  
   const statusMap = {
-    1: "open",
-    2: "completed",
-    3: "completed"
+    1: "Open",
+    2: "Completed",
+    3: "Completed"
   };
   
   document.getElementById("wo-detail-id").innerText = wo.woid;
