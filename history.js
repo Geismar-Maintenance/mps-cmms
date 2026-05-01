@@ -97,13 +97,31 @@ catch (err) {
 
 };
 
+function clearWorkOrderModal() {
+  document.getElementById("wo-detail-workperformed").value = "";
+  document.getElementById("wo-detail-workperformed-by").value = "";
+}
+
 function showWorkOrderModal(wo) {
+   clearWorkOrderModal();
+ 
+  const statusMap = {
+    1: "open",
+    2: "completed",
+    3: "completed"
+  };
+  
   document.getElementById("wo-detail-id").innerText = wo.woid;
   document.getElementById("wo-detail-description").value = wo.description || "";
+  document.getElementById("wo-detail-asset").value = wo.assetid || "";
+  document.getElementById("wo-detail-priority").value = wo.priority || "";
+  document.getElementById("wo-detail-type").value = wo.type || "";
+  document.getElementById("wo-detail-status").value = statusMap[wo.status] || "open";
+  document.getElementById("wo-detail-due").value = wo.duedate ? new Date(wo.duedate).toISOString().split("T")[0]
+      : "";
   document.getElementById("wo-detail-workperformed").value = wo.workperformed || "";
   document.getElementById("wo-detail-workperformed-by").value =
     wo.workperformed_by || window.currentUser.display_name;
-
   document.getElementById("wo-detail-created-by").innerText =
     wo.created_by || "—";
 
