@@ -294,5 +294,18 @@ async function loadAllLocationsForMove() {
     opt.textContent = `${loc.cabinet}.${loc.section}.${loc.bin}`;
     toSelect.appendChild(opt);
   });
+   
+window.refreshPartsTable = async function () {
+  try {
+    const res = await fetch(`${API_BASE}/api/parts`);
+    const parts = await res.json();
+
+    allParts = parts;          // update your global data
+    renderPartsTable(parts);   // re-render UI
+
+  } catch (err) {
+    console.error("Failed to refresh parts table", err);
+  }
+};
 }
-``
+
