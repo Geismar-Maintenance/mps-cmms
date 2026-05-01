@@ -78,7 +78,7 @@ window.loadWOHistory = async function () {
 };
 window.openWorkOrder = async function (woid) {
   try {
-    const res = await fetch(`${API_BASE}/api/workorders/${woid}`);
+    const res = await fetch(`${API_BASE}/api/workorders?${woid}`);
     const data = await res.json();
 
     if (!res.ok) throw new Error(data.error);
