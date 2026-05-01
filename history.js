@@ -106,7 +106,6 @@ workList.innerHTML = `
   <li>${wo.workperformed || "No work recorded"}</li>
   <li><strong>Performed by:</strong> ${wo.workperformed_by || "—"}</li>
 `;
- }
 
   bootstrap.Modal
     .getOrCreateInstance(document.getElementById("workOrderModal"))
