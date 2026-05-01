@@ -89,10 +89,12 @@ window.openWorkOrder = async function (woid) {
 
     showWorkOrderModal(data);
 
-  } catch (err) {
-    console.error("ERROR:", err);
-    alert("Failed to load work order");
-  }
+  } 
+catch (err) {
+  console.error("FULL ERROR:", err);
+  alert(err.message);
+}
+
 };
 
 function showWorkOrderModal(wo) {
