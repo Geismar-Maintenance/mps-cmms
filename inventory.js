@@ -207,7 +207,7 @@ async function openMoveModal(partid) {
     fromSelect.appendChild(opt);
   });
 
-  loadAllLocationsForMove();
+  loadMoveDestinationLocations();
   document.getElementById("move-qty").value = "";
 
   bootstrap.Modal
@@ -284,6 +284,22 @@ async function loadAssetsForIssue() {
     opt.value = a.assetid;
     opt.textContent = `${a.assetnumber} – ${a.assetname}`;
     select.appendChild(opt);
+  });
+}
+
+async function loadMoveDestinationLocations() {
+
+  const res = await fetch(`${API_BASE}/api/locations?type=move_dest`);
+  const locations = await res.json();
+
+  const toSelect = document.getElementById("move-to-location");
+  toSelect.replaceChildren();
+
+  locations.forEach(loc => {
+    const opt = document.createElement("option");
+    opt.value = loc.locationid;
+    opt.textContent = `${loc.cabinet}.${loc.section}.${loc.bin}`;
+    toSelect.appendChild(opt);
   });
 }
 
