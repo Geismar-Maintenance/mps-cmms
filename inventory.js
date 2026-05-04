@@ -183,7 +183,8 @@ body: JSON.stringify({
 }
 
 /* ---------- MOVE ---------- */
-function openMoveModal(partid) {
+async function openMoveModal(partid) {
+
   selectedPart = allParts.find(p => Number(p.partid) === Number(partid));
   if (!selectedPart) return;
 
@@ -193,11 +194,16 @@ function openMoveModal(partid) {
   const fromSelect = document.getElementById("move-from-location");
   fromSelect.replaceChildren();
 
-  selectedPart.locations.forEach(loc => {
+  // 🔥 FETCH REAL INVENTORY LOCATIONS
+  const res = await fetch(`${API_BASE}/api/partlocations?partid=${partid}`);
+  const locations = await res.json();
+
+  locations.forEach(loc => {
     const opt = document.createElement("option");
     opt.value = loc.locationid;
     opt.textContent =
-      `${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.qty})`;
+      `${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.on_hand_qty})`;
+
     fromSelect.appendChild(opt);
   });
 
