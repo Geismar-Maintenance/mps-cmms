@@ -202,7 +202,7 @@ async function openMoveModal(partid) {
     const opt = document.createElement("option");
     opt.value = loc.locationid;
     opt.textContent =
-      `${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.on_hand_qty})`;
+      `${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.qty})`;
 
     fromSelect.appendChild(opt);
   });
