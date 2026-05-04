@@ -195,7 +195,7 @@ async function openMoveModal(partid) {
   fromSelect.replaceChildren();
 
   // 🔥 FETCH REAL INVENTORY LOCATIONS
-  const res = await fetch(`${API_BASE}/api/partlocations?partid=${partid}`);
+  const res = await fetch(`${API_BASE}/api/parts?partid=${partid}`);
   const locations = await res.json();
 
   locations.forEach(loc => {
