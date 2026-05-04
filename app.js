@@ -121,11 +121,12 @@ async function submitPinChange() {
   }
 
   try {
-    const response = await fetch('/api/change-pin', {
+    const response = await fetch('/api/admin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        // In a real app, the server gets the UserID from the session/token
+        action: 'changePin',
+         username: currentUser.username,
         currentPin: currentPin,
         newPin: newPin
       })
