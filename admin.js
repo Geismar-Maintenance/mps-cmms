@@ -179,28 +179,67 @@ function openReceiveFromAdmin(partid) {
     }, 300);
   };
 
-   async function addLocation() {
-  const cabinet = document.getElementById("loc-cabinet").value.trim();
-  const section = document.getElementById("loc-section").value.trim();
-  const bin = document.getElementById("loc-bin").value.trim();
+  async function addLocationRange() {
+  const cabinet = document.getElementById("loc-cabinet").value.trim().toUpperCase();
+  const section = document.getElementById("loc-section").value.trim().toUpperCase();
 
-  if (!cabinet || !section || !bin) {
+  const start = parseInt(document.getElementById("loc-bin-start").value, 10);
+  const end = parseInt(document.getElementById("loc-bin-end").value, 10);
+  const increment = parseInt(document.getElementById("loc-bin-increment").value, 10) || 1;
+
+  if (!cabinet || !section || isNaN(start) || isNaN(end)) {
     alert("All fields are required");
     return;
   }
 
+  if (increment <= 0) {
+    alert("Increment must be greater than 0");
+    return;
+  }
+
+  if (end < start) {
+    alert("End must be greater than or equal to start");
+    return;
+  }
+
   try {
-    const res = await fetch(`${API_BASE}/api/locations`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        cabinet,
-        section,
-        bin
-      })
-    });
+    for (let i = start; i <= end; i += increment) {
+
+      // ✅ Keep original formatting based on input length
+      const width = document.getElementById("loc-bin-start").value.length;
+      const bin = String(i).padStart(width, "0");
+
+      const res = await fetch(`${API_BASE}/api/locations`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          cabinet,
+          section,
+          bin
+        })
+      });
+
+      const data = await res.json();
+
+      // ✅ skip duplicates silently
+      if (!res.ok && data.error === "Location already exists") {
+        continue;
+      }
+
+      if (!res.ok) throw new Error(data.error);
+    }
+
+    alert("Locations created successfully");
+
+    loadLocations();
+
+  } catch (err) {
+    console.error(err);
+    alert("Error creating locations");
+  }
+}
 
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
