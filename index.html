@@ -413,6 +413,17 @@
     </div>
   </div>
 </div>
+
+          <div class="card h-100 shadow-sm border-0 bg-light"
+     style="cursor: pointer;"
+     onclick="switchModule('locations')">
+
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-map-marked-alt fa-3x text-info mb-3"></i>
+                        <h4 class="card-title">Location Manager</h4>
+                        <p class="card-text text-muted">Manage bin naming and activity status.</p>
+                    </div>
+                </div>
           <div id="inventory-import" class="card p-3">
   <h5>Inventory Import (CSV)</h5>
 
@@ -431,14 +442,8 @@
 </div>
 
             <div class="col-xl-4 col-md-6">
-                <div class="card h-100 shadow-sm border-0 bg-light" style="cursor: pointer;">
-                    <div class="card-body text-center p-5">
-                        <i class="fas fa-map-marked-alt fa-3x text-info mb-3"></i>
-                        <h4 class="card-title">Location Manager</h4>
-                        <p class="card-text text-muted">Manage bin naming and activity status.</p>
-                    </div>
-                </div>
-            </div>
+                
+           </div>
         </div>
     </div>
 </div>
@@ -489,6 +494,55 @@
 
   </div>
 </div>
+<!-- ================= LOCATION MANAGEMENT MODULE ================= -->
+      <section id="module-locations" class="module">
+  <h4 class="mb-3">Location Manager</h4>
+
+  <!-- Add Location Form -->
+  <div class="card p-3 mb-3">
+    <div class="row g-2">
+
+      <div class="col-md-3">
+        <input id="loc-cabinet" class="form-control" placeholder="Cabinet">
+      </div>
+
+      <div class="col-md-3">
+        <input id="loc-section" class="form-control" placeholder="Section">
+      </div>
+
+      <div class="col-md-3">
+        <input id="loc-bin" class="form-control" placeholder="Bin">
+      </div>
+
+      <div class="col-md-3">
+        <button class="btn btn-primary w-100"
+                onclick="addLocation()">
+          Add Location
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Locations Table -->
+  <div class="card">
+    <div class="card-body">
+
+      <table class="table table-sm table-hover" id="locations-table">
+        <thead>
+          <tr>
+            <th>Cabinet</th>
+            <th>Section</th>
+            <th>Bin</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+    </div>
+  </div>
+</section>
 
  
 <!-- ================= ISSUE MODAL ================= -->
