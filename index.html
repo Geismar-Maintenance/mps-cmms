@@ -236,6 +236,34 @@
         </div>
 
         <table id="parts-table" class="table table-sm table-hover">
+  <div class="btn-group mb-3" role="group" aria-label="Inventory Filters">
+
+  <button class="btn btn-outline-secondary"
+          onclick="setInventoryFilter('all')">
+    All
+  </button>
+
+  <button class="btn btn-outline-primary"
+          onclick="setInventoryFilter('active')">
+    In Stock
+  </button>
+
+  <button class="btn btn-outline-warning"
+          onclick="setInventoryFilter('low')">
+    Low Stock
+  </button>
+
+  <button class="btn btn-outline-danger"
+          onclick="setInventoryFilter('out')">
+    Out of Stock
+  </button>
+
+  <button class="btn btn-outline-info"
+          onclick="setInventoryFilter('receiving')">
+    Receiving
+  </button>
+
+</div>
 
 <thead>
   <tr>
