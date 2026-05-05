@@ -35,6 +35,13 @@ window.loadParts = function () {
 
 
 /* ---------- Filtered Inventory ---------- */
+function setInventoryFilter(type) {
+  window.currentModuleFilters = {
+    inventoryFilter: type
+  };
+
+  window.loadInventoryFilteredParts(type);
+}
 
 window.loadInventoryFilteredParts = async function (type) {
   console.log("✅ loadInventoryFilteredParts called with:", type);
