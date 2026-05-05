@@ -48,10 +48,17 @@ function setInventoryFilter(type) {
 window.loadInventoryFilteredParts = async function (type) {
   console.log("✅ loadInventoryFilteredParts called with:", type);
 
-  let url = `${API_BASE}/api/parts?inventory=${type}`;
+  let url = `${API_BASE}/api/parts`;
+
+  const params = new URLSearchParams();
 
   if (type && type !== "all") {
-    url += `?inventory=${type}`;
+    params.append("inventory", type);
+  }
+
+  const queryString = params.toString();
+  if (queryString) {
+    url += `?${queryString}`;
   }
 
   const res = await fetch(url);
@@ -74,7 +81,6 @@ window.loadInventoryFilteredParts = async function (type) {
 
   renderPartsTable(allParts);
 };
-
 
 /* ---------- Search ---------- */
 document.getElementById("part-search")?.addEventListener("keydown", e => {
