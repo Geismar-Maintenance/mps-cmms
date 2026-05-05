@@ -495,42 +495,44 @@
   </div>
 </div>
 <!-- ================= LOCATION MANAGEMENT MODULE ================= -->
-      <section id="module-locations" class="module">
+<section id="module-locations" class="module">
+
   <h4 class="mb-3">Location Manager</h4>
 
-<div class="row g-2">
+  <!-- Add Range Form -->
+  <div class="card p-3 mb-3">
 
-  <div class="col-md-2">
-    <input id="loc-cabinet" class="form-control" placeholder="Cabinet">
-  </div>
+    <div class="row g-2">
 
-  <div class="col-md-2">
-    <input id="loc-section" class="form-control" placeholder="Section">
-  </div>
+      <div class="col-md-2">
+        <input id="loc-cabinet" class="form-control" placeholder="Cabinet">
+      </div>
 
-  <div class="col-md-2">
-    <input id="loc-bin-start" class="form-control" placeholder="Start Bin">
-  </div>
+      <div class="col-md-2">
+        <input id="loc-section" class="form-control" placeholder="Section">
+      </div>
 
-  <div class="col-md-2">
-    <input id="loc-bin-end" class="form-control" placeholder="End Bin">
-  </div>
+      <div class="col-md-2">
+        <input id="loc-bin-start" class="form-control" placeholder="Start Bin">
+      </div>
 
-  <div class="col-md-2">
-    <input id="loc-bin-increment" class="form-control" placeholder="Increment">
-  </div>
+      <div class="col-md-2">
+        <input id="loc-bin-end" class="form-control" placeholder="End Bin">
+      </div>
 
-  <div class="col-md-2">
-    <button class="btn btn-primary w-100"
-            onclick="addLocationRange()">
-      Add Range
-    </button>
-  </div>
+      <div class="col-md-2">
+        <input id="loc-bin-increment" class="form-control" placeholder="Increment">
+      </div>
 
-</div>
-
+      <div class="col-md-2">
+        <button class="btn btn-primary w-100"
+                onclick="addLocationRange()">
+          Add Range
+        </button>
+      </div>
 
     </div>
+
   </div>
 
   <!-- Locations Table -->
@@ -551,8 +553,8 @@
 
     </div>
   </div>
-</section>
 
+</section>
  
 <!-- ================= ISSUE MODAL ================= -->
 <div class="modal fade" id="issueModal" tabindex="-1">
