@@ -48,7 +48,7 @@ function setInventoryFilter(type) {
 window.loadInventoryFilteredParts = async function (type) {
   console.log("✅ loadInventoryFilteredParts called with:", type);
 
-  let url = `${API_BASE}/api/parts`;
+  let url = `${API_BASE}/api/parts?inventory=${type}`;
 
   if (type && type !== "all") {
     url += `?inventory=${type}`;
