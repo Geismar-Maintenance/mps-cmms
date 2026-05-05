@@ -149,7 +149,7 @@ function renderPartsTable(parts) {
 
 <td class="text-primary"
     style="cursor:pointer"
-    onclick="loadPartDetails(${p.partid})">
+    onclick="openPartDetail(${p.partid})">
   ${p.partnumber}
 </td>
       <td>${p.description}</td>
@@ -171,7 +171,7 @@ function renderPartsTable(parts) {
     tbody.appendChild(tr);
   });
 }
-window.loadPartDetails = async function (partId) {
+window.openPartDetail = async function (partId) {
   const res = await fetch(`${API_BASE}/api/parts?partId=${partId}`);
   if (!res.ok) {
     alert("Failed to load part details");
@@ -183,53 +183,65 @@ window.loadPartDetails = async function (partId) {
 };
 
 function renderPartDetails(data) {
-  const panel = document.getElementById("part-detail-panel");
-  if (!panel) return;
 
-  panel.style.display = "block";
+  // ✅ basic info
+  document.getElementById("part-detail-number").innerText =
+    data.part.partnumber;
 
-  panel.innerHTML = `
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <h5>${data.part.partnumber}</h5>
-      <button class="btn btn-sm btn-outline-secondary"
-              onclick="closePartDetails()">Back to Parts</button>
-    </div>
+  document.getElementById("part-detail-desc").innerText =
+    data.part.description;
 
-    <div class="mb-2">${data.part.description}</div>
+  document.getElementById("part-detail-mfg").innerText =
+    data.part.manufacturer ?? "—";
 
-    <div class="text-muted mb-3">
-      ${data.part.manufacturer ?? "—"} | ${data.part.model ?? "—"}
-    </div>
+  document.getElementById("part-detail-model").innerText =
+    data.part.model ?? "—";
 
-    <hr>
+  // ✅ locations
+  const locTable = document.getElementById("part-detail-locations");
+  locTable.innerHTML = "";
 
-    <h6>Locations</h6>
-    ${
-      data.locations.length === 0
-        ? `<div class="text-muted">No inventory on hand.</div>`
-        : data.locations.map(l => `
-            <div class="d-flex justify-content-between align-items-center mb-1">
-              <div>
-                ${l.cabinet}.${l.section}.${l.bin} — ${l.qty}
-                </div>
-                </div>
-          `).join("")
-    }
+  if (data.locations.length === 0) {
+    locTable.innerHTML =
+      `<tr><td colspan="2" class="text-muted">No inventory on hand.</td></tr>`;
+  } else {
+    data.locations.forEach(l => {
+      const tr = document.createElement("tr");
 
-    <hr>
+      tr.innerHTML = `
+        <td>${l.cabinet}.${l.section}.${l.bin}</td>
+        <td>${l.qty}</td>
+      `;
 
-    <h6>History</h6>
-    ${
-      data.history.length === 0
-        ? `<div class="text-muted">No transactions.</div>`
-        : data.history.map(h => `
-            <div>
-              ${new Date(h.transactiondate).toLocaleString()}
-              — ${h.transactiontype} ${h.qty}
-            </div>
-          `).join("")
-    }
-  `;
+      locTable.appendChild(tr);
+    });
+  }
+
+  // ✅ total qty
+  const total = data.locations.reduce((sum, l) => sum + Number(l.qty), 0);
+  document.getElementById("part-detail-qty").innerText = total;
+
+  // ✅ history
+  const historyDiv = document.getElementById("part-detail-history");
+
+  if (!historyDiv) return;
+
+  if (data.history.length === 0) {
+    historyDiv.innerHTML =
+      `<div class="text-muted">No transactions.</div>`;
+  } else {
+    historyDiv.innerHTML = data.history.map(h => `
+      <div>
+        ${new Date(h.transactiondate).toLocaleString()}
+        — ${h.transactiontype} ${h.qty}
+      </div>
+    `).join("");
+  }
+
+  // ✅ SHOW MODAL
+  bootstrap.Modal
+    .getOrCreateInstance(document.getElementById("partDetailModal"))
+    .show();
 }
 
 function closePartDetails() {
