@@ -153,6 +153,87 @@ async function loadLocations() {
     console.error("Failed to load locations", err);
   }
 }
+
+window.addLocationRange = async function () {
+  const cabinet = document.getElementById("loc-cabinet").value.trim().toUpperCase();
+  const section = document.getElementById("loc-section").value.trim().toUpperCase();
+
+  const startInput = document.getElementById("loc-bin-start").value;
+  const start = parseInt(startInput, 10);
+  const end = parseInt(document.getElementById("loc-bin-end").value, 10);
+  const increment = parseInt(document.getElementById("loc-bin-increment").value, 10) || 1;
+
+  if (!cabinet || !section || isNaN(start)) {
+    alert("Cabinet, section, and start bin are required");
+    return;
+  }
+
+  const finalEnd = isNaN(end) ? start : end;
+
+  if (finalEnd < start) {
+    alert("End must be >= start");
+    return;
+  }
+
+  if (increment <= 0) {
+    alert("Increment must be greater than 0");
+    return;
+  }
+
+  const totalCount = Math.floor((finalEnd - start) / increment) + 1;
+  if (totalCount > 500) {
+    alert("Too many locations at once (limit 500)");
+    return;
+  }
+
+  const width = startInput.length;
+
+  try {
+    const requests = [];
+
+    for (let i = start; i <= finalEnd; i += increment) {
+      const bin = String(i).padStart(width, "0");
+
+      requests.push(
+        fetch(`${API_BASE}/api/locations`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cabinet, section, bin })
+        })
+      );
+    }
+
+    const responses = await Promise.all(requests);
+
+    for (const res of responses) {
+      if (!res.ok) {
+        const data = await res.json();
+
+        if (data.error !== "Location already exists") {
+          throw new Error(data.error);
+        }
+      }
+    }
+
+    alert("Locations created");
+
+    // clear inputs
+    document.getElementById("loc-cabinet").value = "";
+    document.getElementById("loc-section").value = "";
+    document.getElementById("loc-bin-start").value = "";
+    document.getElementById("loc-bin-end").value = "";
+    document.getElementById("loc-bin-increment").value = "";
+
+    document.getElementById("loc-cabinet").focus();
+
+    loadLocations();
+
+  } catch (err) {
+    console.error(err);
+    alert("Error creating locations");
+  }
+};
+
 /* ======================================================
    ADMIN‑GUIDED INVENTORY HELPERS
    ====================================================== */
@@ -178,85 +259,6 @@ function openReceiveFromAdmin(partid) {
       }
     }, 300);
   };
-
-  async function addLocationRange() {
-  const cabinet = document.getElementById("loc-cabinet").value.trim().toUpperCase();
-  const section = document.getElementById("loc-section").value.trim().toUpperCase();
-
-  const start = parseInt(document.getElementById("loc-bin-start").value, 10);
-  const end = parseInt(document.getElementById("loc-bin-end").value, 10);
-  const increment = parseInt(document.getElementById("loc-bin-increment").value, 10) || 1;
-
-  if (!cabinet || !section || isNaN(start) || isNaN(end)) {
-    alert("All fields are required");
-    return;
-  }
-
-  if (increment <= 0) {
-    alert("Increment must be greater than 0");
-    return;
-  }
-
-  if (end < start) {
-    alert("End must be greater than or equal to start");
-    return;
-  }
-
-  try {
-    for (let i = start; i <= end; i += increment) {
-
-      // ✅ Keep original formatting based on input length
-      const width = document.getElementById("loc-bin-start").value.length;
-      const bin = String(i).padStart(width, "0");
-
-      const res = await fetch(`${API_BASE}/api/locations`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          cabinet,
-          section,
-          bin
-        })
-      });
-
-      const data = await res.json();
-
-      // ✅ skip duplicates silently
-      if (!res.ok && data.error === "Location already exists") {
-        continue;
-      }
-
-      if (!res.ok) throw new Error(data.error);
-    }
-
-    alert("Locations created successfully");
-
-    loadLocations();
-
-  } catch (err) {
-    console.error(err);
-    alert("Error creating locations");
-  }
-}
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-
-    // ✅ Clear inputs
-    document.getElementById("loc-cabinet").value = "";
-    document.getElementById("loc-section").value = "";
-    document.getElementById("loc-bin").value = "";
-
-    // ✅ Refresh table
-    loadLocations();
-
-  } catch (err) {
-    alert(err.message);
-    console.error(err);
-  }
-}
 
   bootstrap.Modal
     .getOrCreateInstance(document.getElementById("receiveModal"))
