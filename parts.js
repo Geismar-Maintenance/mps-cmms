@@ -23,15 +23,15 @@ let lastPartSearch = "";
 
 window.loadParts = function () {
   const filter = window.currentModuleFilters?.inventoryFilter;
+
   console.log("loadParts called, inventoryFilter =", filter);
 
-if (!filter || filter === "all") {
-  window.loadInventoryFilteredParts("all");
-  return;
-}
+  const validFilters = ["all", "in", "low", "out", "receiving"];
 
-  loadInventoryFilteredParts(filter);
-}
+  const resolvedFilter = validFilters.includes(filter) ? filter : "all";
+
+  window.loadInventoryFilteredParts(resolvedFilter);
+};
 
 
 /* ---------- Filtered Inventory ---------- */
@@ -39,6 +39,8 @@ function setInventoryFilter(type) {
   window.currentModuleFilters = {
     inventoryFilter: type
   };
+
+  document.getElementById("part-search").value = ""; // 🔥 important
 
   window.loadInventoryFilteredParts(type);
 }
@@ -84,6 +86,11 @@ document.getElementById("part-search")?.addEventListener("keydown", e => {
 async function runPartSearch() {
   const input = document.getElementById("part-search");
   const query = input.value.trim();
+
+   window.currentModuleFilters = {
+  inventoryFilter: null,
+  mode: "search"
+};
 
   if (query.length < 2) {
     renderPartsTable([]);
@@ -198,6 +205,8 @@ function renderPartDetails(data) {
             <div class="d-flex justify-content-between align-items-center mb-1">
               <div>
                 ${l.cabinet}.${l.section}.${l.bin} — ${l.qty}
+                </div>
+                </div>
           `).join("")
     }
 
