@@ -127,6 +127,32 @@ window.importInventoryCSV = async function () {
     }
   });
 };
+
+async function loadLocations() {
+  try {
+    const res = await fetch(`${API_BASE}/api/locations`);
+    const data = await res.json();
+
+    const tbody = document.querySelector("#locations-table tbody");
+    tbody.innerHTML = "";
+
+    data.forEach(loc => {
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${loc.cabinet}</td>
+        <td>${loc.section}</td>
+        <td>${loc.bin}</td>
+        <td>${loc.description || ""}</td>
+      `;
+
+      tbody.appendChild(tr);
+    });
+
+  } catch (err) {
+    console.error("Failed to load locations", err);
+  }
+}
 /* ======================================================
    ADMIN‑GUIDED INVENTORY HELPERS
    ====================================================== */
@@ -152,6 +178,46 @@ function openReceiveFromAdmin(partid) {
       }
     }, 300);
   };
+
+   async function addLocation() {
+  const cabinet = document.getElementById("loc-cabinet").value.trim();
+  const section = document.getElementById("loc-section").value.trim();
+  const bin = document.getElementById("loc-bin").value.trim();
+
+  if (!cabinet || !section || !bin) {
+    alert("All fields are required");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/locations`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        cabinet,
+        section,
+        bin
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+
+    // ✅ Clear inputs
+    document.getElementById("loc-cabinet").value = "";
+    document.getElementById("loc-section").value = "";
+    document.getElementById("loc-bin").value = "";
+
+    // ✅ Refresh table
+    loadLocations();
+
+  } catch (err) {
+    alert(err.message);
+    console.error(err);
+  }
+}
 
   bootstrap.Modal
     .getOrCreateInstance(document.getElementById("receiveModal"))
