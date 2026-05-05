@@ -180,7 +180,7 @@ window.switchModule = function (moduleName, el) {
   if (moduleName === "pm") loadPMView();
   if (moduleName === "pm-management") loadPMManagement();
   if (moduleName === "parts") loadParts();
-  if (module === "locations") {loadLocations();
+  if (moduleName === "locations") {loadLocations();
 }
 
 };
