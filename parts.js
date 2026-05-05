@@ -25,10 +25,10 @@ window.loadParts = function () {
   const filter = window.currentModuleFilters?.inventoryFilter;
   console.log("loadParts called, inventoryFilter =", filter);
 
-  if (!filter) {
-    renderPartsTable([]);
-    return;
-  }
+if (!filter || filter === "all") {
+  window.loadInventoryFilteredParts("all");
+  return;
+}
 
   loadInventoryFilteredParts(filter);
 }
@@ -46,14 +46,20 @@ function setInventoryFilter(type) {
 window.loadInventoryFilteredParts = async function (type) {
   console.log("✅ loadInventoryFilteredParts called with:", type);
 
-  const res = await fetch(`${API_BASE}/api/parts?inventory=${type}`);
+  let url = `${API_BASE}/api/parts`;
+
+  if (type && type !== "all") {
+    url += `?inventory=${type}`;
+  }
+
+  const res = await fetch(url);
+
   if (!res.ok) {
     console.error("Failed to load inventory filter:", type);
     return;
   }
 
   const data = await res.json();
-  console.log("📦 inventory filter response:", data);
 
   allParts = data.map(p => ({
     ...p,
