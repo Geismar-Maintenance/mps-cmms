@@ -42,9 +42,12 @@ window.submitLogin = async function (e) {
 
   const username = document.getElementById("login-username").value.trim();
   const pin = document.getElementById("login-pin").value.trim();
-  const err = document.getElementById("login-error");
+  
+const err = document.getElementById("login-error");
 
+if (err) {
   err.style.display = "none";
+}
 
   if (!username || !pin) {
     err.textContent = "Username and PIN required";
