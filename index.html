@@ -764,6 +764,31 @@
   </div>
 </div>
 
+      <div class="modal fade" id="cycleCountModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content p-3">
+
+      <h5>Cycle Count</h5>
+
+      <p id="cycle-partname"></p>
+
+      <label class="form-label">Location</label>
+      <select id="cycle-location" class="form-select mb-2"></select>
+
+      <label class="form-label">System Qty</label>
+      <input id="cycle-system-qty" class="form-control mb-2" readonly>
+
+      <label class="form-label">Counted Qty</label>
+      <input id="cycle-actual-qty" type="number" class="form-control mb-3">
+
+      <button class="btn btn-warning" onclick="submitCycleCount()">
+        Submit Adjustment
+      </button>
+
+    </div>
+  </div>
+</div>
+
   <!-- ================= Create WO MODAL ================= -->
 <div class="modal fade" id="createWOModal" tabindex="-1">
   <div class="modal-dialog">
