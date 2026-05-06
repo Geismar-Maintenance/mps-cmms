@@ -310,13 +310,15 @@ window.openCycleCountModal = async function (partid) {
     opt.textContent =
       `${loc.cabinet}.${loc.section}.${loc.bin}`;
 
-    // store system qty on option
     opt.dataset.qty = loc.qty;
 
     locSelect.appendChild(opt);
   });
+   
+if (locSelect.options.length > 0) {
+  locSelect.selectedIndex = 0; // ✅ FORCE SELECTION
+}
 
-  // update system qty when changing location
   locSelect.onchange = function () {
     const selected = locSelect.selectedOptions[0];
     document.getElementById("cycle-system-qty").value =
@@ -343,9 +345,15 @@ async function submitCycleCount() {
     return;
   }
 
-  const locationid = Number(
-    document.getElementById("cycle-location").value
-  );
+  const select = document.getElementById("cycle-location");
+const selected = select.selectedOptions[0];
+
+if (!selected) {
+  alert("No location selected");
+  return;
+}
+
+const locationid = Number(selected.value);
 
   const input = document.getElementById("cycle-actual-qty").value.trim();
 
