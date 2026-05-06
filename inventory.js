@@ -306,7 +306,14 @@ window.openCycleCountModal = async function (partid) {
 
   selectedPart.locations.forEach(loc => {
     const opt = document.createElement("option");
-    opt.value = loc.locationid;
+    
+const id =
+  loc.locationid ??
+  loc.location_id ??
+  loc.id;
+
+opt.value = id;
+
     opt.textContent =
       `${loc.cabinet}.${loc.section}.${loc.bin}`;
 
