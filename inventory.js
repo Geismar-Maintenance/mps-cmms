@@ -305,20 +305,18 @@ window.openCycleCountModal = async function (partid) {
   }
 
   selectedPart.locations.forEach(loc => {
-     console.log("Cycle loc:", loc);
-    const opt = document.createElement("option");
+  const opt = document.createElement("option");
     
-const id =
-  loc.locationid ??
-  loc.location_id ??
-  loc.id;
-console.log("Resolved ID:", id);
-opt.value = id;
+  const id =
+   loc.locationid ??
+   loc.location_id ??
+   loc.id;
+   opt.value = id;
 
-    opt.textContent =
+   opt.textContent =
       `${loc.cabinet}.${loc.section}.${loc.bin}`;
 
-    opt.dataset.qty = loc.qty;
+   opt.dataset.qty = loc.qty;
 
     locSelect.appendChild(opt);
   });
@@ -364,17 +362,12 @@ const locationid = Number(selected.value);
 
   const input = document.getElementById("cycle-actual-qty").value.trim();
 
-  console.log("Raw input:", input);
-
-  if (input === "") {
+    if (input === "") {
     alert("Enter a quantity");
     return;
   }
 
   const actualQty = Number(input);
-
-  console.log("Parsed qty:", actualQty);
-  console.log("Location ID:", locationid);
 
   if (!locationid || isNaN(actualQty) || actualQty < 0) {
     alert("Enter a valid quantity");
