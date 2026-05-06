@@ -281,5 +281,19 @@ function closePartDetails() {
   if (panel) panel.style.display = "none";
 }
 
+window.sortParts = function (column) {
+  console.log("Sorting by:", column);
 
+  if (currentSort.column === column) {
+    // toggle direction
+    currentSort.direction =
+      currentSort.direction === "asc" ? "desc" : "asc";
+  } else {
+    // new column sort
+    currentSort.column = column;
+    currentSort.direction = "asc";
+  }
+
+  renderPartsTable(window.currentParts);
+};
 
