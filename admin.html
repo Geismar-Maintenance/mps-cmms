@@ -1,0 +1,94 @@
+<!-- Admin -->
+<div id="module-admin" class="module">
+
+  <div class="container-fluid py-4">
+
+    <div class="row mb-4">
+      <div class="col-12">
+        <h2 class="border-bottom pb-2">System Administration</h2>
+        <p class="text-muted">Manage master data and system configurations.</p>
+      </div>
+    </div>
+
+    <div class="row g-4">
+
+      <!-- Onboard -->
+      <div class="col-xl-4 col-md-6">
+        <div class="card h-100 shadow-sm border-0 bg-light"
+             onclick="openAddPartModal()" style="cursor: pointer;">
+          <div class="card-body text-center p-5">
+            <i class="fas fa-plus-square fa-3x text-primary mb-3"></i>
+            <h4 class="card-title">Onboard New Part</h4>
+            <p class="card-text text-muted">
+              Create master records and initialize stock.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users -->
+      <div class="col-xl-4 col-md-6">
+        <div class="card h-100 shadow-sm border-0 bg-light" style="cursor: pointer;">
+          <div class="card-body text-center p-5">
+            <i class="fas fa-users-cog fa-3x text-secondary mb-3"></i>
+            <h4 class="card-title">User Permissions</h4>
+            <p class="card-text text-muted">
+              Configure roles and access control.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PM -->
+      <div class="col-xl-4 col-md-6">
+        <div class="card h-100 shadow-sm border-0 bg-light"
+             onclick="switchModule('pm')" style="cursor: pointer;">
+          <div class="card-body text-center p-5">
+            <i class="fas fa-layer-group fa-3x text-primary mb-3"></i>
+            <h4 class="card-title">PM Management</h4>
+            <p class="card-text text-muted">
+              Manage PM templates, trigger blocks, task tiers, tasks, and requirements.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Locations -->
+      <div class="col-xl-4 col-md-6">
+        <div class="card h-100 shadow-sm border-0 bg-light"
+             onclick="switchModule('locations')" style="cursor: pointer;">
+          <div class="card-body text-center p-5">
+            <i class="fas fa-map-marked-alt fa-3x text-info mb-3"></i>
+            <h4 class="card-title">Location Manager</h4>
+            <p class="card-text text-muted">
+              Manage bin naming and activity status.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inventory Import -->
+      <div class="col-xl-4 col-md-6">
+        <div id="inventory-import" class="card h-100 p-3">
+          <h5>Inventory Import (CSV)</h5>
+
+          <input
+            type="file"
+            id="inventory-csv"
+            accept=".csv"
+            class="form-control mb-2"
+          />
+
+          <button class="btn btn-primary" onclick="importInventoryCSV()">
+            Import Inventory
+          </button>
+
+          <pre id="import-log" class="mt-3 bg-light p-2"></pre>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
