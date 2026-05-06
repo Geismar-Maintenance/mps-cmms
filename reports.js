@@ -1,11 +1,20 @@
 window.loadReports = function () {
-  document.getElementById("report-output").innerHTML =
-    "Select a report to begin";
 
-  document.getElementById("report-selector").value = "";
-
+  const output = document.getElementById("report-output");
+  const selector = document.getElementById("report-selector");
   const params = document.getElementById("report-params");
-  if (params) params.style.display = "none";
+
+  if (output) {
+    output.innerHTML = "Select a report to begin";
+  }
+
+  if (selector) {
+    selector.value = "";
+  }
+
+  if (params) {
+    params.style.display = "none";
+  }
 };
 
 window.handleReportSelection = function () {
