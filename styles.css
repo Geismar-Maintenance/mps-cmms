@@ -157,18 +157,21 @@ aside {
   background-color: rgba(220, 53, 69, 0.08) !important;
 }
 
+
 .table-container {
-  max-height: 500px;   /* adjust as needed */
+  max-height: 500px;
   overflow-y: auto;
+  display: block; /* helps sticky behavior */
 }
 
-.table thead th {
+
+
+#parts-table thead th {
   position: sticky;
   top: 0;
-  background: white;   /* IMPORTANT: keeps header visible */
-  z-index: 2;
+  background: white;
+  z-index: 5;
 }
-
 
 /* =====================================================
    Buttons & UI Elements
