@@ -25,9 +25,9 @@ body {
    ===================================================== */
 
 /* Hide all modules by default */
- .module, .content-section {
-   display: none !important;
- }
+// .module, .content-section {
+//  display: none !important;
+// }
 
 /* High-specificity rule to force visibility when 'active' is present */
 div.module.active, 
