@@ -148,6 +148,15 @@ aside {
   border-bottom: 1px solid var(--mps-border);
 }
 
+#parts-table th {
+  cursor: pointer;
+}
+
+#parts-table th:hover {
+  text-decoration: underline;
+}
+
+
 /* Status Indicators */
 .table-warning {
   background-color: rgba(243, 111, 33, 0.1) !important; /* MPS Orange tinted */
