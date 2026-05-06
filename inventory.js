@@ -346,9 +346,9 @@ window.refreshPartsTable = async function () {
     console.error("Failed to refresh parts table", err);
   }
 };
-function getSelectedPart(partid) {
+async function getSelectedPart(partid) {
 
-  // ✅ If coming from Part Detail
+  // ✅ Case 1: coming from Part Detail (already have full data)
   if (
     window.currentPartData &&
     window.currentPartData.part &&
@@ -360,12 +360,27 @@ function getSelectedPart(partid) {
     };
   }
 
-  // ✅ If coming from Parts table
-  if (window.allParts && Array.isArray(window.allParts)) {
-    return window.allParts.find(
-      p => Number(p.partid) === Number(partid)
-    );
+  // ✅ Case 2: coming from Parts table → fetch full data
+  try {
+    const res = await fetch(`${API_BASE}/api/parts?partId=${partid}`);
+
+    if (!res.ok) {
+      console.error("Failed to fetch part");
+      return null;
+    }
+
+    const data = await res.json();
+
+    return {
+      ...data.part,
+      locations: data.locations
+    };
+
+  } catch (err) {
+    console.error("getSelectedPart error:", err);
+    return null;
   }
+}
 
   return null;
 }
