@@ -40,18 +40,20 @@ window.goToWorkOrders = function (filter) {
 window.submitLogin = async function (e) {
   e.preventDefault();
 
-  const username = document.getElementById("login-username").value.trim();
-  const pin = document.getElementById("login-pin").value.trim();
-  
-const err = document.getElementById("login-error");
+  const usernameEl = document.getElementById("login-username");
+  const pinEl = document.getElementById("login-pin");
+  const err = document.getElementById("login-error");
 
-if (err) {
-  err.style.display = "none";
-}
+  const username = usernameEl ? usernameEl.value.trim() : "";
+  const pin = pinEl ? pinEl.value.trim() : "";
+
+  if (err) err.style.display = "none";
 
   if (!username || !pin) {
-    err.textContent = "Username and PIN required";
-    err.style.display = "block";
+    if (err) {
+      err.textContent = "Username and PIN required";
+      err.style.display = "block";
+    }
     return;
   }
 
@@ -69,23 +71,34 @@ if (err) {
     }
 
     window.currentUser = data;
-     
-document.getElementById("current-user-label").textContent =
-  `Logged in as ${data.display_name}`;
 
+    const label = document.getElementById("current-user-label");
+    if (label) {
+      label.textContent = `Logged in as ${data.display_name}`;
+    }
 
-    document.getElementById("login-screen").style.display = "none";
-    document.getElementById("app-shell").style.display = "block";
+    const loginScreen = document.getElementById("login-screen");
+    if (loginScreen) loginScreen.style.display = "none";
 
-    loadDashboard();
+    const appShell = document.getElementById("app-shell");
+    if (appShell) appShell.style.display = "block";
+
+    if (typeof loadDashboard === "function") {
+      loadDashboard();
+    }
 
     console.log("Logged in as", data.display_name);
 
   } catch (e) {
-    err.textContent = e.message;
-    err.style.display = "block";
+    console.error("Login error:", e);
+
+    if (err) {
+      err.textContent = e.message;
+      err.style.display = "block";
+    }
   }
-}
+};
+
 /* ======================================================
    LOGOUT
    ====================================================== */
