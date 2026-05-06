@@ -346,5 +346,28 @@ window.refreshPartsTable = async function () {
     console.error("Failed to refresh parts table", err);
   }
 };
+function getSelectedPart(partid) {
+
+  // ✅ If coming from Part Detail
+  if (
+    window.currentPartData &&
+    window.currentPartData.part &&
+    window.currentPartData.part.partid == partid
+  ) {
+    return {
+      ...window.currentPartData.part,
+      locations: window.currentPartData.locations
+    };
+  }
+
+  // ✅ If coming from Parts table
+  if (window.allParts && Array.isArray(window.allParts)) {
+    return window.allParts.find(
+      p => Number(p.partid) === Number(partid)
+    );
+  }
+
+  return null;
+}
 
 
