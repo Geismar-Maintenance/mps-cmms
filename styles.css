@@ -157,25 +157,28 @@ aside {
   background-color: rgba(220, 53, 69, 0.08) !important;
 }
 
-
 .table-container {
   max-height: 500px;
   overflow-y: auto;
-  display: block; /* helps sticky behavior */
+  position: relative;
 }
-
-
 
 #parts-table thead th {
   position: sticky;
   top: 0;
-  background: white;
-  z-index: 5;
+  background-color: #edf2f7; /* match your header color */
+  z-index: 10;
 }
 
 #parts-table thead th {
   position: sticky !important;
 }
+
+#parts-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
 
 
 /* =====================================================
