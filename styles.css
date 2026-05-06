@@ -173,6 +173,11 @@ aside {
   z-index: 5;
 }
 
+#parts-table thead th {
+  position: sticky !important;
+}
+
+
 /* =====================================================
    Buttons & UI Elements
    ===================================================== */
