@@ -12,7 +12,7 @@
    Depends on:
    - allParts[] populated by parts.js
    ====================================================== */
-
+window.selectedPart = null;
 
 /* ======================================================
    INVENTORY OPERATIONS (ISSUE / RECEIVE / MOVE)
@@ -40,25 +40,12 @@ window.applyInventoryDashboardFilters = function () {
 /* ---------- ISSUE ---------- */
 window.openIssueModal = function (partid) {
 
-  let selectedPart = null;
-
-  // ✅ Try using part detail data first
-  if (window.currentPartData && window.currentPartData.part.partid == partid) {
-    selectedPart = {
-      ...window.currentPartData.part,
-      locations: window.currentPartData.locations
-    };
-  }
-  // ✅ fallback to parts table
-  else if (window.allParts) {
-    selectedPart = allParts.find(p => Number(p.partid) === Number(partid));
-  }
+  selectedPart = getSelectedPart(partid); // ✅ ONE source of truth
 
   if (!selectedPart) {
     alert("Part data not available");
     return;
   }
-
 
   document.getElementById("issue-partname").innerText =
     `${selectedPart.partnumber} (${selectedPart.model ?? ""})`;
@@ -66,10 +53,25 @@ window.openIssueModal = function (partid) {
   const locSelect = document.getElementById("issue-location");
   locSelect.replaceChildren();
 
-  if (!selectedPart.locations.length) {
+  if (!selectedPart.locations || !selectedPart.locations.length) {
     alert("No inventory available");
     return;
   }
+
+  selectedPart.locations.forEach(loc => {
+    const opt = document.createElement("option");
+    opt.value = loc.locationid;
+    opt.textContent =
+      `${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.qty})`;
+    locSelect.appendChild(opt);
+  });
+
+  loadAssetsForIssue();
+
+  bootstrap.Modal
+    .getOrCreateInstance(document.getElementById("issueModal"))
+    .show();
+};
 
   selectedPart.locations.forEach(loc => {
     const opt = document.createElement("option");
@@ -133,9 +135,14 @@ body: JSON.stringify({
 }
 
 /* ---------- RECEIVE ---------- */
-function openReceiveModal(partid) {
-  selectedPart = allParts.find(p => Number(p.partid) === Number(partid));
-  if (!selectedPart) return;
+window.openReceiveModal = function (partid) {
+
+  selectedPart = getSelectedPart(partid);
+
+  if (!selectedPart) {
+    alert("Part data not available");
+    return;
+  }
 
   document.getElementById("receive-partname").innerText =
     `${selectedPart.partnumber} (${selectedPart.model ?? ""})`;
@@ -145,7 +152,7 @@ function openReceiveModal(partid) {
   bootstrap.Modal
     .getOrCreateInstance(document.getElementById("receiveModal"))
     .show();
-}
+};
 
 async function submitReceive() {
   if (!selectedPart) {
@@ -201,10 +208,14 @@ body: JSON.stringify({
 }
 
 /* ---------- MOVE ---------- */
-async function openMoveModal(partid) {
+window.openMoveModal = async function (partid) {
 
-  selectedPart = allParts.find(p => Number(p.partid) === Number(partid));
-  if (!selectedPart) return;
+  selectedPart = getSelectedPart(partid);
+
+  if (!selectedPart) {
+    alert("Part data not available");
+    return;
+  }
 
   document.getElementById("move-partname").innerText =
     `${selectedPart.partnumber} (${selectedPart.model ?? ""})`;
@@ -212,16 +223,18 @@ async function openMoveModal(partid) {
   const fromSelect = document.getElementById("move-from-location");
   fromSelect.replaceChildren();
 
-  // 🔥 FETCH REAL INVENTORY LOCATIONS
-  const res = await fetch(`${API_BASE}/api/partlocations?partid=${partid}`);
-  const locations = await res.json();
+  const locations = selectedPart.locations || [];
+
+  if (!locations.length) {
+    alert("No inventory available");
+    return;
+  }
 
   locations.forEach(loc => {
     const opt = document.createElement("option");
     opt.value = loc.locationid;
     opt.textContent =
       `${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.qty})`;
-
     fromSelect.appendChild(opt);
   });
 
@@ -231,7 +244,8 @@ async function openMoveModal(partid) {
   bootstrap.Modal
     .getOrCreateInstance(document.getElementById("moveModal"))
     .show();
-}
+};
+
 
 async function submitMove() {
   const from_locationid =
