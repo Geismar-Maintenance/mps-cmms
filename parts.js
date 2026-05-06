@@ -19,6 +19,12 @@ let allParts = [];
 let selectedPart = null;
 let lastPartSearch = "";
 
+let currentSort = {
+  column: null,
+  direction: "asc"
+};
+
+
 /* ---------- Entry ---------- */
 
 window.loadParts = function () {
@@ -131,6 +137,24 @@ function renderPartsTable(parts) {
   const tbody = document.querySelector("#parts-table tbody");
   if (!tbody) return;
 
+  // ✅ APPLY SORTING
+  if (currentSort.column) {
+    parts = [...parts].sort((a, b) => {
+      let valA = a[currentSort.column];
+      let valB = b[currentSort.column];
+
+      valA = valA ?? "";
+      valB = valB ?? "";
+
+      if (typeof valA === "string") valA = valA.toLowerCase();
+      if (typeof valB === "string") valB = valB.toLowerCase();
+
+      if (valA < valB) return currentSort.direction === "asc" ? -1 : 1;
+      if (valA > valB) return currentSort.direction === "asc" ? 1 : -1;
+      return 0;
+    });
+  }
+
   tbody.innerHTML = "";
 
   parts.forEach(p => {
@@ -146,12 +170,11 @@ function renderPartsTable(parts) {
         : "—";
 
     tr.innerHTML = `
-
-<td class="text-primary"
-    style="cursor:pointer"
-    onclick="openPartDetail(${p.partid})">
-  ${p.partnumber}
-</td>
+      <td class="text-primary"
+          style="cursor:pointer"
+          onclick="openPartDetail(${p.partid})">
+        ${p.partnumber}
+      </td>
       <td>${p.description}</td>
       <td>${p.manufacturer ?? "—"}</td>
       <td>${p.model ?? "—"}</td>
@@ -161,12 +184,14 @@ function renderPartsTable(parts) {
         <button class="btn btn-sm btn-outline-primary"
                 ${p.total_qty === 0 ? "disabled" : ""}
                 onclick="openIssueModal(${p.partid})">Issue</button>
+
         <button class="btn btn-sm btn-outline-success"
                 onclick="openReceiveModal(${p.partid})">Receive</button>
+
         <button class="btn btn-sm btn-outline-secondary"
                 onclick="openMoveModal(${p.partid})">Move</button>
       </td>
- `;
+    `;
 
     tbody.appendChild(tr);
   });
