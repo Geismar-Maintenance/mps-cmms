@@ -1,0 +1,39 @@
+ <!-- ================= WO module ================= -->
+<section id="module-workorders" class="module">
+  <h4 class="mb-3">Work Orders</h4>
+
+  <button class="btn btn-sm btn-primary mb-3"
+          onclick="openCreateWOModal()">
+    Create Work Order
+  </button>
+
+  <div class="d-flex align-items-center mb-3">
+  <label class="me-2 mb-0"><strong>Status:</strong></label>
+  <select
+    id="wo-status-filter"
+    class="form-select form-select-sm"
+    style="width: 180px"
+    onchange="applyWOFilters()"
+  >
+    <option value="open" selected>Open</option>
+    <option value="completed">Completed</option>
+    <option value="all">All</option>
+  </select>
+</div>
+
+  <table class="table table-sm table-hover" id="wo-table">
+    <thead>
+      <tr>
+        <th>WO #</th>
+        <th>Asset</th>
+        <th>Description</th>
+        <th>Type</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Due</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
