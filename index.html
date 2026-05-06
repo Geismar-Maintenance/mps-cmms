@@ -624,6 +624,30 @@
         <p><strong>Model:</strong> <span id="part-detail-model"></span></p>
         <p><strong>Total Qty:</strong> <span id="part-detail-qty"></span></p>
 
+        <div class="d-flex gap-2 mb-3">
+
+  <button class="btn btn-primary"
+          onclick="openIssueModal(currentPartId)">
+    Issue
+  </button>
+
+  <button class="btn btn-secondary"
+          onclick="openMoveModal(currentPartId)">
+    Move
+  </button>
+
+  <button class="btn btn-success"
+          onclick="openReceiveModal(currentPartId)">
+    Receive
+  </button>
+
+  <button class="btn btn-warning"
+          onclick="openCycleCountModal(currentPartId)">
+    Cycle Count
+  </button>
+
+</div>
+
         <hr>
 
         <h6>Locations</h6>
