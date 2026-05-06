@@ -172,6 +172,9 @@ function renderPartsTable(parts) {
   });
 }
 window.openPartDetail = async function (partId) {
+
+  window.currentPartId = partId;
+
   const res = await fetch(`${API_BASE}/api/parts?partId=${partId}`);
   if (!res.ok) {
     alert("Failed to load part details");
@@ -181,6 +184,7 @@ window.openPartDetail = async function (partId) {
   const data = await res.json();
   renderPartDetails(data);
 };
+
 
 function renderPartDetails(data) {
 
