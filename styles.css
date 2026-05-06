@@ -25,9 +25,9 @@ body {
    ===================================================== */
 
 /* Hide all modules by default */
-.module, .content-section {
-  display: none !important;
-}
+// .module, .content-section {
+//   display: none !important;
+// }
 
 /* High-specificity rule to force visibility when 'active' is present */
 div.module.active, 
@@ -184,8 +184,6 @@ aside {
   background: yellow;
 }
 
-
-
 /* =====================================================
    Buttons & UI Elements
    ===================================================== */
@@ -247,25 +245,4 @@ aside {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-
-/* ===== FORCE PARTS TABLE SCROLL + STICKY ===== */
-
-.table-container {
-  max-height: 500px !important;
-  overflow-y: auto !important;
-  background: yellow !important; /* test */
-}
-
-#parts-table {
-  border-collapse: separate !important;
-  border-spacing: 0 !important;
-}
-
-#parts-table thead th {
-  position: sticky !important;
-  top: 0 !important;
-  background: #edf2f7 !important;
-  z-index: 20 !important;
 }
