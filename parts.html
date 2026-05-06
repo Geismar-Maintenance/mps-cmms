@@ -1,0 +1,68 @@
+<!-- ================= parts management module ================= -->
+<section id="module-parts" class="module">
+
+  <h4 class="mb-3">Parts Management</h4>
+
+  <!-- Context Banner -->
+  <div id="parts-context-banner" class="alert alert-info" style="display:none;"></div>
+
+  <!-- ✅ SEARCH (keep above everything) -->
+  <input
+    id="part-search"
+    class="form-control form-control-sm mb-3"
+    placeholder="Search by part number, model, or description (Press Enter)"
+  >
+
+  <div id="parts-placeholder" class="text-muted mb-2">
+    Search by part number, model, or description to view parts.
+  </div>
+
+  <!-- ✅ FILTER BUTTONS -->
+  <div class="btn-group mb-3" role="group" aria-label="Inventory Filters">
+
+    <button class="btn btn-outline-secondary"
+            onclick="setInventoryFilter('all')">
+      All
+    </button>
+
+    <button class="btn btn-outline-primary"
+            onclick="setInventoryFilter('in')">
+      In Stock
+    </button>
+
+    <button class="btn btn-outline-warning"
+            onclick="setInventoryFilter('low')">
+      Low Stock
+    </button>
+
+    <button class="btn btn-outline-danger"
+            onclick="setInventoryFilter('out')">
+      Out of Stock
+    </button>
+
+    <button class="btn btn-outline-info"
+            onclick="setInventoryFilter('receiving')">
+      Receiving
+    </button>
+
+  </div>
+
+  <!-- ✅ SCROLLABLE TABLE -->
+  <div class="table-container">
+    <table id="parts-table" class="table table-sm table-hover">
+      <thead>
+  <tr>
+    <th onclick="sortParts('partnumber')">Part #</th>
+    <th onclick="sortParts('description')">Description</th>
+    <th onclick="sortParts('manufacturer')">Manufacturer</th>
+    <th onclick="sortParts('model')">Model</th>
+    <th onclick="sortParts('total_qty')">Total Qty</th>
+    <th>Locations</th>
+    <th>Actions</th>
+  </tr>
+</thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+</section>
