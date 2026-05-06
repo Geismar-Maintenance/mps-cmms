@@ -382,7 +382,3 @@ async function getSelectedPart(partid) {
   }
 }
 
-  return null;
-}
-
-
