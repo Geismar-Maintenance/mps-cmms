@@ -1,21 +1,16 @@
 window.loadReports = function () {
 
-  const output = document.getElementById("report-output");
   const selector = document.getElementById("report-selector");
-  const params = document.getElementById("report-params");
 
-  if (output) {
-    output.innerHTML = "Select a report to begin";
-  }
+  if (!selector) return;
 
-  if (selector) {
-    selector.value = "";
-  }
+  // ✅ Auto-select first report
+  selector.value = "section";
 
-  if (params) {
-    params.style.display = "none";
-  }
+  // ✅ Render its UI immediately
+  handleReportSelection();
 };
+``
 
 window.handleReportSelection = function () {
   const value = document.getElementById("report-selector").value;
