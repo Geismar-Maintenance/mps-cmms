@@ -40,7 +40,7 @@ window.applyInventoryDashboardFilters = function () {
 /* ---------- ISSUE ---------- */
 window.openIssueModal = function (partid) {
 
-  selectedPart = getSelectedPart(partid); // ✅ ONE source of truth
+  selectedPart = await getSelectedPart(partid);
 
   if (!selectedPart) {
     alert("Part data not available");
@@ -122,7 +122,7 @@ body: JSON.stringify({
 /* ---------- RECEIVE ---------- */
 window.openReceiveModal = function (partid) {
 
-  selectedPart = getSelectedPart(partid);
+  selectedPart = await getSelectedPart(partid);
 
   if (!selectedPart) {
     alert("Part data not available");
@@ -195,7 +195,7 @@ body: JSON.stringify({
 /* ---------- MOVE ---------- */
 window.openMoveModal = async function (partid) {
 
-  selectedPart = getSelectedPart(partid);
+  selectedPart = await getSelectedPart(partid);
 
   if (!selectedPart) {
     alert("Part data not available");
