@@ -182,7 +182,10 @@ window.openPartDetail = async function (partId) {
   }
 
   const data = await res.json();
-  renderPartDetails(data);
+  
+window.currentPartData = data;
+renderPartDetails(data);
+
 };
 
 
