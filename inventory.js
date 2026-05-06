@@ -283,6 +283,105 @@ body: JSON.stringify({
   }
 }
 
+window.openCycleCountModal = async function (partid) {
+
+  selectedPart = await getSelectedPart(partid);
+
+  if (!selectedPart) {
+    alert("Part data not available");
+    return;
+  }
+
+  document.getElementById("cycle-partname").innerText =
+    `${selectedPart.partnumber} (${selectedPart.model ?? ""})`;
+
+  const locSelect = document.getElementById("cycle-location");
+  locSelect.replaceChildren();
+
+  if (!selectedPart.locations || !selectedPart.locations.length) {
+    alert("No inventory available");
+    return;
+  }
+
+  selectedPart.locations.forEach(loc => {
+    const opt = document.createElement("option");
+    opt.value = loc.locationid;
+    opt.textContent =
+      `${loc.cabinet}.${loc.section}.${loc.bin}`;
+
+    // store system qty on option
+    opt.dataset.qty = loc.qty;
+
+    locSelect.appendChild(opt);
+  });
+
+  // update system qty when changing location
+  locSelect.onchange = function () {
+    const selected = locSelect.selectedOptions[0];
+    document.getElementById("cycle-system-qty").value =
+      selected.dataset.qty;
+  };
+
+  locSelect.dispatchEvent(new Event("change"));
+
+  document.getElementById("cycle-actual-qty").value = "";
+
+  bootstrap.Modal
+    .getOrCreateInstance(document.getElementById("cycleCountModal"))
+    .show();
+};
+
+async function submitCycleCount() {
+
+  if (!selectedPart) {
+    alert("No part selected");
+    return;
+  }
+
+  const locationid = Number(
+    document.getElementById("cycle-location").value
+  );
+
+  const actualQty = Number(
+    document.getElementById("cycle-actual-qty").value
+  );
+
+  if (!locationid || isNaN(actualQty) || actualQty < 0) {
+    alert("Enter a valid quantity");
+    return;
+  }
+
+  try {
+
+    const res = await fetch(`${API_BASE}/api/transactions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        type: "cycle_count",
+        partid: selectedPart.partid,
+        locationid,
+        qty: actualQty,
+        performed_by: window.currentUser.display_name
+      })
+    });
+
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error);
+
+    bootstrap.Modal
+      .getInstance(document.getElementById("cycleCountModal"))
+      .hide();
+
+    refreshPartsTable();
+
+  } catch (err) {
+    alert(err.message || "Cycle count failed");
+    console.error(err);
+  }
+}
+
 /* ---------- SUPPORT ---------- */
 async function loadAssetsForIssue() {
   const select = document.getElementById("issue-asset");
