@@ -232,12 +232,12 @@ aside {
 }
 
 /* ================= LOGIN OVERLAY ================= */
-#login-screen {
-  position: fixed;
-  inset: 0;
-  background-color: #f8f9fa;
-  z-index: 2000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+//#login-screen {
+//  position: fixed;
+//  inset: 0;
+//  background-color: #f8f9fa;
+//  z-index: 2000;
+//  display: flex;
+//  align-items: center;
+//  justify-content: center;
+//}
