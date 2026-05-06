@@ -41,4 +41,67 @@ function renderSectionReportParams() {
     </div>
   `;
 }
-``
+
+window.runSectionReport = async function () {
+  const cabinet = document.getElementById("report-cabinet").value.trim();
+  const section = document.getElementById("report-section").value.trim();
+
+  if (!cabinet || !section) {
+    alert("Cabinet and section required");
+    return;
+  }
+
+  const output = document.getElementById("report-output");
+  output.innerHTML = "Loading...";
+
+  try {
+    const res = await fetch(`${API_BASE}/api/reports?type=inventory-section&cabinet=${cabinet}&section=${section}`)
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error);
+
+    renderSectionReport(data);
+
+  } catch (err) {
+    console.error(err);
+    output.innerHTML = `<div class="text-danger">Failed to load report</div>`;
+  }
+};
+
+function renderSectionReport(data) {
+  const output = document.getElementById("report-output");
+
+  if (!data.length) {
+    output.innerHTML =
+      `<div class="text-muted">No items found for this section.</div>`;
+    return;
+  }
+
+  output.innerHTML = `
+    <table class="table table-sm table-hover">
+      <thead>
+        <tr>
+          <th>Part #</th>
+          <th>Description</th>
+          <th>Location</th>
+          <th>Qty</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(row => `
+          <tr>
+            <td class="text-primary"
+                style="cursor:pointer"
+                onclick="openPartDetail(${row.partid})">
+              ${row.partnumber}
+            </td>
+            <td>${row.description}</td>
+            <td>${row.cabinet}.${row.section}.${row.bin}</td>
+            <td>${row.qty}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
