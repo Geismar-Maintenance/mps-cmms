@@ -305,13 +305,14 @@ window.openCycleCountModal = async function (partid) {
   }
 
   selectedPart.locations.forEach(loc => {
+     console.log("Cycle loc:", loc);
     const opt = document.createElement("option");
     
 const id =
   loc.locationid ??
   loc.location_id ??
   loc.id;
-
+console.log("Resolved ID:", id);
 opt.value = id;
 
     opt.textContent =
@@ -323,7 +324,7 @@ opt.value = id;
   });
    
 if (locSelect.options.length > 0) {
-  locSelect.selectedIndex = 0; // ✅ FORCE SELECTION
+  locSelect.selectedIndex = 0;
 }
 
   locSelect.onchange = function () {
@@ -346,8 +347,6 @@ document.getElementById("cycle-actual-qty").value = systemQty;
 };
 
 async function submitCycleCount() {
-   console.log("Cycle loc:", loc);
-
   if (!selectedPart) {
     alert("No part selected");
     return;
