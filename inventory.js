@@ -38,7 +38,7 @@ window.applyInventoryDashboardFilters = function () {
 };
 
 /* ---------- ISSUE ---------- */
-window.openIssueModal = function (partid) {
+window.openIssueModal = async function (partid) {
 
   selectedPart = await getSelectedPart(partid);
 
@@ -120,7 +120,7 @@ body: JSON.stringify({
 }
 
 /* ---------- RECEIVE ---------- */
-window.openReceiveModal = function (partid) {
+window.openReceiveModal = async function (partid) {
 
   selectedPart = await getSelectedPart(partid);
 
