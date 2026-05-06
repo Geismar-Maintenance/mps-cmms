@@ -282,6 +282,7 @@ body: JSON.stringify({
     console.error(err);
   }
 }
+/* ---------- CYCLE COUNT ---------- */
 
 window.openCycleCountModal = async function (partid) {
 
@@ -323,8 +324,12 @@ window.openCycleCountModal = async function (partid) {
   };
 
   locSelect.dispatchEvent(new Event("change"));
+ 
+const systemQty =
+  document.getElementById("cycle-system-qty").value;
 
-  document.getElementById("cycle-actual-qty").value = "";
+document.getElementById("cycle-actual-qty").value = systemQty;
+
 
   bootstrap.Modal
     .getOrCreateInstance(document.getElementById("cycleCountModal"))
