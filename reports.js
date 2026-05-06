@@ -119,3 +119,32 @@ function renderSectionReport(data) {
     </table>
   `;
 }
+
+function exportToExcel(data) {
+
+  const headers = Object.keys(data[0]);
+
+  const csv = [
+    headers.join(","), // header row
+    ...data.map(row =>
+      headers.map(field => `"${row[field] ?? ""}"`).join(",")
+    )
+  ].join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv" });
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "inventory_report.csv";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+
+function printReport() {
+  window.print();
+}
+
