@@ -73,22 +73,7 @@ window.openIssueModal = function (partid) {
     .show();
 };
 
-  selectedPart.locations.forEach(loc => {
-    const opt = document.createElement("option");
-    opt.value = loc.locationid;
-    opt.textContent =
-      `${loc.cabinet}.${loc.section}.${loc.bin} (Qty ${loc.qty})`;
-    locSelect.appendChild(opt);
-  });
-
-  loadAssetsForIssue();
-
-  bootstrap.Modal
-    .getOrCreateInstance(document.getElementById("issueModal"))
-    .show();
-}
-
-async function submitIssue() {
+ async function submitIssue() {
   const assetid = document.getElementById("issue-asset").value;
   const locationid = document.getElementById("issue-location").value;
   const qty = Number(document.getElementById("issue-qty").value);
