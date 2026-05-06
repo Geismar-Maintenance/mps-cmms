@@ -181,6 +181,7 @@ window.switchModule = function (moduleName, el) {
   if (moduleName === "pm-management") loadPMManagement();
   if (moduleName === "parts") loadParts();
   if (moduleName === "locations") {loadLocations();
+  if (moduleName === "reports") loadReports();
 }
 
 };
