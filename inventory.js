@@ -339,6 +339,7 @@ document.getElementById("cycle-actual-qty").value = systemQty;
 };
 
 async function submitCycleCount() {
+   console.log("Cycle loc:", loc);
 
   if (!selectedPart) {
     alert("No part selected");
