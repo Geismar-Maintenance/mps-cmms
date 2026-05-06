@@ -76,7 +76,7 @@ window.loadInventoryFilteredParts = async function (type) {
 
   const data = await res.json();
 
-  allParts = data.map(p => ({
+  window.currentParts = data.map(p => ({
     ...p,
     total_qty: Number(p.total_qty ?? 0),
     locations: Array.isArray(p.locations) ? p.locations : []
@@ -85,7 +85,7 @@ window.loadInventoryFilteredParts = async function (type) {
   document.getElementById("parts-placeholder")
     ?.style.setProperty("display", "none");
 
-  renderPartsTable(allParts);
+  renderPartsTable(window.currentParts);
 };
 
 /* ---------- Search ---------- */
@@ -122,14 +122,14 @@ async function runPartSearch() {
 
   const data = await res.json();
 
-  allParts = data.map(p => ({
+ window.currentParts = data.map(p => ({
     ...p,
     total_qty: Number(p.total_qty ?? 0),
     locations: Array.isArray(p.locations) ? p.locations : []
   }));
 
   document.getElementById("parts-placeholder")?.style.setProperty("display", "none");
-  renderPartsTable(allParts);
+  renderPartsTable(window.currentParts);
 }
 
 /* ---------- Rendering ---------- */
