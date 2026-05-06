@@ -332,27 +332,7 @@ window.openCycleCountModal = async function (partid) {
 };
 
 async function submitCycleCount() {
-  const locationid = Number(
-    document.getElementById("cycle-location").value
-  );
 
-  const input = document.getElementById("cycle-actual-qty").value;
-
-  console.log("Raw input:", input);
-
-  const actualQty = Number(input);
-
-  console.log("Parsed qty:", actualQty);
-  console.log("Location ID:", locationid);
-
-  if (!locationid || isNaN(actualQty) || actualQty < 0) {
-    alert("Enter a valid quantity");
-    return;
-  }
-
-  // rest of function...
-}
-``
   if (!selectedPart) {
     alert("No part selected");
     return;
@@ -362,9 +342,19 @@ async function submitCycleCount() {
     document.getElementById("cycle-location").value
   );
 
-  const actualQty = Number(
-    document.getElementById("cycle-actual-qty").value
-  );
+  const input = document.getElementById("cycle-actual-qty").value.trim();
+
+  console.log("Raw input:", input);
+
+  if (input === "") {
+    alert("Enter a quantity");
+    return;
+  }
+
+  const actualQty = Number(input);
+
+  console.log("Parsed qty:", actualQty);
+  console.log("Location ID:", locationid);
 
   if (!locationid || isNaN(actualQty) || actualQty < 0) {
     alert("Enter a valid quantity");
@@ -401,6 +391,7 @@ async function submitCycleCount() {
     console.error(err);
   }
 }
+
 
 /* ---------- SUPPORT ---------- */
 async function loadAssetsForIssue() {
