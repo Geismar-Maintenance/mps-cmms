@@ -38,9 +38,27 @@ window.applyInventoryDashboardFilters = function () {
 };
 
 /* ---------- ISSUE ---------- */
-function openIssueModal(partid) {
-  selectedPart = allParts.find(p => Number(p.partid) === Number(partid));
-  if (!selectedPart) return;
+window.openIssueModal = function (partid) {
+
+  let selectedPart = null;
+
+  // ✅ Try using part detail data first
+  if (window.currentPartData && window.currentPartData.part.partid == partid) {
+    selectedPart = {
+      ...window.currentPartData.part,
+      locations: window.currentPartData.locations
+    };
+  }
+  // ✅ fallback to parts table
+  else if (window.allParts) {
+    selectedPart = allParts.find(p => Number(p.partid) === Number(partid));
+  }
+
+  if (!selectedPart) {
+    alert("Part data not available");
+    return;
+  }
+
 
   document.getElementById("issue-partname").innerText =
     `${selectedPart.partnumber} (${selectedPart.model ?? ""})`;
