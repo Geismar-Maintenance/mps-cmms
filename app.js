@@ -9,6 +9,12 @@ let partsEntryMode = "sidebar";
 
 window.currentUser = null;
 
+document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("hidden.bs.modal", () => {
+    document.activeElement.blur();
+  });
+});
+
 /* ======================================================
    NAV HELPERS
    ====================================================== */
