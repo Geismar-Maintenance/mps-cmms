@@ -9,7 +9,19 @@ let partsEntryMode = "sidebar";
 
 window.currentUser = null;
 
-document.addEventListener("DOMContentLoaded", () => {
+/* ======================================================
+   APP INITIALIZATION
+   ====================================================== */
+async function loadModals() {
+  const res = await fetch("modals.html");
+  document.getElementById("modal-root").innerHTML = await res.text();
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  // ✅ Load global modals once
+  await loadModals();
+
+  // ✅ Modal focus cleanup
   document.addEventListener("hidden.bs.modal", () => {
     document.activeElement.blur();
   });
