@@ -217,7 +217,5 @@ window.switchModule = async function (moduleName, el) {
   );
   if (el) el.classList.add("active");
 };
-  );
-  if (el) el.classList.add("active");
 };
 
