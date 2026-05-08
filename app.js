@@ -179,43 +179,33 @@ async function submitPinChange() {
    NAVIGATION
    ====================================================== */
 window.switchModule = async function (moduleName, el) {
+  try {
+    const res = await fetch(`${moduleName}.html`);
+    if (!res.ok) throw new Error(`Failed to load ${moduleName}.html`);
 
-  if (moduleName === "dashboard") {
-    const res = await fetch("dashboard.html");
     document.getElementById("app-root").innerHTML = await res.text();
-    if (typeof loadDashboard === "function") loadDashboard();
 
-  } else if (moduleName === "parts-history") {
-    const res = await fetch("partshistory.html");
-    document.getElementById("app-root").innerHTML = await res.text();
-    if (typeof loadPartsHistory === "function") loadPartsHistory();
+    // nav highlighting
+    document.querySelectorAll("#module-nav .nav-link").forEach(l =>
+      l.classList.remove("active")
+    );
+    if (el) el.classList.add("active");
 
-  } else {
-      if (moduleName === "wo-history") loadWOHistory();
-  if (moduleName === "workorders") loadWorkOrders();
-  if (moduleName === "pm") loadPMView();
-  if (moduleName === "pm-management") loadPMManagement();
-  if (moduleName === "parts") loadParts();
-  if (moduleName === "locations") {loadLocations();
-  if (moduleName === "reports") loadReports();
+    // module initializers
+    if (moduleName === "dashboard" && typeof loadDashboard === "function") loadDashboard();
+    if (moduleName === "parts" && typeof loadParts === "function") loadParts();
+    if (moduleName === "workorders" && typeof loadWorkOrders === "function") loadWorkOrders();
+    if (moduleName === "parts-history" && typeof loadPartsHistory === "function") loadPartsHistory();
+    if (moduleName === "wo-history" && typeof loadWOHistory === "function") loadWOHistory();
+    if (moduleName === "reports" && typeof loadReports === "function") loadReports();
+    if (moduleName === "admin" && typeof loadAdmin === "function") loadAdmin();
+    if (moduleName === "locations" && typeof loadLocations === "function") loadLocations();
+    if (moduleName === "pm" && typeof loadPMView === "function") loadPMView();
+    if (moduleName === "pm-management" && typeof loadPMManagement === "function") loadPMManagement();
 
-    document.querySelectorAll(".module").forEach(m => {
-      m.classList.remove("active");
-      m.style.display = "none";
-    });
-
-    const target = document.getElementById(`module-${moduleName}`);
-    if (target) {
-      target.classList.add("active");
-      target.style.display = "block";
-    }
+  } catch (err) {
+    console.error("Module load failed:", err);
+    document.getElementById("app-root").innerHTML =
+      `<div class="alert alert-danger">Failed to load module</div>`;
   }
-
-  // nav highlighting
-  document.querySelectorAll("#module-nav .nav-link").forEach(l =>
-    l.classList.remove("active")
-  );
-  if (el) el.classList.add("active");
 };
-};
-
