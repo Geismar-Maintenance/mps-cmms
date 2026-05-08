@@ -178,22 +178,37 @@ async function submitPinChange() {
 /* ======================================================
    NAVIGATION
    ====================================================== */
-window.switchModule = function (moduleName, el) {
-  document.querySelectorAll(".module").forEach(m => {
-    m.classList.remove("active");
-    m.style.display = "none";
-  });
+window.switchModule = async function (moduleName, el) {
+  // ✅ TEMP: only dashboard uses file-based loading
+  if (moduleName === "dashboard") {
+    const res = await fetch("dashboard.html");
+    const html = await res.text();
+    document.getElementById("app-root").innerHTML = html;
 
-  const target = document.getElementById(`module-${moduleName}`);
-  if (target) {
-    target.classList.add("active");
-    target.style.display = "block";
+    if (typeof loadDashboard === "function") {
+      loadDashboard();
+    }
+  } else {
+    // ✅ fallback to old behavior for everything else
+    document.querySelectorAll(".module").forEach(m => {
+      m.classList.remove("active");
+      m.style.display = "none";
+    });
+
+    const target = document.getElementById(`module-${moduleName}`);
+    if (target) {
+      target.classList.add("active");
+      target.style.display = "block";
+    }
   }
 
+  // nav highlighting
   document.querySelectorAll("#module-nav .nav-link").forEach(l =>
     l.classList.remove("active")
   );
   if (el) el.classList.add("active");
+};
+
 
   if (moduleName === "dashboard") loadDashboard();
   if (moduleName === "parts-history") loadPartsHistory();
