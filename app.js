@@ -89,9 +89,9 @@ window.submitLogin = async function (e) {
     const appShell = document.getElementById("app-shell");
     if (appShell) appShell.style.display = "block";
 
-    if (typeof loadDashboard === "function") {
-      loadDashboard();
-    }
+
+switchModule("dashboard", document.querySelector(
+  "#module-nav button[onclick*='dashboard']"))
 
     console.log("Logged in as", data.display_name);
 
