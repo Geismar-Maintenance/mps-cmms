@@ -191,17 +191,44 @@ window.switchModule = async function (moduleName, el) {
     );
     if (el) el.classList.add("active");
 
-    // module initializers
-    if (moduleName === "dashboard" && typeof loadDashboard === "function") loadDashboard();
-    if (moduleName === "parts" && typeof loadParts === "function") loadParts();
-    if (moduleName === "workorders" && typeof loadWorkOrders === "function") loadWorkOrders();
-    if (moduleName === "parts-history" && typeof loadPartsHistory === "function") loadPartsHistory();
-    if (moduleName === "wo-history" && typeof loadWOHistory === "function") loadWOHistory();
-    if (moduleName === "reports" && typeof loadReports === "function") loadReports();
-    if (moduleName === "admin" && typeof loadAdmin === "function") loadAdmin();
-    if (moduleName === "locations" && typeof loadLocations === "function") loadLocations();
-    if (moduleName === "pm" && typeof loadPMView === "function") loadPMView();
-    if (moduleName === "pm-management" && typeof loadPMManagement === "function") loadPMManagement();
+    // ✅ module initializers (THIS IS REQUIRED)
+    switch (moduleName) {
+      case "dashboard":
+        loadDashboard();
+        break;
+
+      case "parts":
+        loadParts();
+        break;
+
+      case "parts-history":
+        loadPartsHistory();
+        break;
+
+      case "wo-history":
+        loadWOHistory();
+        break;
+
+      case "workorders":
+        loadWorkOrders();
+        break;
+
+      case "reports":
+        loadReports();
+        break;
+
+      case "locations":
+        loadLocations();
+        break;
+
+      case "pm":
+        loadPMView();
+        break;
+
+      case "pm-management":
+        loadPMManagement();
+        break;
+    }
 
   } catch (err) {
     console.error("Module load failed:", err);
