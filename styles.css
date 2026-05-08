@@ -30,12 +30,12 @@ body {
 // }
 
 /* High-specificity rule to force visibility when 'active' is present */
-div.module.active, 
-div.content-section.active {
-  display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
+// div.module.active, 
+// div.content-section.active {
+//   display: block !important;
+//   opacity: 1 !important;
+//   visibility: visible !important;
+// }
 
 /* =====================================================
    Layout Components (Navbar & Sidebar)
