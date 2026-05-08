@@ -186,7 +186,7 @@ window.switchModule = async function (moduleName, el) {
     if (typeof loadDashboard === "function") loadDashboard();
 
   } else if (moduleName === "parts-history") {
-    const res = await fetch("parthistory.html");
+    const res = await fetch("partshistory.html");
     document.getElementById("app-root").innerHTML = await res.text();
     if (typeof loadPartsHistory === "function") loadPartsHistory();
 
