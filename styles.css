@@ -172,16 +172,14 @@ aside {
   position: relative;
 }
 
-#parts-table thead th {
+
+.table-container thead th {
   position: sticky;
   top: 0;
-  background-color: #edf2f7; /* match your header color */
+  background-color: #edf2f7;
   z-index: 10;
 }
 
-#parts-table thead th {
-  position: sticky !important;
-}
 
 #parts-table {
   border-collapse: separate;
