@@ -429,7 +429,7 @@ async function loadAssetsForIssue() {
 
 async function loadMoveDestinationLocations() {
 
-  const res = await fetch(`${API_BASE}/api/locations?type=move_dest`);
+  const res = await fetch(`${API_BASE}/api/locations?type=move_dest&partid=${selectedPart.partid}`);
   const locations = await res.json();
 
   const toSelect = document.getElementById("move-to-location");
