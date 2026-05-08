@@ -209,16 +209,3 @@ window.switchModule = async function (moduleName, el) {
   if (el) el.classList.add("active");
 };
 
-
-  if (moduleName === "dashboard") loadDashboard();
-  if (moduleName === "parts-history") loadPartsHistory();
-  if (moduleName === "wo-history") loadWOHistory();
-  if (moduleName === "workorders") loadWorkOrders();
-  if (moduleName === "pm") loadPMView();
-  if (moduleName === "pm-management") loadPMManagement();
-  if (moduleName === "parts") loadParts();
-  if (moduleName === "locations") {loadLocations();
-  if (moduleName === "reports") loadReports();
-}
-
-};
