@@ -179,17 +179,26 @@ async function submitPinChange() {
    NAVIGATION
    ====================================================== */
 window.switchModule = async function (moduleName, el) {
-  // ✅ TEMP: only dashboard uses file-based loading
+
   if (moduleName === "dashboard") {
     const res = await fetch("dashboard.html");
-    const html = await res.text();
-    document.getElementById("app-root").innerHTML = html;
+    document.getElementById("app-root").innerHTML = await res.text();
+    if (typeof loadDashboard === "function") loadDashboard();
 
-    if (typeof loadDashboard === "function") {
-      loadDashboard();
-    }
+  } else if (moduleName === "parts-history") {
+    const res = await fetch("parthistory.html");
+    document.getElementById("app-root").innerHTML = await res.text();
+    if (typeof loadPartsHistory === "function") loadPartsHistory();
+
   } else {
-    // ✅ fallback to old behavior for everything else
+      if (moduleName === "wo-history") loadWOHistory();
+  if (moduleName === "workorders") loadWorkOrders();
+  if (moduleName === "pm") loadPMView();
+  if (moduleName === "pm-management") loadPMManagement();
+  if (moduleName === "parts") loadParts();
+  if (moduleName === "locations") {loadLocations();
+  if (moduleName === "reports") loadReports();
+
     document.querySelectorAll(".module").forEach(m => {
       m.classList.remove("active");
       m.style.display = "none";
@@ -205,6 +214,9 @@ window.switchModule = async function (moduleName, el) {
   // nav highlighting
   document.querySelectorAll("#module-nav .nav-link").forEach(l =>
     l.classList.remove("active")
+  );
+  if (el) el.classList.add("active");
+};
   );
   if (el) el.classList.add("active");
 };
