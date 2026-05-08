@@ -133,6 +133,22 @@ async function loadLocations() {
     const res = await fetch(`${API_BASE}/api/locations`);
     const data = await res.json();
 
+    // ✅ SORT: Cabinet → Section → Bin
+    data.sort((a, b) => {
+      // Cabinet (string)
+      if (a.cabinet !== b.cabinet) {
+        return a.cabinet.localeCompare(b.cabinet);
+      }
+
+      // Section (string)
+      if (a.section !== b.section) {
+        return a.section.localeCompare(b.section);
+      }
+
+      // Bin (numeric-safe)
+      return Number(a.bin) - Number(b.bin);
+    });
+
     const tbody = document.querySelector("#locations-table tbody");
     tbody.innerHTML = "";
 
@@ -153,7 +169,6 @@ async function loadLocations() {
     console.error("Failed to load locations", err);
   }
 }
-
 window.addLocationRange = async function () {
   const cabinet = document.getElementById("loc-cabinet").value.trim().toUpperCase();
   const section = document.getElementById("loc-section").value.trim().toUpperCase();
