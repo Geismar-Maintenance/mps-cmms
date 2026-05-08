@@ -33,12 +33,31 @@ window.loadParts = function () {
   console.log("loadParts called, inventoryFilter =", filter);
 
   const validFilters = ["all", "in", "low", "out", "receiving"];
-
   const resolvedFilter = validFilters.includes(filter) ? filter : "all";
+
+  // ✅ attach search handler AFTER DOM exists
+  initPartSearch();
 
   window.loadInventoryFilteredParts(resolvedFilter);
 };
 
+function initPartSearch() {
+  const input = document.getElementById("part-search");
+
+  if (!input) {
+    console.warn("part-search input not found");
+    return;
+  }
+
+  // prevent duplicate bindings if user revisits module
+  input.onkeydown = null;
+
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      runPartSearch();
+    }
+  });
+}
 
 /* ---------- Filtered Inventory ---------- */
 function setInventoryFilter(type) {
@@ -89,12 +108,6 @@ window.loadInventoryFilteredParts = async function (type) {
 };
 
 /* ---------- Search ---------- */
-document.getElementById("part-search")?.addEventListener("keydown", e => {
-  if (e.key === "Enter") {
-    runPartSearch();
-  }
-});
-
 async function runPartSearch() {
   const input = document.getElementById("part-search");
   const query = input.value.trim();
