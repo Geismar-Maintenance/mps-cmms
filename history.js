@@ -6,6 +6,7 @@
 
 // Load Parts History
 window.loadPartsHistory = async function () {
+   console.log("loadPartsHistory() called");
   const tbody = document.querySelector("#parts-history-table tbody");
   if (!tbody) return;
 
