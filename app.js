@@ -242,7 +242,7 @@ window.switchModule = async function (moduleName, el) {
         break;
           
       case "assets":
-        loadAssetsModule();
+        loadAssets();
         break;
 
     }
