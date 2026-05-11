@@ -183,12 +183,12 @@ function renderRuntimeAlert(data) {
         </div>
       </div>
 
-      <button class="btn btn-sm btn-outline-dark ms-3"
-              onclick=loadModule("assets", {  week_id: missingWeekId
-});
 
-        Enter Runtime
-      </button>
+<button class="btn btn-sm btn-outline-dark ms-3"
+  onclick="switchModule('assets', { week_id: missingWeekId })">
+  Enter Runtime
+</button>
+
 
     </div>
   `;
