@@ -120,69 +120,77 @@ window.goToInventory = function (type) {
 };
 
 async function loadRuntimeValidation() {
-  const res = await fetch(`${API_BASE}/api/reports?type=missing-runtime`);
+  const alertBox = document.getElementById("runtime-alert");
 
-  if (!res.ok) {
-    throw new Error("Runtime validation request failed");
+  if (!alertBox) return;
+
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/reports?type=missing-runtime`
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error("Runtime validation error:", data);
+      throw new Error(data.error || "Request failed");
+    }
+
+    console.log("Runtime validation:", data);
+
+    if (data.hasMissing) {
+      renderRuntimeAlert(data);
+    } else {
+      alertBox.style.display = "none";
+      alertBox.innerHTML = "";
+    }
+
+  } catch (err) {
+    console.error("Failed to validate runtime data:", err);
+
+    alertBox.className = "alert alert-danger";
+    alertBox.style.display = "block";
+    alertBox.innerHTML = `
+      <strong>Error:</strong> Unable to validate runtime data.
+    `;
   }
-
-  const data = await res.json();
-
-  renderRuntimeAlert(data);
 }
 
 function renderRuntimeAlert(data) {
-  const container = document.getElementById("runtime-alert");
+  const alertBox = document.getElementById("runtime-alert");
 
-  if (!container) return;
+  if (!alertBox) return;
 
-  // ✅ No missing data → hide card
-  if (!data.hasMissing) {
-    container.innerHTML = "";
-    return;
-  }
+  alertBox.className = "alert alert-warning";
+  alertBox.style.display = "block";
 
-  const list = data.missingAssets
-    .map(a => `<li>${a.assetname}</li>`)
-    .join("");
+  const count = data.missingAssets.length;
 
-  container.innerHTML = `
-    <div class="card border-danger shadow-sm">
-      <div class="card-body">
+  alertBox.innerHTML = `
+    <div class="d-flex justify-content-between align-items-start">
+      
+      <div>
+        <strong>Runtime Data Required</strong><br>
+        Week ${data.week} (${data.year}) is missing runtime entries.<br>
 
-        <div class="d-flex justify-content-between align-items-center">
-          <h6 class="card-title text-danger mb-0">
-            ⚠️ Runtime Data Required
-          </h6>
+        <div class="mt-2">
+          <strong>${count} Machine${count !== 1 ? "s" : ""} Affected:</strong>
+          <ul class="mb-0">
+            ${data.missingAssets.map(a => `
+              <li>${a.assetname}</li>
+            `).join("")}
+          </ul>
         </div>
-
-        <p class="mt-2 mb-2">
-          Week <strong>${data.week}</strong> (${data.year})
-          is missing runtime entry.
-        </p>
-
-        <p class="mb-1"><strong>Affected Machines:</strong></p>
-
-        <ul class="mb-3">
-          ${list}
-        </ul>
-
-        <div class="d-flex justify-content-between align-items-center">
-          <span class="text-muted small">
-            ${data.missingAssets.length} machine(s) missing data
-          </span>
-
-          <button class="btn btn-sm btn-outline-danger"
-                  onclick="openRuntimeEntry()">
-            Enter Runtime
-          </button>
-        </div>
-
       </div>
+
+      <button class="btn btn-sm btn-outline-dark ms-3"
+              onclick="switchModule('assets')">
+        Enter Runtime
+      </button>
+
     </div>
   `;
 }
-
 
 function openRuntimeEntry() {
   loadModule("assets"); // match your module name
