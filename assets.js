@@ -2,16 +2,15 @@
    ASSETS MODULE (RUNTIME ENTRY)
    ====================================================== */
 
-window.loadAssets = async function () {
-  const container = document.getElementById("app-root");
-
-    initAssetsPage();
+window.loadAssets = function () {
+  initAssetsPage();
 };
 
 /* ======================================================
    INIT
    ====================================================== */
-async function initAssetsPage() {
+
+function initAssetsPage() {
   loadAssetsList();
 
   const filters = window.currentModuleFilters || {};
@@ -19,11 +18,9 @@ async function initAssetsPage() {
   if (filters.week_id) {
     setWeek(filters.week_id);
   } else {
-    loadWeekOptions();
+    console.warn("No week_id provided to assets module");
   }
 }
-``
-
 
 /* ======================================================
    LOAD ASSETS
@@ -36,8 +33,6 @@ async function loadAssetsList() {
     console.log("asset-list not found");
     return;
   }
-
-  console.log("Loading assets...");
 
   list.innerHTML = `<li class="list-group-item">Loading...</li>`;
 
@@ -61,6 +56,12 @@ async function loadAssetsList() {
 
       li.onclick = () => {
         selectAsset(a);
+
+        // highlight selected
+        document.querySelectorAll("#asset-list li")
+          .forEach(el => el.classList.remove("active"));
+
+        li.classList.add("active");
       };
 
       list.appendChild(li);
@@ -72,33 +73,28 @@ async function loadAssetsList() {
       `<li class="list-group-item text-danger">Error loading assets</li>`;
   }
 }
+
 /* ======================================================
-   LOAD WEEKS
+   SET WEEK (READ ONLY)
    ====================================================== */
 
-async function loadWeekOptions() {
-  const select = document.getElementById("runtime-week");
+function setWeek(weekId) {
+  const display = document.getElementById("runtime-week-display");
+  if (!display) return;
 
-  if (!select) return;
+  display.value = `Week ${weekId}`;
+}
 
-  select.innerHTML = `<option>Loading weeks...</option>`;
+/* ======================================================
+   SELECT ASSET
+   ====================================================== */
 
-  try {
-    const res = await fetch(`${API_BASE}/api/assets?action=weeks`);
-    const weeks = await res.json();
+function selectAsset(asset) {
+  window.selectedAsset = asset;
 
-    select.innerHTML = "";
-
-    weeks.forEach(w => {
-      const opt = document.createElement("option");
-      opt.value = w.week_id;
-      opt.textContent = `Week ${w.week_number} (${w.year})`;
-      select.appendChild(opt);
-    });
-
-  } catch (err) {
-    console.error("Failed to load weeks:", err);
-    select.innerHTML = `<option>Error loading weeks</option>`;
+  const input = document.getElementById("runtime-asset-name");
+  if (input) {
+    input.value = asset.assetname;
   }
 }
 
@@ -109,11 +105,12 @@ async function loadWeekOptions() {
 window.submitRuntime = async function () {
 
   const asset = window.selectedAsset;
-  const weekId = document.getElementById("runtime-week").value;
+  const filters = window.currentModuleFilters || {};
+  const weekId = filters.week_id;
   const hours = document.getElementById("runtime-hours").value;
 
   if (!asset || !weekId || !hours) {
-    alert("Select an asset, week, and enter hours");
+    alert("Select an asset and enter hours");
     return;
   }
 
@@ -125,7 +122,7 @@ window.submitRuntime = async function () {
       },
       body: JSON.stringify({
         action: "add-runtime",
-        asset_id: asset.assetid,   // ✅ FIXED (was assetId)
+        asset_id: asset.assetid,
         week_id: weekId,
         runtime_hours: hours,
         recorded_by: window.currentUser.display_name
@@ -149,24 +146,3 @@ window.submitRuntime = async function () {
     alert("Failed to save runtime");
   }
 };
-function selectAsset(asset) {
-  console.log("Selected asset:", asset);
-
-  // store selected asset globally
-  window.selectedAsset = asset;
-
-  // update UI field
-  const input = document.getElementById("runtime-asset-name");
-  if (input) {
-    input.value = asset.assetname;
-  }
-}
-
-function setWeek(weekId) {
-  const display = document.getElementById("runtime-week-display");
-  if (!display) return;
-
-  display.value = `Week ${weekId}`;
-}
-
-
