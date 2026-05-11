@@ -141,3 +141,16 @@ window.submitRuntime = async function () {
     alert("Failed to save runtime");
   }
 };
+function selectAsset(asset) {
+  console.log("Selected asset:", asset);
+
+  // store selected asset globally
+  window.selectedAsset = asset;
+
+  // update UI field
+  const input = document.getElementById("runtime-asset-name");
+  if (input) {
+    input.value = asset.assetname;
+  }
+}
+
