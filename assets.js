@@ -144,22 +144,19 @@ window.submitRuntime = async function () {
 };
 /* ======================================================
    ASSETS MODULE
-   Handles runtime entry UI + logic
    ====================================================== */
 
-export async function loadAssets() {
-  const container = document.getElementById("main-content");
+window.loadAssets = async function () {
+  const container = document.getElementById("app-root");
 
   container.innerHTML = "Loading runtime entry...";
 
   try {
-    // ✅ Load HTML UI
-    const res = await fetch("/assets.html");
+    const res = await fetch("assets.html");
     const html = await res.text();
 
     container.innerHTML = html;
 
-    // ✅ Initialize page behavior
     initAssetsPage();
 
   } catch (err) {
@@ -171,15 +168,13 @@ export async function loadAssets() {
       </div>
     `;
   }
-}
+};
 
 /* ======================================================
-   INITIALIZATION
+   INIT
    ====================================================== */
 
 function initAssetsPage() {
-  console.log("Assets module initialized");
-
   loadAssetsList();
   loadWeekOptions();
 }
@@ -190,21 +185,20 @@ function initAssetsPage() {
 
 async function loadAssetsList() {
   const select = document.getElementById("runtime-asset");
-
   if (!select) return;
 
-  select.innerHTML = `<option value="">Loading assets...</option>`;
+  select.innerHTML = `<option>Loading assets...</option>`;
 
   try {
-    const res = await fetch(`${API_BASE}/api/assets?action=list`);
-    const data = await res.json();
+    const res = await fetch(`${API_BASE}/api/assets`);
+    const assets = await res.json();
 
     select.innerHTML = `<option value="">Select Asset</option>`;
 
-    data.forEach(asset => {
+    assets.forEach(a => {
       const opt = document.createElement("option");
-      opt.value = asset.assetid;
-      opt.textContent = asset.assetname;
+      opt.value = a.assetid;
+      opt.textContent = a.assetname;
       select.appendChild(opt);
     });
 
@@ -220,18 +214,17 @@ async function loadAssetsList() {
 
 async function loadWeekOptions() {
   const select = document.getElementById("runtime-week");
-
   if (!select) return;
 
   select.innerHTML = `<option>Loading weeks...</option>`;
 
   try {
     const res = await fetch(`${API_BASE}/api/assets?action=weeks`);
-    const data = await res.json();
+    const weeks = await res.json();
 
     select.innerHTML = "";
 
-    data.forEach(w => {
+    weeks.forEach(w => {
       const opt = document.createElement("option");
       opt.value = w.week_id;
       opt.textContent = `Week ${w.week_number} (${w.year})`;
@@ -280,14 +273,13 @@ window.submitRuntime = async function () {
 
     alert("Runtime saved successfully");
 
-    // ✅ reload dashboard to refresh alert
     if (window.loadDashboard) {
       window.loadDashboard();
     }
 
   } catch (err) {
     console.error("Runtime submission failed:", err);
-
     alert("Failed to save runtime");
   }
 };
+
