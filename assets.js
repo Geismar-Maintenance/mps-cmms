@@ -11,20 +11,18 @@ window.loadAssets = async function () {
 /* ======================================================
    INIT
    ====================================================== */
-
 function initAssetsPage() {
   loadAssetsList();
-   
+
   const filters = window.currentModuleFilters || {};
 
   if (filters.week_id) {
     setWeek(filters.week_id);
   } else {
-    loadWeekOptions(); // fallback
+    loadWeekOptions();
+  }
+}
 
-  loadWeekOptions();
-}
-}
 
 /* ======================================================
    LOAD ASSETS
@@ -108,14 +106,14 @@ async function loadWeekOptions() {
    ====================================================== */
 
 window.submitRuntime = async function () {
-const asset = window.selectedAsset;
-const weekId = document.getElementById("runtime-week").value;
-const hours = document.getElementById("runtime-hours").value;
 
-if (!asset || !weekId || !hours) {
-  alert("Select an asset, week, and enter hours");
-  return;
-}
+  const asset = window.selectedAsset;
+  const weekId = document.getElementById("runtime-week").value;
+  const hours = document.getElementById("runtime-hours").value;
+
+  if (!asset || !weekId || !hours) {
+    alert("Select an asset, week, and enter hours");
+    return;
   }
 
   try {
@@ -126,9 +124,9 @@ if (!asset || !weekId || !hours) {
       },
       body: JSON.stringify({
         action: "add-runtime",
-        asset_id: assetId,
+        asset_id: asset.assetid,   // ✅ FIXED (was assetId)
         week_id: weekId,
-        total_hours: hours,
+        runtime_hours: hours,
         recorded_by: window.currentUser.display_name
       })
     });
@@ -141,7 +139,6 @@ if (!asset || !weekId || !hours) {
 
     alert("Runtime saved successfully");
 
-    // ✅ Refresh dashboard alert
     if (window.loadDashboard) {
       window.loadDashboard();
     }
@@ -162,5 +159,13 @@ function selectAsset(asset) {
   if (input) {
     input.value = asset.assetname;
   }
+}
+
+function setWeek(weekId) {
+  const select = document.getElementById("runtime-week");
+  if (!select) return;
+
+  select.innerHTML = `<option value="${weekId}">Week ${weekId}</option>`;
+  select.value = weekId;
 }
 
