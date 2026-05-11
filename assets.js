@@ -22,31 +22,36 @@ function initAssetsPage() {
    ====================================================== */
 
 async function loadAssetsList() {
-  const select = document.getElementById("runtime-asset");
+  const list = document.getElementById("asset-list");
 
-  if (!select) return;
+  if (!list) return;
 
-  select.innerHTML = `<option>Loading...</option>`;
+  list.innerHTML = `<li class="list-group-item">Loading...</li>`;
 
   try {
     const res = await fetch(`${API_BASE}/api/assets`);
     const assets = await res.json();
 
-    select.innerHTML = `<option value="">Select Asset</option>`;
+    list.innerHTML = "";
 
     assets.forEach(a => {
-      const opt = document.createElement("option");
-      opt.value = a.assetid;
-      opt.textContent = a.assetname;
-      select.appendChild(opt);
+      const li = document.createElement("li");
+      li.className = "list-group-item list-group-item-action";
+      li.style.cursor = "pointer";
+
+      li.textContent = a.assetname;
+
+      li.onclick = () => selectAsset(a);
+
+      list.appendChild(li);
     });
 
   } catch (err) {
     console.error("Failed to load assets:", err);
-    select.innerHTML = `<option>Error loading assets</option>`;
+    list.innerHTML =
+      `<li class="list-group-item text-danger">Error loading assets</li>`;
   }
 }
-
 /* ======================================================
    LOAD WEEKS
    ====================================================== */
