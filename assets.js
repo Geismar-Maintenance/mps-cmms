@@ -14,7 +14,16 @@ window.loadAssets = async function () {
 
 function initAssetsPage() {
   loadAssetsList();
+   
+  const filters = window.currentModuleFilters || {};
+
+  if (filters.week_id) {
+    setWeek(filters.week_id);
+  } else {
+    loadWeekOptions(); // fallback
+
   loadWeekOptions();
+}
 }
 
 /* ======================================================
