@@ -42,6 +42,12 @@ async function loadDashboard() {
     console.error("Failed to load inventory summary", err);
   }
 
+  try {
+    await loadRuntimeValidation();
+  } catch (err) {
+    console.error("Failed to validate runtime data", err);
+  }
+
   renderDashboard();
 }
 
@@ -86,14 +92,6 @@ function renderDashboard() {
     () => goToWorkOrders("week")
   );
 }
-
-
-  try {
-    await loadRuntimeValidation();
-  } catch (err) {
-    console.error("Failed to validate runtime data", err);
-  }
-
 
 /* ---------- Inventory Summary ---------- */
 async function loadDashboardInventory() {
@@ -187,6 +185,6 @@ function renderRuntimeAlert(data) {
 
 
 function openRuntimeEntry() {
-  loadModule("runtime"); // match your module name
+  loadModule("assets"); // match your module name
 }
 
