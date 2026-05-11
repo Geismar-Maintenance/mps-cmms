@@ -121,3 +121,72 @@ window.goToInventory = function (type) {
   loadModule("parts", { inventoryFilter: type });
 };
 
+async function loadRuntimeValidation() {
+  const res = await fetch(`${API_BASE}/api/reports?type=missing-runtime`);
+
+  if (!res.ok) {
+    throw new Error("Runtime validation request failed");
+  }
+
+  const data = await res.json();
+
+  renderRuntimeAlert(data);
+}
+
+function renderRuntimeAlert(data) {
+  const container = document.getElementById("runtime-alert");
+
+  if (!container) return;
+
+  // ✅ No missing data → hide card
+  if (!data.hasMissing) {
+    container.innerHTML = "";
+    return;
+  }
+
+  const list = data.missingAssets
+    .map(a => `<li>${a.assetname}</li>`)
+    .join("");
+
+  container.innerHTML = `
+    <div class="card border-danger shadow-sm">
+      <div class="card-body">
+
+        <div class="d-flex justify-content-between align-items-center">
+          <h6 class="card-title text-danger mb-0">
+            ⚠️ Runtime Data Required
+          </h6>
+        </div>
+
+        <p class="mt-2 mb-2">
+          Week <strong>${data.week}</strong> (${data.year})
+          is missing runtime entry.
+        </p>
+
+        <p class="mb-1"><strong>Affected Machines:</strong></p>
+
+        <ul class="mb-3">
+          ${list}
+        </ul>
+
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted small">
+            ${data.missingAssets.length} machine(s) missing data
+          </span>
+
+          <button class="btn btn-sm btn-outline-danger"
+                  onclick="openRuntimeEntry()">
+            Enter Runtime
+          </button>
+        </div>
+
+      </div>
+    </div>
+  `;
+}
+
+
+function openRuntimeEntry() {
+  loadModule("runtime"); // match your module name
+}
+
