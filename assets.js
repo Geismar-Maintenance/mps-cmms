@@ -5,25 +5,7 @@
 window.loadAssets = async function () {
   const container = document.getElementById("app-root");
 
-  container.innerHTML = "Loading runtime entry...";
-
-  try {
-    const res = await fetch("assets.html");
-    const html = await res.text();
-
-    container.innerHTML = html;
-
     initAssetsPage();
-
-  } catch (err) {
-    console.error("Failed to load assets module:", err);
-
-    container.innerHTML = `
-      <div class="alert alert-danger">
-        Failed to load runtime entry page.
-      </div>
-    `;
-  }
 };
 
 /* ======================================================
