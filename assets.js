@@ -24,7 +24,12 @@ function initAssetsPage() {
 async function loadAssetsList() {
   const list = document.getElementById("asset-list");
 
-  if (!list) return;
+  if (!list) {
+    console.log("asset-list not found");
+    return;
+  }
+
+  console.log("Loading assets...");
 
   list.innerHTML = `<li class="list-group-item">Loading...</li>`;
 
@@ -34,6 +39,11 @@ async function loadAssetsList() {
 
     list.innerHTML = "";
 
+    if (!assets.length) {
+      list.innerHTML = `<li class="list-group-item">No assets found</li>`;
+      return;
+    }
+
     assets.forEach(a => {
       const li = document.createElement("li");
       li.className = "list-group-item list-group-item-action";
@@ -41,7 +51,9 @@ async function loadAssetsList() {
 
       li.textContent = a.assetname;
 
-      li.onclick = () => selectAsset(a);
+      li.onclick = () => {
+        selectAsset(a);
+      };
 
       list.appendChild(li);
     });
