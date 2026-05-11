@@ -163,12 +163,10 @@ function selectAsset(asset) {
 }
 
 function setWeek(weekId) {
-  const select = document.getElementById("runtime-week");
-  if (!select) return;
+  const display = document.getElementById("runtime-week-display");
+  if (!display) return;
 
-  loadWeekOptions().then(() => {
-    select.value = weekId;
-  });
+  display.value = `Week ${weekId}`;
 }
 
 
