@@ -11,7 +11,7 @@ window.loadAssets = async function () {
 /* ======================================================
    INIT
    ====================================================== */
-function initAssetsPage() {
+async function initAssetsPage() {
   loadAssetsList();
 
   const filters = window.currentModuleFilters || {};
@@ -22,6 +22,7 @@ function initAssetsPage() {
     loadWeekOptions();
   }
 }
+``
 
 
 /* ======================================================
@@ -165,7 +166,9 @@ function setWeek(weekId) {
   const select = document.getElementById("runtime-week");
   if (!select) return;
 
-  select.innerHTML = `<option value="${weekId}">Week ${weekId}</option>`;
-  select.value = weekId;
+  loadWeekOptions().then(() => {
+    select.value = weekId;
+  });
 }
+
 
