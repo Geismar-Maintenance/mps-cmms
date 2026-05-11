@@ -99,13 +99,14 @@ async function loadWeekOptions() {
    ====================================================== */
 
 window.submitRuntime = async function () {
-  const assetId = document.getElementById("runtime-asset").value;
-  const weekId = document.getElementById("runtime-week").value;
-  const hours = document.getElementById("runtime-hours").value;
+const asset = window.selectedAsset;
+const weekId = document.getElementById("runtime-week").value;
+const hours = document.getElementById("runtime-hours").value;
 
-  if (!assetId || !weekId || !hours) {
-    alert("All fields required");
-    return;
+if (!asset || !weekId || !hours) {
+  alert("Select an asset, week, and enter hours");
+  return;
+}
   }
 
   try {
