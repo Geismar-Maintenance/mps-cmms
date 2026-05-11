@@ -185,7 +185,7 @@ function renderRuntimeAlert(data) {
 
 
 <button class="btn btn-sm btn-outline-dark ms-3"
-  onclick="switchModule('assets', { week_id: ${data.week} })">
+  onclick="openRuntimeEntry(${data.week})">
   Enter Runtime
 </button>
 
@@ -194,7 +194,10 @@ function renderRuntimeAlert(data) {
   `;
 }
 
-function openRuntimeEntry() {
-  loadModule("assets"); // match your module name
-}
+
+window.openRuntimeEntry = function (weekId) {
+  window.currentModuleFilters = { week_id: weekId };
+  switchModule("assets");
+};
+
 
