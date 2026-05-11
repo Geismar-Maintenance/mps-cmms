@@ -240,6 +240,11 @@ window.switchModule = async function (moduleName, el) {
       case "pm-management":
         loadPMManagement();
         break;
+          
+      case "assets":
+        loadAssetsModule();
+        break;
+
     }
 
   } catch (err) {
