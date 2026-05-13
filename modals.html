@@ -436,29 +436,52 @@
 </div>
 </div>
 
-<div id="addTemplateModal" style="display:none; border:1px solid #ccc; padding:16px; background:white;">
-  
-  <h3>Add PM Template</h3>
+<!-- ================= ADD PM TEMPLATE MODAL ================= -->
+<div class="modal fade" id="addTemplateModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content p-3">
 
-  <label>Asset:</label>
-  <select id="templateAsset"></select>
+      <div class="modal-header">
+        <h5 class="modal-title">Add PM Template</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
 
-  <label>Type:</label>
-  <select id="templateType">
-    <option value="cyclical">Cyclical</option>
-    <option value="time">Time</option>
-  </select>
+      <div class="modal-body">
 
-  <label>Description:</label>
-  <input type="text" id="templateDescription" />
+        <!-- Asset -->
+        <label class="form-label">Asset</label>
+        <select id="templateAsset" class="form-select mb-2"></select>
 
-  <br><br>
+        <!-- Type -->
+        <label class="form-label">Type</label>
+        <select id="templateType" class="form-select mb-2">
+          <option value="cyclical">Cyclical</option>
+          <option value="time">Time</option>
+        </select>
 
-  <button onclick="saveTemplate()">Save</button>
-  <button onclick="closeAddTemplateModal()">Cancel</button>
+        <!-- Description -->
+        <label class="form-label">Description</label>
+        <input
+          id="templateDescription"
+          class="form-control"
+          placeholder="Enter template name"
+        />
 
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+
+        <button class="btn btn-primary" onclick="saveTemplate()">
+          Create
+        </button>
+      </div>
+
+    </div>
+  </div>
 </div>
-
  <!-- PINCODE CHANGE MODAL -->
 
  <div class="modal fade" id="changePinModal" tabindex="-1" aria-labelledby="changePinModalLabel" aria-hidden="true">
