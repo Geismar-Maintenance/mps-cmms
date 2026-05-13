@@ -44,24 +44,18 @@ async function loadPMTemplates() {
       return;
     }
 
-    list.innerHTML = '';
+list.innerHTML = '';
 
 pmTemplates.forEach(t => {
   const item = document.createElement('button');
   item.className = 'list-group-item list-group-item-action';
 
-  item.innerHTML = `
-    <div class="fw-bold">
-      ${t.description || "(Unnamed Template)"}
-    </div>
-    <div class="text-muted small text-capitalize">
-      ${t.pm_engine_type === "cyclical" ? "🔁 Cyclical" : "📅 Time"}
-    </div>
-  `;
+  item.textContent = `${t.assetname} (${t.pm_engine_type})`;
 
   item.onclick = () => selectPMTemplate(t.pm_template_id);
   list.appendChild(item);
 });
+     
   } catch (err) {
     console.error('Failed to load PM templates:', err);
     list.innerHTML = `
