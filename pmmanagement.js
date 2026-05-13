@@ -55,7 +55,7 @@ pmTemplates.forEach(t => {
       ${t.description || "(Unnamed Template)"}
     </div>
     <div class="text-muted small text-capitalize">
-      ${t.pm_engine_type}
+      ${t.pm_engine_type === "cyclical" ? "🔁 Cyclical" : "📅 Time"}
     </div>
   `;
 
