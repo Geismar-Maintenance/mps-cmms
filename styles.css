@@ -14,10 +14,10 @@
 
 /* Base resets */
 body {
-  background-color: var(--tinwagon-forest-green);
+  background-color: var(--mps-light);
   font-size: 0.9rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: var(--tinwagon-earth-brown);
+  color: var(--mps-bg-light);
 }
 
 /* =====================================================
@@ -42,7 +42,7 @@ body {
    ===================================================== */
 
 .navbar {
-  background-color: var(--tinwagon-sky-blue) !important;
+  background-color: var(--mps-blue) !important;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
