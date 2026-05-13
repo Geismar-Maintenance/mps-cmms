@@ -356,6 +356,47 @@ async function loadTriggerBlocks() {
       `<div class="text-danger">Failed to load blocks.</div>`;
   }
 }
+async function addTriggerBlock() {
+  const hours = Number(document.getElementById("new-block-hours").value);
+  const order = Number(document.getElementById("new-block-seq").value);
+
+  if (!hours || !order) {
+    alert("Block hours and sequence are required.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/pm?action=addBlock`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        pm_template_id: selectedPMTemplateId,
+        block_hours: hours,
+        sequence_order: order
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      alert("Failed to add block");
+      return;
+    }
+
+    // clear inputs
+    document.getElementById("new-block-hours").value = "";
+    document.getElementById("new-block-seq").value = "";
+
+    renderTriggerBlocks();
+
+  } catch (err) {
+    console.error("Add block error:", err);
+    alert("Error adding block");
+  }
+}
+
 
 async function removeTriggerBlock(blockId) {
   const confirmDelete = confirm(
