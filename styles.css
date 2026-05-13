@@ -3,10 +3,10 @@
    ===================================================== */
 
 :root {
-  --mps-blue: #003A8F;
-  --mps-blue-dark: #002B6C;
-  --mps-gray-dark: #2B2E34;
-  --mps-gray-light: #F4F6F8;
+  --tinwagon-sky-blue: #87CEEB; /* PMs / Scheduling */
+  --tinwagon-forest-green: #2E8B57; /* Work Orders / Completion */
+  --tinwagon-earth-brown: #5D4037; /* Parts / Roots / Infrastructure */
+  --tinwagon-bg-light: #F9F9F9;
   --mps-accent-orange: #F36F21;
   --mps-white: #ffffff;
   --mps-border: #e0e0e0;
