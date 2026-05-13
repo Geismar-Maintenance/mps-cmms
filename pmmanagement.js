@@ -781,4 +781,83 @@ async function removeRequirement(reqId, taskId) {
 
   renderRequirements(taskId);
 }
-``
+
+/* ======================================================
+   ADD TEMPLATE MODAL
+   ====================================================== */
+
+function openAddTemplateModal() {
+  loadTemplateAssets();
+
+  const modal = new bootstrap.Modal(
+    document.getElementById('addTemplateModal')
+  );
+
+  modal.show();
+}
+
+async function loadTemplateAssets() {
+  try {
+    const res = await fetch(`${API_BASE}/api/assets`);
+    const data = await res.json();
+
+    const select = document.getElementById('templateAsset');
+    select.innerHTML = '';
+
+    data.forEach(asset => {
+      const opt = document.createElement('option');
+      opt.value = asset.assetid;
+      opt.textContent = asset.assetname;
+      select.appendChild(opt);
+    });
+
+  } catch (err) {
+    console.error("Failed to load assets:", err);
+  }
+}
+
+async function saveTemplate() {
+  const asset_id = document.getElementById('templateAsset').value;
+  const pm_engine_type = document.getElementById('templateType').value;
+  const description = document.getElementById('templateDescription').value;
+
+  if (!asset_id) {
+    alert("Asset is required");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/pm?action=addTemplate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        asset_id,
+        pm_engine_type,
+        description
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      alert("Failed to create template");
+      return;
+    }
+
+    // ✅ Close modal
+    const modalEl = document.getElementById('addTemplateModal');
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    modal.hide();
+
+    // ✅ Reload templates
+    await loadPMTemplates();
+
+    // ✅ OPTIONAL: auto-select new template
+    selectPMTemplate(data.pm_template_id);
+
+  } catch (err) {
+    console.error("Create template error:", err);
+    alert("Error creating template");
+  }
+}
+
