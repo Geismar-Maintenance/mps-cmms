@@ -436,6 +436,29 @@
 </div>
 </div>
 
+<div id="addTemplateModal" style="display:none; border:1px solid #ccc; padding:16px; background:white;">
+  
+  <h3>Add PM Template</h3>
+
+  <label>Asset:</label>
+  <select id="templateAsset"></select>
+
+  <label>Type:</label>
+  <select id="templateType">
+    <option value="cyclical">Cyclical</option>
+    <option value="time">Time</option>
+  </select>
+
+  <label>Description:</label>
+  <input type="text" id="templateDescription" />
+
+  <br><br>
+
+  <button onclick="saveTemplate()">Save</button>
+  <button onclick="closeAddTemplateModal()">Cancel</button>
+
+</div>
+
  <!-- PINCODE CHANGE MODAL -->
 
  <div class="modal fade" id="changePinModal" tabindex="-1" aria-labelledby="changePinModalLabel" aria-hidden="true">
