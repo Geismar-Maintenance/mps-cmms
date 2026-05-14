@@ -2,11 +2,12 @@
    TinWagon CMMS Branding & Variables
    ===================================================== */
 
+
 :root {
-  --tinwagon-sky-blue: #87CEEB; /* PMs / Scheduling */
-  --tinwagon-forest-green: #2E8B57; /* Work Orders / Completion */
-  --tinwagon-earth-brown: #5D4037; /* Parts / Roots / Infrastructure */
-  --tinwagon-bg-light: #F9F9F9;
+  --mps-blue: #2E7D32;
+  --mps-blue-dark: #002B6C;
+  --mps-gray-dark: #BF360C;
+  --mps-gray-light: #0288D1;
   --mps-accent-orange: #F36F21;
   --mps-white: #ffffff;
   --mps-border: #e0e0e0;
@@ -14,10 +15,10 @@
 
 /* Base resets */
 body {
-  background-color: var(--mps-light);
+  background-color: var(--mps-gray-light);
   font-size: 0.9rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: var(--mps-bg-light);
+  color: var(--mps-gray-dark);
 }
 
 /* =====================================================
