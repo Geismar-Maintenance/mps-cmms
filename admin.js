@@ -351,9 +351,16 @@ async function createUser(username, display_name, pin, role) {
 
   window.editUser = async function (username) {
 
-  const newRole = prompt("Enter new role (tech, manager, supervisor, admin):");
+  
+const allowed = ["tech", "manager", "supervisor", "admin"];
 
-  if (!newRole) return;
+let newRole = prompt("Enter role (tech, manager, supervisor, admin):");
+
+if (!allowed.includes(newRole)) {
+  alert("Invalid role");
+  return;
+}
+
 
   const res = await fetch(`${API_BASE}/api/admin`, {
     method: "POST",
