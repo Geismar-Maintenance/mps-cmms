@@ -349,6 +349,30 @@ async function createUser(username, display_name, pin, role) {
   loadUsers();
 }
 
+  window.editUser = async function (username) {
+
+  const newRole = prompt("Enter new role (tech, manager, supervisor, admin):");
+
+  if (!newRole) return;
+
+  const res = await fetch(`${API_BASE}/api/admin`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "updateRole",
+      username,
+      role: newRole
+    })
+  });
+
+  if (!res.ok) {
+    alert("Failed to update role");
+    return;
+  }
+
+  loadUsers();
+};
+
 
 /* ======================================================
    ADMIN‑GUIDED INVENTORY HELPERS
