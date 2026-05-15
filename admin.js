@@ -256,7 +256,7 @@ window.openUserManagement = async function () {
 };
 
 async function loadUsers() {
-  const res = await fetch(`${API_BASE}/api/users`);
+  const res = await fetch(`${API_BASE}/api/admin`);
   const users = await res.json();
 
   const tbody = document.getElementById("user-table");
@@ -295,7 +295,7 @@ async function loadUsers() {
 window.toggleUser = async function (username, currentStatus) {
   if (!confirm("Are you sure?")) return;
 
-  const res = await fetch(`${API_BASE}/api/users`, {
+  const res = await fetch(`${API_BASE}/api/admin`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -329,7 +329,7 @@ window.openCreateUser = function () {
 };
 
 async function createUser(username, display_name, pin, role) {
-  const res = await fetch(`${API_BASE}/api/users`, {
+  const res = await fetch(`${API_BASE}/api/admin`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
