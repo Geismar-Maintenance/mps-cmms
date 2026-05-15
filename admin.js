@@ -249,6 +249,107 @@ window.addLocationRange = async function () {
   }
 };
 
+window.openUserManagement = async function () {
+  const modal = document.getElementById("userMgmtModal");
+  bootstrap.Modal.getOrCreateInstance(modal).show();
+  loadUsers();
+};
+
+async function loadUsers() {
+  const res = await fetch(`${API_BASE}/api/users`);
+  const users = await res.json();
+
+  const tbody = document.getElementById("user-table");
+  tbody.innerHTML = "";
+
+  users.forEach(u => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+<td>
+  <strong>${u.display_name}</strong><br>
+  <small class="text-muted">${u.username}</small>
+</td>
+
+      <td>${u.role}</td>
+      <td>
+        <span class="${u.active ? 'text-success' : 'text-danger'}">
+          ${u.active ? 'Active' : 'Disabled'}
+        </span>
+      </td>
+      <td class="text-end">
+        <button class="btn btn-sm btn-outline-primary"
+          onclick="editUser('${u.username}')">Edit</button>
+
+        <button class="btn btn-sm btn-outline-danger"
+          onclick="toggleUser('${u.username}', ${u.active})">
+          ${u.active ? 'Disable' : 'Enable'}
+        </button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+window.toggleUser = async function (username, currentStatus) {
+  if (!confirm("Are you sure?")) return;
+
+  const res = await fetch(`${API_BASE}/api/users`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "toggleUser",
+      username,
+      active: !currentStatus
+    })
+  });
+
+  if (!res.ok) {
+    alert("Failed to update user");
+    return;
+  }
+
+  loadUsers();
+};
+
+window.openCreateUser = function () {
+  const username = prompt("Username:");
+  if (!username) return;
+
+  const display_name = prompt("Display name:");
+  if (!display_name) return;
+
+  const pin = prompt("PIN:");
+  if (!pin) return;
+
+  const role = prompt("Role (tech, manager, supervisor, admin):", "tech");
+
+  createUser(username, display_name, pin, role);
+};
+
+async function createUser(username, display_name, pin, role) {
+  const res = await fetch(`${API_BASE}/api/users`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "createUser",
+      username,
+      display_name,
+      pin,
+      role
+    })
+  });
+
+  if (!res.ok) {
+    alert("Failed to create user");
+    return;
+  }
+
+  loadUsers();
+}
+
+
 /* ======================================================
    ADMIN‑GUIDED INVENTORY HELPERS
    ====================================================== */
