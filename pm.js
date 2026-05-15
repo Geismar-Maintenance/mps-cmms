@@ -4,7 +4,7 @@
    PM VIEW LOADER
    ====================================================== */
 
-window.loadPMView = async function () {
+async function (loadPMView) {
   const container = document.getElementById("pm-content");
   if (!container) {
     console.error("pm-content container not found");
