@@ -116,6 +116,10 @@ function renderPMTemplateWorkspace(template) {
       <li class="nav-item">
         <a class="nav-link" onclick="renderTasks()">Tasks</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" onclick="renderPreview()">Preview</a>
+      </li>
+
     </ul>
 
     <div id="pm-template-editor">
@@ -824,6 +828,81 @@ async function removeRequirement(reqId, taskId) {
   });
 
   renderRequirements(taskId);
+}
+
+async function renderPreview() {
+  const editor = document.getElementById("pm-template-editor");
+
+  editor.innerHTML = `<p>Loading preview...</p>`;
+
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/pm?action=previewTemplate&templateId=${selectedPMTemplateId}`
+    );
+
+    const data = await res.json();
+
+    let html = `
+      <div class="alert alert-info">
+        Preview Mode – No data saved
+      </div>
+    `;
+
+    let lastGroup = "";
+
+    // ✅ group requirements by task
+    const reqMap = {};
+    data.requirements.forEach(r => {
+      reqMap[r.pm_task_template_id] ??= [];
+      reqMap[r.pm_task_template_id].push(r);
+    });
+
+    data.tasks.forEach(task => {
+
+      const group = `${task.discipline} - ${task.tier_name}`;
+
+      if (group !== lastGroup) {
+        html += `<h5 class="mt-3">${group}</h5>`;
+        lastGroup = group;
+      }
+
+      html += `
+        <div class="card mb-2">
+          <div class="card-body">
+            <strong>${task.task_description}</strong>
+      `;
+
+      const reqs = reqMap[task.pm_task_template_id] || [];
+
+      reqs.forEach(r => {
+        html += `
+          <div class="d-flex align-items-center mt-2">
+            <div style="flex:1">
+              ${r.requirement_name}
+            </div>
+
+            ${
+              r.requires_reading
+                ? `<input type="number" class="form-control form-control-sm"
+                         style="width:120px;" placeholder="value">`
+                : `<input type="checkbox">`
+            }
+          </div>
+        `;
+      });
+
+      html += `
+          </div>
+        </div>
+      `;
+    });
+
+    editor.innerHTML = html;
+
+  } catch (err) {
+    console.error("Preview failed:", err);
+    editor.innerHTML = `<div class="text-danger">Preview failed</div>`;
+  }
 }
 
 /* ======================================================
