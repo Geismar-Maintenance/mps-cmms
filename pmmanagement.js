@@ -875,19 +875,22 @@ html += `
       <!-- TASK HEADER -->
       <div class="d-flex align-items-center">
 
+      
+       <!-- LEFT SIDE (task text) -->
+        <div style="flex:1">
+          <strong>${task.task_description}</strong>
+
+          ${
+            !hasRequirements
+              ? `<span class="text-success ms-2 small">(No requirements)</span>`
+              : `<span class="text-muted ms-2 small">(Requires checks)</span>`
+          }
+        </div>
+
         <!-- TASK CHECKBOX -->
         <input type="checkbox"
                class="me-2"
                ${hasRequirements ? "disabled" : ""}>
-
-        <strong>${task.task_description}</strong>
-
-        ${
-          !hasRequirements
-            ? `<span class="text-success ms-2">(No requirements)</span>`
-            : `<span class="text-muted ms-2">(Requires checks)</span>`
-        }
-
       </div>
 `;
       reqs.forEach(r => {
