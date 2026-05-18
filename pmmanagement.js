@@ -866,11 +866,30 @@ async function renderPreview() {
         lastGroup = group;
       }
 
-      html += `
-        <div class="card mb-2">
-          <div class="card-body">
-            <strong>${task.task_description}</strong>
-      `;
+     const hasRequirements = reqs.length > 0;
+
+html += `
+  <div class="card mb-2">
+    <div class="card-body">
+
+      <!-- TASK HEADER -->
+      <div class="d-flex align-items-center">
+
+        <!-- TASK CHECKBOX -->
+        <input type="checkbox"
+               class="me-2"
+               ${hasRequirements ? "disabled" : ""}>
+
+        <strong>${task.task_description}</strong>
+
+        ${
+          !hasRequirements
+            ? `<span class="text-success ms-2">(No requirements)</span>`
+            : `<span class="text-muted ms-2">(Requires checks)</span>`
+        }
+
+      </div>
+`;
 
       const reqs = reqMap[task.pm_task_template_id] || [];
 
