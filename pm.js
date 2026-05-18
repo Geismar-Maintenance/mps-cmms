@@ -5,13 +5,17 @@
    ====================================================== */
 
 async function loadPMView() {
-  const container = document.getElementById("pm-content");
-  if (!container) {
-    console.error("pm-content container not found");
-    return;
-  }
+  const root = document.getElementById("app-root");
 
-  container.innerHTML = "<h3>Loading Preventive Maintenance…</h3>";
+  // ✅ Create container dynamically
+  root.innerHTML = `
+    <h4 class="mb-3">Preventive Maintenance</h4>
+    <div id="pm-content">
+      <h5>Loading Preventive Maintenance…</h5>
+    </div>
+  `;
+
+  const container = document.getElementById("pm-content");
 
   try {
     const res = await fetch(`${API_BASE}/api/pm?action=status`);
@@ -25,7 +29,7 @@ async function loadPMView() {
     container.innerHTML =
       `<div class="text-danger">Error loading PMs</div>`;
   }
-};
+}
 
 /* ======================================================
    RENDER PM LIST (READ-ONLY)
