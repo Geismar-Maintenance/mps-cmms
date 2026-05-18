@@ -15,6 +15,7 @@ window.loadReports = function () {
 window.handleReportSelection = function () {
   const value = document.getElementById("report-selector").value;
   const paramsDiv = document.getElementById("report-params");
+  const output = document.getElementById("report-output");
 
   paramsDiv.style.display = "block";
   paramsDiv.innerHTML = "";
@@ -22,7 +23,24 @@ window.handleReportSelection = function () {
   if (value === "section") {
     renderSectionReportParams();
   }
+
+  else if (value === "pm-visual") {
+
+    // No parameters needed
+    paramsDiv.style.display = "none";
+
+    output.innerHTML = `
+      <h5 class="mb-3">Visual Maintenance Summary</h5>
+
+      <div id="pm-summary-dashboard" class="mb-4"></div>
+
+      <div id="pm-visual-board"></div>
+    `;
+
+    loadVisualMaintenanceReport();
+  }
 };
+
 // ---------------Inventory Report By Cabinet Section----------------//
 
 function renderSectionReportParams() {
