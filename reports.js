@@ -26,7 +26,6 @@ window.handleReportSelection = function () {
 
   else if (value === "pm-visual") {
 
-    // No parameters needed
     paramsDiv.style.display = "none";
 
     output.innerHTML = `
@@ -166,3 +165,124 @@ function printReport() {
   window.print();
 }
 
+async function loadVisualMaintenanceReport() {
+
+  const summary = document.getElementById("pm-summary-dashboard");
+  const board = document.getElementById("pm-visual-board");
+
+  summary.innerHTML = "Loading summary…";
+  board.innerHTML = "Loading board…";
+
+  try {
+    const res = await fetch(`${API_BASE}/api/pm?action=visualBoard`);
+    const data = await res.json();
+
+    renderPMSummary(data.summary);
+    renderPMBoard(data.board);
+
+  } catch (err) {
+    console.error(err);
+    summary.innerHTML =
+      `<div class="text-danger">Failed to load report</div>`;
+  }
+}
+function renderPMSummary(data) {
+
+  const container = document.getElementById("pm-summary-dashboard");
+
+  let html = `
+    <h6>PM Completion Summary</h6>
+
+    <table class="table table-sm table-bordered text-center">
+      <thead>
+        <tr>
+          <th>Location</th>
+          ${data.months.map(m => `<th>${m}</th>`).join("")}
+          <th>YTD</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  data.locations.forEach(loc => {
+    html += `
+      <tr>
+        <td>${loc.name}</td>
+        ${loc.months.map(p => `
+          <td class="${p < 85 ? 'text-danger' : 'text-success'}">
+            ${p ?? '-'}%
+          </td>
+        `).join("")}
+        <td><strong>${loc.ytd}%</strong></td>
+      </tr>
+    `;
+  });
+
+  html += `</tbody></table>`;
+
+  container.innerHTML = html;
+}
+function renderPMBoard(data) {
+
+  const container = document.getElementById("pm-visual-board");
+
+  let html = `
+    <h6 class="mt-4">PM Weekly Execution Board</h6>
+
+    <div style="overflow:auto;">
+      <table class="table table-sm table-bordered text-center align-middle">
+        <thead>
+          <tr>
+            <th>Machine</th>
+            ${Array.from({length: 52}, (_, i) => `<th>${i+1}</th>`).join("")}
+          </tr>
+        </thead>
+        <tbody>
+  `;
+
+  data.machines.forEach(machine => {
+
+    html += `<tr><td><strong>${machine.name}</strong></td>`;
+
+    machine.weeks.forEach(w => {
+
+      if (!w) {
+        html += `<td></td>`;
+        return;
+      }
+
+      let bg = "";
+
+      if (w.pm_completed) bg = "#28a745";
+      else if (w.pm_due) bg = "#dc3545";
+      else if (w.warning) bg = "#ffc107";
+
+      html += `
+        <td style="
+          min-width:85px;
+          font-size:11px;
+          padding:4px;
+          background:${bg};
+          color:${bg ? 'white' : 'black'};
+        ">
+          <div><strong>${w.hours ?? ""}h</strong></div>
+          <div>${w.cumulative ?? ""}</div>
+
+          ${w.pm_due ? `<div>🔧 ${w.pm_type}</div>` : ""}
+          ${w.pm_completed ? `<div>✅</div>` : ""}
+          ${w.has_exception ? `<div>⚠️</div>` : ""}
+        </td>
+      `;
+    });
+
+    html += `</tr>`;
+  });
+
+  html += `
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
