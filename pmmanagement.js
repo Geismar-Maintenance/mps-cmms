@@ -865,7 +865,7 @@ async function renderPreview() {
         html += `<h5 class="mt-3">${group}</h5>`;
         lastGroup = group;
       }
-
+     const reqs = reqMap[task.pm_task_template_id] || [];
      const hasRequirements = reqs.length > 0;
 
 html += `
@@ -890,9 +890,6 @@ html += `
 
       </div>
 `;
-
-      const reqs = reqMap[task.pm_task_template_id] || [];
-
       reqs.forEach(r => {
         html += `
           <div class="d-flex align-items-center mt-2">
