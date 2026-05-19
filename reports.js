@@ -38,6 +38,36 @@ window.handleReportSelection = function () {
 
     loadVisualMaintenanceReport();
   }
+  else if (value === "parts-usage") {
+
+  paramsDiv.innerHTML = `
+    <h6 class="mb-2">Parts Usage</h6>
+
+    <div class="row g-2">
+
+      <div class="col-md-3">
+        <select id="usage-range"
+                class="form-select"
+                onchange="loadPartsUsageReport()">
+          <option value="7">Last 7 Days</option>
+          <option value="30" selected>Last 30 Days</option>
+          <option value="90">Last 90 Days</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <button class="btn btn-primary w-100"
+                onclick="loadPartsUsageReport()">
+          Run Report
+        </button>
+      </div>
+
+    </div>
+  `;
+
+  // ✅ Auto-load immediately
+  loadPartsUsageReport();
+}
 };
 
 // ---------------Inventory Report By Cabinet Section----------------//
@@ -285,4 +315,76 @@ function renderPMBoard(data) {
   `;
 
   container.innerHTML = html;
+}
+window.loadPartsUsageReport = async function () {
+
+  const output = document.getElementById("report-output");
+  output.innerHTML = "Loading...";
+
+  try {
+    const days = Number(document.getElementById("usage-range").value);
+
+    const { start, end } = getDateRange(days);
+
+    const res = await fetch(
+      `${API_BASE}/api/reports?type=parts-usage&startDate=${start}&endDate=${end}`
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error);
+
+    renderPartsUsageReport(data);
+
+  } catch (err) {
+    console.error(err);
+    output.innerHTML =
+      `<div class="text-danger">Failed to load report</div>`;
+  }
+};
+function renderPartsUsageReport(data) {
+
+  const output = document.getElementById("report-output");
+
+  if (!data.length) {
+    output.innerHTML =
+      `<div class="text-muted">No parts used in this period.</div>`;
+    return;
+  }
+
+  output.innerHTML = `
+    <h6 class="mb-2">Parts Usage</h6>
+
+    <table class="table table-sm table-hover">
+      <thead>
+        <tr>
+          <th>Part #</th>
+          <th>Description</th>
+          <th class="text-end">Total Used</th>
+          <th class="text-end">Transactions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(row => `
+          <tr>
+            <td>${row.partnumber}</td>
+            <td>${row.part_description || row.description}</td>
+            <td class="text-end">${row.total_used}</td>
+            <td class="text-end">${row.transaction_count || ""}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+function getDateRange(days) {
+  const end = new Date();
+  const start = new Date();
+
+  start.setDate(end.getDate() - days);
+
+  return {
+    start: start.toISOString(),
+    end: end.toISOString()
+  };
 }
