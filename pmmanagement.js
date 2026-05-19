@@ -90,7 +90,7 @@ function clearPMWorkspace() {
   const workspace = document.getElementById('pm-management-workspace');
   workspace.innerHTML = `
     <div class="text-muted text-center py-5">
-      Select a PM template to begin managing blocks, tasks, and requirements.
+      Select a PM template to begin managing triggers, tasks, and requirements.
     </div>
   `;
 }
@@ -108,7 +108,7 @@ function renderPMTemplateWorkspace(template) {
         <a class="nav-link active" onclick="renderTemplateInfo()">Template Info</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" onclick="renderTriggerBlocks()">Trigger Blocks</a>
+        <a class="nav-link" onclick="renderTemplateTriggers()">Triggers</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" onclick="renderTaskTiers()">Task Tiers</a>
@@ -275,153 +275,90 @@ async function renderTemplateWarnings(templateId) {
   }
 }
 
-async function renderTriggerBlocks() {
-  const editor = document.getElementById("pm-template-editor");
-
+async function renderTemplateTriggers() {
   if (!selectedPMTemplateId) return;
 
-  editor.innerHTML = `
-    <h5 class="mb-3">Trigger Blocks</h5>
-    <div id="pm-block-list">Loading blocks…</div>
+  const container = document.getElementById("pm-template-editor");
 
-    <hr />
+  container.innerHTML = `
+    <h5 class="mb-3">Triggers</h5>
+    <div id="linked-triggers"></div>
 
-    <h6>Add New Block</h6>
-    <div class="row g-2 mb-3">
-      <div class="col-md-6">
-        <input
-          type="number"
-          id="new-block-hours"
-          class="form-control"
-          placeholder="Block hours (e.g. 2000)"
-        />
-      </div>
-      <div class="col-md-4">
-        <input
-          type="number"
-          id="new-block-seq"
-          class="form-control"
-          placeholder="Sequence order"
-        />
-      </div>
-      <div class="col-md-2">
-        <button class="btn btn-primary w-100" onclick="addTriggerBlock()">
-          Add
-        </button>
-      </div>
-    </div>
+    <hr/>
+
+    <h6>Available Triggers</h6>
+    <div id="all-triggers"></div>
   `;
 
-  loadTriggerBlocks();
+  loadLinkedTriggers();
+  loadAllTriggers();
 }
 
-async function loadTriggerBlocks() {
-  const container = document.getElementById("pm-block-list");
-
-  try {
-    const res = await fetch(
-      `${API_BASE}/api/pm?action=getBlocks&templateId=${selectedPMTemplateId}`
-    );
-    const data = await res.json();
-
-    if (data.blocks.length === 0) {
-      container.innerHTML =
-        `<div class="text-muted">No trigger blocks defined.</div>`;
-      return;
-    }
-
-    container.innerHTML = `
-      <table class="table table-sm">
-        <thead>
-          <tr>
-            <th>Order</th>
-            <th>Block Hours</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          ${data.blocks.map(b => `
-            <tr>
-              <td>${b.sequence_order}</td>
-              <td>${b.block_hours}</td>
-              <td>
-                <button
-                  class="btn btn-sm btn-outline-danger"
-                  onclick="removeTriggerBlock(${b.pm_block_id})"
-                >
-                  Remove
-                </button>
-              </td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-    `;
-
-  } catch (err) {
-    container.innerHTML =
-      `<div class="text-danger">Failed to load blocks.</div>`;
-  }
-}
-async function addTriggerBlock() {
-  const hours = Number(document.getElementById("new-block-hours").value);
-  const order = Number(document.getElementById("new-block-seq").value);
-
-  if (!hours || !order) {
-    alert("Block hours and sequence are required.");
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API_BASE}/api/pm?action=addBlock`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        pm_template_id: selectedPMTemplateId,
-        block_hours: hours,
-        sequence_order: order
-      })
-    });
-
-    const data = await res.json();
-
-    if (!data.success) {
-      alert("Failed to add block");
-      return;
-    }
-
-    // clear inputs
-    document.getElementById("new-block-hours").value = "";
-    document.getElementById("new-block-seq").value = "";
-
-    renderTriggerBlocks();
-
-  } catch (err) {
-    console.error("Add block error:", err);
-    alert("Error adding block");
-  }
-}
-
-
-async function removeTriggerBlock(blockId) {
-  const confirmDelete = confirm(
-    "Remove this trigger block? Existing PMs may prevent removal."
+async function loadLinkedTriggers() {
+  const res = await fetch(
+    `${API_BASE}/api/pm?action=getTemplateTriggers&templateId=${selectedPMTemplateId}`
   );
 
-  if (!confirmDelete) return;
+  const data = await res.json();
 
-  await fetch(`${API_BASE}/api/pm`, {
+  const container = document.getElementById("linked-triggers");
+
+  container.innerHTML = data.triggers.map(t => `
+    <div class="list-group-item d-flex justify-content-between align-items-center">
+      <div>
+       ${t.name} – ${t.interval_value} ${t.trigger_type === "runtime" ? "hrs" : ""}
+      </div>
+
+      <button class="btn btn-sm btn-danger"
+        onclick="unlinkTrigger(${t.trigger_block_id})">
+        Remove
+      </button>
+    </div>
+  `).join("");
+}
+
+async function loadAllTriggers() {
+  const res = await fetch(`${API_BASE}/api/pm?action=getTriggers`);
+  const data = await res.json();
+
+  const container = document.getElementById("all-triggers");
+
+  container.innerHTML = data.triggers.map(t => `
+    <div class="list-group-item d-flex justify-content-between align-items-center">
+      <div>
+       ${t.name} – ${t.interval_value} ${t.trigger_type === "runtime" ? "hrs" : ""}
+      </div>
+
+      <button class="btn btn-sm btn-primary"
+        onclick="linkTrigger(${t.trigger_block_id})">
+        Add
+      </button>
+    </div>
+  `).join("");
+}
+async function linkTrigger(triggerId) {
+  await fetch(`${API_BASE}/api/pm?action=linkTriggerTemplate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      action: "removeBlock",
-      pm_block_id: blockId
+      trigger_block_id: triggerId,
+      pm_template_id: selectedPMTemplateId
     })
   });
 
-  renderTriggerBlocks();
+  renderTemplateTriggers();
+}
+async function unlinkTrigger(triggerId) {
+  await fetch(`${API_BASE}/api/pm?action=unlinkTriggerTemplate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      trigger_block_id: triggerId,
+      pm_template_id: selectedPMTemplateId
+    })
+  });
+
+  renderTemplateTriggers();
 }
 
 async function renderTaskTiers() {
@@ -562,7 +499,7 @@ async function removeTaskTier(tierId) {
   );
   if (!confirmDelete) return;
 
-await fetch(`${API_BASE}/api/pm?action=removeTaskTier`, {
+const res = await fetch(`${API_BASE}/api/pm?action=removeTaskTier`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
