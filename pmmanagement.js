@@ -10,7 +10,6 @@ let currentTaskId = null;
 /* ======================================================
    ENTRY POINT
    ====================================================== */
-
 function loadPMManagement() {
   loadPMTemplates();
   clearPMWorkspace();
@@ -725,11 +724,11 @@ async function addRequirement(taskId) {
 
   const nameInput = document.getElementById("req-name");
   const orderInput = document.getElementById("req-order");
-  const readingInput = document.getElementById("req-reading");
+  const typeInput = document.getElementById("req-type");
 
   const name = nameInput.value.trim();
   const order = Number(orderInput.value);
-  const requiresReading = readingInput.checked;
+  const inputType = typeInput.value;
 
   if (!name || !order) {
     alert("Name and sequence are required.");
@@ -743,7 +742,7 @@ async function addRequirement(taskId) {
       pm_task_template_id: taskId,
       requirement_name: name,
       sequence_order: order,
-      requires_reading: requiresReading
+      input_type: inputType
     })
   });
 
