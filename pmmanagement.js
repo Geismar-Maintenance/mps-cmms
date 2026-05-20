@@ -590,14 +590,16 @@ async function renderTasks() {
                placeholder="Seq" />
       </div>
 
-      <div class="col-md-2 form-check mt-2">
-        <input id="req-reading"
-               type="checkbox"
-               class="form-check-input" />
-        <label class="form-check-label">
-          Requires Reading
-        </label>
-      </div>
+      
+<div class="col-md-3">
+  <label class="form-label small">Type</label>
+  <select id="req-type" class="form-select form-select-sm">
+    <option value="check">Check</option>
+    <option value="number">Numeric Reading</option>
+    <option value="boolean">Yes / No</option>
+  </select>
+</div>
+
 
 <button type="button"
         class="btn btn-primary w-100"
