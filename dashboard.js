@@ -4,6 +4,9 @@
    - Load dashboard data
    - Render dashboard stats
    ====================================================== */
+function getDeltaClass(weekly, avg) {
+  return weekly >= avg ? "good" : "bad";
+}
 
 /* ---------- Utility ---------- */
 function updateDashboardStat(id, value, onClickFn) {
@@ -47,6 +50,12 @@ async function loadDashboard() {
   } catch (err) {
     console.error("Failed to validate runtime data", err);
   }
+   try {
+  await loadRuntimeData();
+} catch (err) {
+  console.error("Failed to load runtime data", err);
+}
+
 
   renderDashboard();
 }
@@ -91,6 +100,7 @@ function renderDashboard() {
     dueThisWeek.length,
     () => goToWorkOrders("week")
   );
+   renderRuntimeTable();
 }
 
 /* ---------- Inventory Summary ---------- */
@@ -193,11 +203,61 @@ function renderRuntimeAlert(data) {
     </div>
   `;
 }
+let runtimeAssets = [];
+
+async function loadRuntimeData() {
+  const res = await fetch(`${API_BASE}/api/runtime?type=dashboard`);
+
+  if (!res.ok) {
+    throw new Error("Runtime request failed");
+  }
+
+  const data = await res.json();
+
+  runtimeAssets = data.assets || [];
+}
 
 
 window.openRuntimeEntry = function (weekId) {
   window.currentModuleFilters = { week_id: weekId };
   switchModule("assets");
 };
+
+function renderRuntimeTable() {
+  const table = document.getElementById("runtime-table");
+  if (!table) return;
+
+  table.innerHTML = "";
+
+  runtimeAssets.forEach(asset => {
+    const delta = asset.weekly - asset.rolling_avg;
+    const deltaSymbol = delta >= 0 ? "↑" : "↓";
+
+    const row = `
+      <tr>
+        <td>${asset.name}</td>
+
+        <td class="runtime-cell ${getDeltaClass(asset.weekly, asset.rolling_avg)}">
+          ${asset.weekly}
+          <small>${deltaSymbol} ${Math.abs(delta)}</small>
+        </td>
+
+        <td class="runtime-cell">
+          ${asset.rolling_avg}
+        </td>
+
+        <td>
+          ${asset.ytd}
+        </td>
+
+        <td class="pm-trigger">
+          <!-- Future trigger dot -->
+        </td>
+      </tr>
+    `;
+
+    table.innerHTML += row;
+  });
+}
 
 
