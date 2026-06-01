@@ -206,7 +206,7 @@ function renderRuntimeAlert(data) {
 let runtimeAssets = [];
 
 async function loadRuntimeData() {
-  const res = await fetch(`${API_BASE}/api/runtime?type=dashboard`);
+  const res = await fetch(`${API_BASE}/api/reports?type=dashboard-runtime`);
 
   if (!res.ok) {
     throw new Error("Runtime request failed");
