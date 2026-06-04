@@ -265,6 +265,29 @@ aside {
 .pm-trigger.yellow { color: #ffc107; }
 .pm-trigger.blue { color: #0d6efd; }
 .pm-trigger.red { color: #dc3545; }
+
+#dashboard table {
+  table-layout: fixed;
+  width: 100%;
+}
+#dashboard table th:nth-child(1),
+#dashboard table td:nth-child(1) {
+  width: 40%;
+  text-align: left;
+}
+
+#dashboard table th:nth-child(2),
+#dashboard table td:nth-child(2),
+#dashboard table th:nth-child(3),
+#dashboard table td:nth-child(3),
+#dashboard table th:nth-child(4),
+#dashboard table td:nth-child(4),
+#dashboard table th:nth-child(5),
+#dashboard table td:nth-child(5) {
+  width: 15%;
+  text-align: center;
+}
+``
 #runtime-table th:not(:first-child),
 #runtime-table td:not(:first-child) {
   text-align: center;
