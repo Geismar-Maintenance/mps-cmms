@@ -254,11 +254,12 @@ function renderRuntimeTable() {
   ${
     asset.weeks_to_pm !== null && asset.weeks_to_pm <= 4
       ? `<span class="badge bg-warning text-dark">
-           $Number(asset.weeks_to_pm).toFixed(1)} wk
+           ${Number(asset.weeks_to_pm).toFixed(1)} wk
          </span>`
       : ""
   }
 </td>
+
       </tr>
     `;
 
