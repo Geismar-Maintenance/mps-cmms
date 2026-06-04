@@ -230,7 +230,7 @@ function renderRuntimeTable() {
   table.innerHTML = "";
 
   runtimeAssets.forEach(asset => {
-    const delta = asset.weekly - asset.rolling_avg;
+    const delta = Number((asset.weekly - asset.rolling_avg).toFixed(1));
     const deltaSymbol = delta >= 0 ? "↑" : "↓";
 
     const row = `
