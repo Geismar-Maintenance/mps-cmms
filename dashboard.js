@@ -237,10 +237,9 @@ function renderRuntimeTable() {
       <tr>
         <td>${asset.name}</td>
 
-        <td class="runtime-cell ${getDeltaClass(asset.weekly, asset.rolling_avg)}">
-          ${asset.weekly}
-          <small>${deltaSymbol} ${Math.abs(delta)}</small>
-        </td>
+      <td class="runtime-cell">
+        ${Number(asset.weekly).toFixed(1)}
+      </td>
 
         <td class="runtime-cell">
           ${asset.rolling_avg}
