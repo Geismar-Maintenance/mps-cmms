@@ -107,8 +107,8 @@ window.runSectionReport = async function () {
   const cabinet = document.getElementById("report-cabinet").value.trim();
   const section = document.getElementById("report-section").value.trim();
 
-  if (!cabinet || !section) {
-    alert("Cabinet and section required");
+  if (!cabinet) {
+    alert("Cabinet required");
     return;
   }
 
