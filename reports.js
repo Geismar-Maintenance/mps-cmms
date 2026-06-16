@@ -133,7 +133,10 @@ window.runSectionReport = async function () {
 function renderSectionReport(data) {
   const output = document.getElementById("report-output");
 
-  if (!data.length) {
+  // ✅ FILTER OUT zero quantities
+  const filtered = data.filter(row => Number(row.qty) > 0);
+
+  if (!filtered.length) {
     output.innerHTML =
       `<div class="text-muted">No items found for this section.</div>`;
     return;
@@ -150,7 +153,7 @@ function renderSectionReport(data) {
         </tr>
       </thead>
       <tbody>
-        ${data.map(row => `
+        ${filtered.map(row => `
           <tr>
             <td class="text-primary"
                 style="cursor:pointer"
@@ -166,7 +169,6 @@ function renderSectionReport(data) {
     </table>
   `;
 }
-
 function exportToExcel(data) {
 
   const headers = Object.keys(data[0]);
