@@ -53,6 +53,31 @@ window.submitAddPart = async function (event) {
   }
 };
 
+window.openPartsManagement = function () {
+  const container = document.getElementById("admin-content");
+
+  if (!container) return;
+
+  container.innerHTML = `
+    <h4 class="mb-3">Parts Management</h4>
+
+    <table class="table table-bordered table-sm">
+      <thead>
+        <tr>
+          <th>Part</th>
+          <th>Description</th>
+          <th>Location</th>
+          <th>Qty</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="pm-table-body"></tbody>
+    </table>
+  `;
+
+  loadPartsManagement();
+};
+
 window.importInventoryCSV = async function () {
   const fileInput = document.getElementById("inventory-csv");
   const log = document.getElementById("import-log");
